@@ -42,8 +42,6 @@ class MapFragment : Fragment() {
             gestures.pitchEnabled = false
             gestures.simultaneousRotateAndPinchToZoomEnabled = false
             scalebar.enabled = false
-
-
         }
     }
 }

@@ -17,6 +17,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/round_background"
+        android:elevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -36,8 +37,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/white"
         android:contentDescription="@string/cd_find_my_position"
         android:src="@drawable/ic_fab_filter"
+        app:borderWidth="0dp"
         app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -48,7 +51,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/white"
         android:src="@drawable/ic_fab_near_me"
+        app:borderWidth="0dp"
         app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@id/fab_settings"
         app:layout_constraintEnd_toEndOf="parent" />
