@@ -18,6 +18,10 @@ android {
     }
 
     buildTypes {
+        buildFeatures {
+            viewBinding = true
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -31,11 +35,22 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 
 dependencies {
+
+    // Algolia Search
+    implementation("com.algolia:algoliasearch-client-kotlin:2.0.0")
+    implementation("io.ktor:ktor-client-okhttp:2.1.3")
+
+    //Mapbox
+    implementation("com.mapbox.maps:android:10.9.1")
+
+    //Navigation
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
 
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.5.1")

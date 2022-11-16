@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="map">Map</string>
+    <string name="menu_track_list">Track List</string>
+    <string name="search_query_hint">Probelm or area name</string>
+</resources>
