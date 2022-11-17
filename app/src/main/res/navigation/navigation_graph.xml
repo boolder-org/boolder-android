@@ -12,9 +12,15 @@
         tools:layout="@layout/fragment_map" />
     <fragment
         android:id="@+id/trackListFragment"
-        android:name="com.boolder.boolder.view.map.TrackListFragment"
+        android:name="com.boolder.boolder.view.TrackList.TrackListFragment"
         android:label="fragment_track_list"
         tools:layout="@layout/fragment_track_list" />
+
+    <fragment
+        android:id="@+id/discoveryFragment"
+        android:name="com.boolder.boolder.view.discovery.DiscoveryFragment"
+        android:label="fragment_discovery"
+        tools:layout="@layout/fragment_discovery" />
 
     <action
         android:id="@+id/menu_map"
@@ -24,5 +30,10 @@
         android:id="@+id/menu_track_list"
         app:destination="@id/trackListFragment"
         app:launchSingleTop="true" />
+    <action
+        android:id="@+id/menu_discovery"
+        app:destination="@id/discoveryFragment"
+        app:launchSingleTop="true" />
+
 
 </navigation>
