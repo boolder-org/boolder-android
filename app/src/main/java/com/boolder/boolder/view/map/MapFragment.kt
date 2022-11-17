@@ -1,4 +1,4 @@
-package com.nicolas.boolder.view.map
+package com.boolder.boolder.view.map
 
 import android.location.Location
 import android.os.Bundle
@@ -7,15 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.boolder.boolder.R
+import com.boolder.boolder.databinding.FragmentMapBinding
+import com.boolder.boolder.viewBinding
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CameraOptions.Builder
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
-import com.nicolas.boolder.R
-import com.nicolas.boolder.databinding.FragmentMapBinding
-import com.nicolas.boolder.viewBinding
 
 
 class MapFragment : Fragment(), LocationCallback {

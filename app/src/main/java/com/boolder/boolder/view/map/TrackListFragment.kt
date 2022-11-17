@@ -1,13 +1,13 @@
-package com.nicolas.boolder.view.map
+package com.boolder.boolder.view.map
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.nicolas.boolder.R
-import com.nicolas.boolder.databinding.FragmentTrackListBinding
-import com.nicolas.boolder.viewBinding
+import com.boolder.boolder.R
+import com.boolder.boolder.databinding.FragmentTrackListBinding
+import com.boolder.boolder.viewBinding
 
 class TrackListFragment : Fragment() {
 

@@ -1,4 +1,4 @@
-package com.nicolas.boolder.view.map
+package com.boolder.boolder.view.map
 
 import android.Manifest.permission
 import android.annotation.SuppressLint

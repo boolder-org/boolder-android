@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nicolas.boolder"
+    namespace = "com.boolder.boolder"
     compileSdk = 32
 
     defaultConfig {
-        applicationId = "com.nicolas.boolder"
+        applicationId = "com.boolder.boolder"
         minSdk = 21
         targetSdk = 32
         versionCode = 1

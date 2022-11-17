@@ -1,11 +1,11 @@
-package com.nicolas.boolder
+package com.boolder.boolder
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.nicolas.boolder.R.id
-import com.nicolas.boolder.databinding.ActivityMainBinding
+import com.boolder.boolder.R.id
+import com.boolder.boolder.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

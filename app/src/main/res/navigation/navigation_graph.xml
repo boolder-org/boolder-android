@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/mapFragment"
-        android:name="com.nicolas.boolder.view.map.MapFragment"
+        android:name="com.boolder.boolder.view.map.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map" />
     <fragment
         android:id="@+id/trackListFragment"
-        android:name="com.nicolas.boolder.view.map.TrackListFragment"
+        android:name="com.boolder.boolder.view.map.TrackListFragment"
         android:label="fragment_track_list"
         tools:layout="@layout/fragment_track_list" />
 
