@@ -48,10 +48,6 @@ dependencies {
     //Mapbox
     implementation("com.mapbox.maps:android:10.9.1")
 
-    //Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
-
     implementation("com.google.android.gms:play-services-location:20.0.0")
 
     implementation("androidx.core:core-ktx:1.7.0")

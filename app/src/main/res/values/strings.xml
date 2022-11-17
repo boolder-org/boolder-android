@@ -7,7 +7,5 @@
     <string name="search_query_hint">Probelm or area name</string>
     <string name="cd_find_my_position">Find my position</string>
     <string name="discovery">Discovery</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
