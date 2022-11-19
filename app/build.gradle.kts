@@ -41,6 +41,8 @@ android {
 
 dependencies {
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
     // Algolia Search
     implementation("com.algolia:algoliasearch-client-kotlin:2.0.0")
     implementation("io.ktor:ktor-client-okhttp:2.1.3")

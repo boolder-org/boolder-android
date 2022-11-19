@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.FragmentMapBinding
@@ -39,7 +38,7 @@ class MapFragment : Fragment(), LocationCallback {
         savedInstanceState: Bundle?
     ): View? {
 
-        locationProvider = LocationProvider(requireActivity() as AppCompatActivity, this)
+//        locationProvider = LocationProvider(requireActivity() as AppCompatActivity, this)
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_map, container, false)
@@ -51,7 +50,6 @@ class MapFragment : Fragment(), LocationCallback {
         setupMap()
         addSources()
         addLayers()
-
 
         binding.fabLocation.setOnClickListener {
             locationProvider.askForPosition()
