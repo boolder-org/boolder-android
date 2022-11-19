@@ -55,6 +55,10 @@ class MapActivity : AppCompatActivity(), LocationCallback {
                 startActivity(intent, option.toBundle())
             }
         }
+
+
+        //TODO TO REMOVE
+        selectProblem(2102)
     }
 
     override fun onGPSLocation(location: Location) {
@@ -145,11 +149,9 @@ class MapActivity : AppCompatActivity(), LocationCallback {
     // Triggered when user click on a Problem on Map
     private fun selectProblem(problemId: Int) {
         lifecycleScope.launch {
-            mapViewModel.getProblemAndTopo(problemId).collect { (topo, problem) ->
-                if (topo != null && problem != null) {
-                    val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo)
-                    bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
-                }
+            mapViewModel.fetchProblemAndTopo(problemId).collect { (problem, topo) ->
+                val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo)
+                bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
             }
         }
     }

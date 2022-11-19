@@ -6,10 +6,8 @@ import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.network.repository.TopoRepository
 import com.boolder.boolder.domain.convert
-import com.boolder.boolder.domain.model.Problem
-import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.CompleteProblem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 
 class MapViewModel(
@@ -18,28 +16,18 @@ class MapViewModel(
     private val problemRepository: ProblemRepository,
     private val topoRepository: TopoRepository
 ) : ViewModel() {
-
-    fun getProblemById(problemId: Int): Flow<Problem?> {
+    
+    fun fetchProblemAndTopo(problemId: Int): Flow<CompleteProblem> {
         return flow {
-            val result = problemRepository.loadById(problemId)?.convert()
-            emit(result)
-        }
-    }
-
-    fun getTopoById(problemId: Int): Flow<Topo?> {
-        return flow {
-            val result = topoRepository.getTopoById(problemId).map { it.convert() }
-            if (result.isSuccess) {
-                emit(result.getOrNull())
-            } else {
-                //TODO Log a message
+            lineRepository.loadByProblemId(problemId)?.topoId?.let {
+                val problem = problemRepository.loadById(problemId)
+                val topo = topoRepository.getTopoById(it)
+                if (problem != null && (topo.isSuccess && topo.getOrNull() != null)) {
+                    emit(CompleteProblem(problem.convert(), topo.getOrNull()!!.convert()))
+                } else {
+                    //TODO handle edge(s) case(s)
+                }
             }
         }
-    }
-
-    fun getProblemAndTopo(problemId: Int): Flow<Pair<Topo?, Problem?>> {
-        val topoFlow = getTopoById(1234) // TODO Need to know how to get this id
-        val problemFlow = getProblemById(problemId)
-        return topoFlow.combine(problemFlow) { topo, problem -> Pair(topo, problem) }
     }
 }

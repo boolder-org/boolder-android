@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import com.boolder.boolder.R
 import com.boolder.boolder.R.layout
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.Problem
@@ -41,9 +43,25 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
 
         Glide.with(view)
             .load(topo.url)
+            .placeholder(R.drawable.ic_placeholder)
+            .centerCrop()
             .into(binding.picture)
 
         binding.title.text = problem.name
+        binding.grade.text = problem.grade
+
+        val steepnessDrawable = when (problem.steepness) {
+            "slab" -> R.drawable.ic_steepness_slab
+            "overhang" -> R.drawable.ic_steepness_overhang
+            "roof" -> R.drawable.ic_steepness_roof
+            "wall" -> R.drawable.ic_steepness_wall
+            "traverse" -> R.drawable.ic_steepness_traverse_left_right
+            else -> null
+        }?.let {
+            ContextCompat.getDrawable(requireContext(), it)
+        }
+        binding.typeIcon.setImageDrawable(steepnessDrawable)
+        binding.typeText.text = problem.steepness.replaceFirstChar { it.uppercaseChar() }
 
     }
 }
