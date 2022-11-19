@@ -52,7 +52,7 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
 
     // Entry point
     fun askForPosition() {
-        rationale()
+        showRationaleDialog()
         isWaitingPosition = true
         if (checkPermission()) {
             enableGPS()
@@ -137,7 +137,7 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
                 // features are disabled if it's declined. In this UI, include a
                 // "cancel" or "no thanks" button that lets the user continue
                 // using your app without granting the permission.
-                rationale()
+                showRationaleDialog()
                 return false
             }
             else -> {
@@ -148,7 +148,7 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
         }
     }
 
-    private fun rationale() {
+    private fun showRationaleDialog() {
         AlertDialog.Builder(activity)
             .setTitle(activity.getString(string.rational_title))
             .setMessage(activity.getString(string.rationale_message))

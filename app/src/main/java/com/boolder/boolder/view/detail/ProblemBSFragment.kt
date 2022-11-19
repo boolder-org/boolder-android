@@ -16,8 +16,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class ProblemBSFragment : BottomSheetDialogFragment() {
 
     companion object {
-        private const val PROBLEM = "problem"
-        private const val TOPO = "topo"
+        private const val PROBLEM = "PROBLEM"
+        private const val TOPO = "TOPO"
         fun newInstance(problem: Problem, topo: Topo) = ProblemBSFragment()
             .apply {
                 arguments = bundleOf(PROBLEM to problem, TOPO to topo)
