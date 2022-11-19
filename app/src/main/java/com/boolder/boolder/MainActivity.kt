@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.databinding.ActivityMainBinding
 import com.boolder.boolder.view.map.LocationCallback
 import com.boolder.boolder.view.map.LocationProvider
@@ -29,11 +30,15 @@ import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : AppCompatActivity(), LocationCallback {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
+
+    private val mainViewModel by viewModel<MainViewModel>()
 
     private lateinit var locationProvider: LocationProvider
 
@@ -372,13 +377,17 @@ class MainActivity : AppCompatActivity(), LocationCallback {
     }
 
     // 4B.
-    private fun selectPois(stringProperty: String, stringProperty1: String, geometry: Geometry?) {
+    private fun selectPois(name: String, googleUrl: String, geometry: Geometry?) {
 
     }
 
     // 4C.
-    private fun selectProblem(numberProperty: Int) {
-
-
+    private fun selectProblem(problemId: Int) {
+        //TODO REMOVE
+        lifecycleScope.launch {
+            mainViewModel.getProblemById(2102).collect {
+                println("RESULT COUNT ${it.size}\n FIRST RESULT ${it.firstOrNull()?.id}")
+            }
+        }
     }
 }
