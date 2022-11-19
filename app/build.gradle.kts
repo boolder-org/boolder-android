@@ -48,6 +48,8 @@ dependencies {
 
     // Algolia Search
     implementation("com.algolia:algoliasearch-client-kotlin:2.0.0")
+    implementation("com.algolia:instantsearch-android:3.0.0")
+    implementation("com.algolia:instantsearch-android-paging3:3.0.0")
 
     //Ktor (core + okhttp are required by Algolia)
     implementation("io.ktor:ktor-client-core:2.1.3")

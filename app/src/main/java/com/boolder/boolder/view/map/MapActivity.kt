@@ -23,6 +23,7 @@ import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -31,6 +32,7 @@ class MapActivity : AppCompatActivity(), LocationCallback {
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
     private val mapViewModel by viewModel<MapViewModel>()
+    private val layerFactory: MapboxStyleFactory by inject()
 
     private lateinit var locationProvider: LocationProvider
 
@@ -48,7 +50,6 @@ class MapActivity : AppCompatActivity(), LocationCallback {
 
         binding.searchComponent.searchBar.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-
                 val intent = Intent(this, SearchActivity::class.java)
                 val option: ActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this)
                 startActivity(intent, option.toBundle())
@@ -84,7 +85,7 @@ class MapActivity : AppCompatActivity(), LocationCallback {
         }
 
         // Draw problems on map
-        binding.mapView.getMapboxMap().loadBoolderLayer()
+        binding.mapView.getMapboxMap().loadStyle(layerFactory.buildStyle())
 
         addClickEvent()
     }
