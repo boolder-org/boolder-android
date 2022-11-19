@@ -1,18 +1,15 @@
 <resources>
-    <string name="app_name">Boolder</string>
+    <string name="app_name" translatable="false">Boolder</string>
     <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoibm1vbmRvbGxvdCIsImEiOiJjbDlyNHo2OGMwZjNyM3ZsNzk5d2M1NDVlIn0.HUjcpmT5EZyhuR_VjN6eog</string>
 
-    <string name="map">Map</string>
-    <string name="menu_track_list">Track List</string>
     <string name="search_query_hint">Problem or area name</string>
     <string name="cd_find_my_position">Find my position</string>
-    <string name="discovery">Discovery</string>
     <string name="cancel_search">Cancel search</string>
     <string name="cd_go_back">Go Back</string>
-    <string name="cd_boolder_picture">boolder picture</string>
-    <string name="cd_type">type</string>
-    <string name="rational_title">\"We need your permission ! \"</string>
-    <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS. No data is collected.</string>
+    <string name="cd_boolder_picture">Boolder picture</string>
+    <string name="cd_type">Boolder type</string>
+    <string name="rational_title">We need your permission !</string>
+    <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS.\nNo data is collected.</string>
     <string name="rationale_postitive_btn">Yes, I agree</string>
     <string name="rationale_negative_Btn">No, Just Exit</string>
 
