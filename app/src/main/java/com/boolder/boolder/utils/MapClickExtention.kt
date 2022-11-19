@@ -81,13 +81,10 @@ fun MapboxMap.queryProblemRenderedFeatures(
         problemsOption
     ) { features: Expected<String, MutableList<QueriedFeature>> ->
         if (features.isValue) {
-            println("PROBLEMS ${features.value}")
             features.value?.firstOrNull()?.feature?.let {
-                println("PROBLEM $it")
                 if (it.hasProperty("id") && it.geometry() != null) {
                     callback(it.getNumberProperty("id").toInt())
 
-                    println("Will be hidden ${geometry.screenCoordinate.y >= screenHeight}")
                     // Move camera is problem is hidden by bottomSheet
                     if (geometry.screenCoordinate.y >= screenHeight) {
 
