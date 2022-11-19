@@ -1,0 +1,29 @@
+package com.boolder.boolder.domain
+
+import com.boolder.boolder.data.database.entity.ProblemEntity
+import com.boolder.boolder.data.network.`object`.TopoRemote
+import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Topo
+
+fun ProblemEntity.convert(): Problem {
+    return Problem(
+        id,
+        name,
+        grade,
+        latitude,
+        longitude,
+        circuitId,
+        circuitNumber,
+        circuitColor,
+        steepness,
+        sitStart,
+        areaId,
+        bleauInfoId,
+        featured,
+        parentId
+    )
+}
+
+fun TopoRemote.convert(): Topo {
+    return Topo(url)
+}

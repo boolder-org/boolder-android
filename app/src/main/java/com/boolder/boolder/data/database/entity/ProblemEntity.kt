@@ -1,4 +1,4 @@
-package com.boolder.boolder.database.entity
+package com.boolder.boolder.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -29,7 +29,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-data class Problem(
+data class ProblemEntity(
     @PrimaryKey
     val id: Int,
     val name: String?,

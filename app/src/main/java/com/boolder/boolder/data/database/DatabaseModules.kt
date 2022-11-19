@@ -1,9 +1,9 @@
-package com.boolder.boolder.database
+package com.boolder.boolder.data.database
 
 import androidx.room.Room
-import com.boolder.boolder.database.repository.AreaRepository
-import com.boolder.boolder.database.repository.LineRepository
-import com.boolder.boolder.database.repository.ProblemRepository
+import com.boolder.boolder.data.database.repository.AreaRepository
+import com.boolder.boolder.data.database.repository.LineRepository
+import com.boolder.boolder.data.database.repository.ProblemRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

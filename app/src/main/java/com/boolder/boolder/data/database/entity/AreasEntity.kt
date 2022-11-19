@@ -1,4 +1,4 @@
-package com.boolder.boolder.database.entity
+package com.boolder.boolder.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
         orders = [Index.Order.ASC]
     )]
 )
-data class Areas(
+data class AreasEntity(
     @PrimaryKey
     val id: Int,
     val name: String,

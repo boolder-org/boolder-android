@@ -1,7 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
     kotlin("kapt")
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -46,7 +48,17 @@ dependencies {
 
     // Algolia Search
     implementation("com.algolia:algoliasearch-client-kotlin:2.0.0")
+
+    //Ktor (core + okhttp are required by Algolia)
+    implementation("io.ktor:ktor-client-core:2.1.3")
     implementation("io.ktor:ktor-client-okhttp:2.1.3")
+    implementation("io.ktor:ktor-client-resources:2.1.3")
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
+    implementation("io.ktor:ktor-client-logging:2.1.3")
+
+    // Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     //Mapbox
     implementation("com.mapbox.maps:android:10.9.1")
@@ -64,6 +76,9 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.2.2")
     implementation("io.insert-koin:koin-android:3.2.2")
 
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.14.2")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
 
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.5.1")

@@ -1,8 +1,8 @@
 package com.boolder.boolder.view
 
-import com.boolder.boolder.MainViewModel
+import com.boolder.boolder.view.map.MapViewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    single { MainViewModel(get(), get(), get()) }
+    single { MapViewModel(get(), get(), get(), get()) }
 }

@@ -9,5 +9,11 @@
     <string name="discovery">Discovery</string>
     <string name="cancel_search">Cancel search</string>
     <string name="cd_go_back">Go Back</string>
+    <string name="cd_boolder_picture">boolder picture</string>
+    <string name="cd_type">type</string>
+    <string name="rational_title">\"We need your permission ! \"</string>
+    <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS. No data is collected.</string>
+    <string name="rationale_postitive_btn">Yes, I agree</string>
+    <string name="rationale_negative_Btn">No, Just Exit</string>
 
 </resources>

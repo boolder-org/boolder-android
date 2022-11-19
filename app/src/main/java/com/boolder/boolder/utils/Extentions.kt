@@ -1,4 +1,4 @@
-package com.boolder.boolder
+package com.boolder.boolder.utils
 
 import android.view.LayoutInflater
 import android.view.View

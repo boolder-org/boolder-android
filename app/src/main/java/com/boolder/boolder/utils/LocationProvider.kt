@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.map
+package com.boolder.boolder.utils
 
 import android.Manifest.permission
 import android.annotation.SuppressLint
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.boolder.boolder.R.string
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationToken
@@ -149,10 +150,10 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
 
     private fun rationale() {
         AlertDialog.Builder(activity)
-            .setTitle("We need your permission ! ")
-            .setMessage("In order to find you on the map, we need you to grant an access to your GPS.\nNo data is collected.")
-            .setPositiveButton("Yes, I agree") { _, _ -> enableGPS() }
-            .setNegativeButton("No, Just Exit") { dialog, _ -> dialog.dismiss() }
+            .setTitle(activity.getString(string.rational_title))
+            .setMessage(activity.getString(string.rationale_message))
+            .setPositiveButton(activity.getString(string.rationale_postitive_btn)) { _, _ -> enableGPS() }
+            .setNegativeButton(activity.getString(string.rationale_negative_Btn)) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
     }

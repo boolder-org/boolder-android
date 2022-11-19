@@ -40,7 +40,7 @@
         android:id="@+id/host_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity" />
+        tools:context=".view.map.MapActivity" />
 
     <include
         android:id="@+id/search_component"
