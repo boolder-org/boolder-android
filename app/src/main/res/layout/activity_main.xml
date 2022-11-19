@@ -10,21 +10,7 @@
         android:layout_height="match_parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/white"
         android:contentDescription="@string/cd_find_my_position"
-        android:src="@drawable/ic_fab_filter"
-        app:borderWidth="0dp"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +19,7 @@
         android:src="@drawable/ic_fab_near_me"
         app:borderWidth="0dp"
         app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@id/fab_settings"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView xmlns:tools="http://schemas.android.com/tools"

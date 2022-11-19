@@ -152,7 +152,7 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
         AlertDialog.Builder(activity)
             .setTitle(activity.getString(string.rational_title))
             .setMessage(activity.getString(string.rationale_message))
-            .setPositiveButton(activity.getString(string.rationale_postitive_btn)) { _, _ -> enableGPS() }
+            .setPositiveButton(activity.getString(string.rationale_positive_btn)) { _, _ -> enableGPS() }
             .setNegativeButton(activity.getString(string.rationale_negative_Btn)) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()

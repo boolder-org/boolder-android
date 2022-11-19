@@ -8,6 +8,6 @@
     <string name="cd_type">Type de rocher</string>
     <string name="rational_title">Nous avons besoin de votre permission !</string>
     <string name="rationale_message">Afin de vous localiser sur la carte, nous avons besoin que vous nous donniez accès à votre GPS.\nAucune données collectées.</string>
-    <string name="rationale_postitive_btn">D\'accord</string>
+    <string name="rationale_positive_btn">D\'accord</string>
     <string name="rationale_negative_Btn">Non, merci</string>
 </resources>

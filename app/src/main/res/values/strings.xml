@@ -10,7 +10,7 @@
     <string name="cd_type">Boolder type</string>
     <string name="rational_title">We need your permission !</string>
     <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS.\nNo data is collected.</string>
-    <string name="rationale_postitive_btn">Yes, I agree</string>
+    <string name="rationale_positive_btn">Yes, I agree</string>
     <string name="rationale_negative_Btn">No, Just Exit</string>
 
 </resources>
