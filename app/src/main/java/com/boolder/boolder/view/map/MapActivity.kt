@@ -93,7 +93,7 @@ class MapActivity : AppCompatActivity(), LocationCallback {
     @SuppressLint("ClickableViewAccessibility")
     // 1. Catch a tap on screen
     private fun addClickEvent() {
-        binding.mapView.setOnTouchListener { v, event: MotionEvent ->
+        binding.mapView.setOnTouchListener { _, event: MotionEvent ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     shouldClick = true
@@ -139,7 +139,7 @@ class MapActivity : AppCompatActivity(), LocationCallback {
 
     // Triggered when user click on a Parking on Map
     private fun selectPois(name: String, googleUrl: String, geometry: Geometry?) {
-
+        //TODO
     }
 
     // Triggered when user click on a Problem on Map

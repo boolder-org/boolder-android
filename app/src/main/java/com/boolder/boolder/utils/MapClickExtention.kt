@@ -61,11 +61,24 @@ fun MapboxMap.queryProblemRenderedFeatures(
     screenHeight: Int,
     callback: (Int) -> Unit
 ) {
-    geometry.screenCoordinate.y
 
-    val problemGeometry = RenderedQueryGeometry(
-        ScreenCoordinate(geometry.screenCoordinate.x - 12.0, geometry.screenCoordinate.y - 12.0)
-    )
+    val problemGeometry =
+//        RenderedQueryGeometry(
+//            ScreenCoordinate(geometry.screenCoordinate.x - 12.0, geometry.screenCoordinate.y - 12.0)
+//        )
+
+        RenderedQueryGeometry(
+            ScreenBox(
+                ScreenCoordinate(
+                    geometry.screenCoordinate.x - 12.0, geometry.screenCoordinate.y - 12.0
+                ),
+                ScreenCoordinate(
+                    geometry.screenCoordinate.x + 12.0,
+                    geometry.screenCoordinate.y + 12.0
+                )
+            )
+        )
+
     val problemsOption = RenderedQueryOptions(listOf("problems"), null)
 
     queryRenderedFeatures(
