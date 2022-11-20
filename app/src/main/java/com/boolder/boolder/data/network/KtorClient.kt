@@ -1,5 +1,6 @@
 package com.boolder.boolder.data.network
 
+import android.util.Log
 import com.boolder.boolder.data.network.`object`.TopoRemote
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -31,6 +32,7 @@ class KtorClient {
             val body = request.body<TopoRemote>()
             Result.success(body)
         } catch (e: Exception) {
+            Log.e("Ktor Client", e.message ?: "No message")
             Result.failure(e)
         }
     }

@@ -19,7 +19,6 @@ import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.viewBinding
-import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
@@ -52,11 +51,11 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         val topo = requireArguments().getParcelable<Topo>(TOPO)
             ?: error("No Topo in arguments")
 
-        Glide.with(view)
-            .load(topo.url)
-            .placeholder(R.drawable.ic_placeholder)
-            .centerCrop()
-            .into(binding.picture)
+//        Glide.with(requireContext())
+//            .load(topo.url)
+//            .placeholder(R.drawable.ic_placeholder)
+//            .centerCrop()
+//            .into(binding.picture)
 
         binding.title.text = problem.name
         binding.grade.text = problem.grade

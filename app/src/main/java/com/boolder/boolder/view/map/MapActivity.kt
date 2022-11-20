@@ -70,9 +70,15 @@ class MapActivity : AppCompatActivity(), LocationCallback {
     }
 
     private fun setupMap() {
+
+        // TODO remove this
+        //2.605752646923065, 48.408801229423915
+
         val cameraOptions = CameraOptions.Builder()
-            .center(Point.fromLngLat(2.5968216, 48.3925623))
-            .zoom(10.2)
+//            .center(Point.fromLngLat(2.5968216, 48.3925623))
+            .center(Point.fromLngLat(2.605752646923065, 48.408801229423915))
+//            .zoom(10.2)
+            .zoom(25.0)
             .build()
 
         binding.mapView.getMapboxMap().apply {
