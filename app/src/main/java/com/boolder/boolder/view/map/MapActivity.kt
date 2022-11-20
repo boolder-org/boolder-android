@@ -48,12 +48,12 @@ class MapActivity : AppCompatActivity(), LocationCallback {
             locationProvider.askForPosition()
         }
 
-        binding.searchComponent.searchBar.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                val intent = Intent(this, SearchActivity::class.java)
-                val option: ActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this)
-                startActivity(intent, option.toBundle())
-            }
+        binding.searchComponent.searchBar.isFocusable = false
+        binding.searchComponent.searchBar.isClickable = false
+        binding.searchComponent.searchBar.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            val option: ActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this)
+            startActivity(intent, option.toBundle())
         }
     }
 
