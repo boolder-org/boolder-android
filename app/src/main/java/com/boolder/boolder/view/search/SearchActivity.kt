@@ -12,7 +12,6 @@ import com.boolder.boolder.utils.NetworkObserver
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.utils.viewBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -38,13 +37,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         networkObserverImpl.subscribeOn(this, this)
 
-        // TODO Make it focus when activity start
-        // Below code not working
-        lifecycleScope.launch {
-            delay(100)
-            binding.searchComponent.searchBar.isFocusableInTouchMode = true
-            binding.searchComponent.searchBar.requestFocus()
-        }
+        binding.searchComponent.searchBar.requestFocus()
 
         binding.searchComponent.searchFirstIcon.apply {
             val drawable = ContextCompat.getDrawable(
