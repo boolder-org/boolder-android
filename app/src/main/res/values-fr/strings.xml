@@ -27,4 +27,7 @@
     <string name="circuit_short_name_white_for_kids">Blanc</string>
     <string name="circuit_short_name_black">Noir</string>
     <string name="circuit_short_name_off_circuit">Hors circuit</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="no_result">No result</string>
+    <string name="query_examples">Query examples:</string>
 </resources>

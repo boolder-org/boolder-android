@@ -23,23 +23,23 @@
 
         <TextView
             android:id="@+id/suggestion_title"
+            android:text="@string/query_examples"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Query examples:"
+            android:textStyle="bold"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/suggestion_first"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <Button
             android:id="@+id/suggestion_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:clickable="true"
-            android:focusable="true"
+            android:background="@android:color/transparent"
+            android:minHeight="0dp"
+            android:textAllCaps="false"
             android:textColor="@color/primary"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/suggestion_second"
@@ -48,13 +48,13 @@
             app:layout_constraintTop_toBottomOf="@+id/suggestion_title"
             tools:text="Isatis" />
 
-        <TextView
+        <Button
             android:id="@+id/suggestion_second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:clickable="true"
-            android:focusable="true"
+            android:background="@android:color/transparent"
+            android:minHeight="0dp"
+            android:textAllCaps="false"
             android:textColor="@color/primary"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/suggestion_third"
@@ -63,13 +63,13 @@
             app:layout_constraintTop_toBottomOf="@+id/suggestion_first"
             tools:text="Isatis" />
 
-        <TextView
+        <Button
             android:id="@+id/suggestion_third"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:clickable="true"
-            android:focusable="true"
+            android:background="@android:color/transparent"
+            android:minHeight="0dp"
+            android:textAllCaps="false"
             android:textColor="@color/primary"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -82,17 +82,31 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/error_message"
+        android:id="@+id/connectivity_error_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+        android:text="@string/no_internet_connection"
         android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="No internet connection"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/empty_query_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="@string/no_result"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView

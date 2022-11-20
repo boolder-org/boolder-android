@@ -31,5 +31,8 @@
     <string name="circuit_short_name_black">Black</string>
     <string name="circuit_short_name_off_circuit">Off circuit</string>
     <string name="contact_mail" translatable="false">hello@boolder.com</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="no_result">No result</string>
+    <string name="query_examples">Query examples:</string>
 
 </resources>
