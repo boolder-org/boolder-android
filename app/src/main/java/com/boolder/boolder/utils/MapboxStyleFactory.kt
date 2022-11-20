@@ -1,5 +1,6 @@
 package com.boolder.boolder.utils
 
+import com.boolder.boolder.domain.model.CircuitColor
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.dsl.generated.*
 import com.mapbox.maps.extension.style.expressions.generated.Expression
@@ -53,26 +54,26 @@ class MapboxStyleFactory {
                     match {
                         get { literal("circuitColor") }
                         literal("yellow")
-                        rgb(255.0, 204.0, 2.0)
+                        CircuitColor.YELLOW.rgb(this) //TODO make it better
                         literal("purple")
-                        rgb(215.0, 131.0, 255.0)
+                        CircuitColor.PURPLE.rgb(this)
                         literal("orange")
-                        rgb(255.0, 149.0, 0.0)
+                        CircuitColor.ORANGE.rgb(this)
                         literal("green")
-                        rgb(255.0, 149.0, 0.0)
+                        CircuitColor.GREEN.rgb(this)
                         literal("blue")
-                        rgb(1.0, 122.0, 255.0)
+                        CircuitColor.BLUE.rgb(this)
                         literal("skyblue")
-                        rgb(90.0, 199.0, 250.0)
+                        CircuitColor.SKY_BLUE.rgb(this)
                         literal("salmon")
-                        rgb(253.0, 175.0, 138.0)
+                        CircuitColor.SALMON.rgb(this)
                         literal("red")
-                        rgb(255.0, 59.0, 47.0)
+                        CircuitColor.RED.rgb(this)
                         literal("black")
-                        rgb(0.0, 0.0, 0.0)
+                        CircuitColor.BLACK.rgb(this)
                         literal("white")
-                        rgb(255.0, 255.0, 255.0)
-                        rgb(135.0, 138.0, 141.0)
+                        CircuitColor.WHITE.rgb(this)
+                        CircuitColor.OFF_CIRCUIT.rgb(this)
                     }
                 )
 

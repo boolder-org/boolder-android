@@ -12,5 +12,24 @@
     <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS.\nNo data is collected.</string>
     <string name="rationale_positive_btn">Yes, I agree</string>
     <string name="rationale_negative_Btn">No, Just Exit</string>
+    <string name="share">Share</string>
+    <string name="save">Save</string>
+    <string name="bleau_info">Bleau.info</string>
+    <string name="report">Report</string>
+
+
+    <string name="circuit_short_name_yellow">Yellow</string>
+    <string name="circuit_short_name_purple">Purple</string>
+    <string name="circuit_short_name_orange">Orange</string>
+    <string name="circuit_short_name_green">Green</string>
+    <string name="circuit_short_name_blue">Blue</string>
+    <string name="circuit_short_name_skyblue">Sky blue</string>
+    <string name="circuit_short_name_salmon">Salmon</string>
+    <string name="circuit_short_name_red">Red</string>
+    <string name="circuit_short_name_white">White</string>
+    <string name="circuit_short_name_white_for_kids">White</string>
+    <string name="circuit_short_name_black">Black</string>
+    <string name="circuit_short_name_off_circuit">Off circuit</string>
+    <string name="contact_mail" translatable="false">hello@boolder.com</string>
 
 </resources>

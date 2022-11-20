@@ -10,4 +10,21 @@
     <string name="rationale_message">Afin de vous localiser sur la carte, nous avons besoin que vous nous donniez accès à votre GPS.\nAucune données collectées.</string>
     <string name="rationale_positive_btn">D\'accord</string>
     <string name="rationale_negative_Btn">Non, merci</string>
+    <string name="share">Share</string>
+    <string name="save">Save</string>
+    <string name="bleau_info">Bleau.info</string>
+    <string name="report">Report</string>
+
+    <string name="circuit_short_name_yellow">Jaune</string>
+    <string name="circuit_short_name_purple">Violet</string>
+    <string name="circuit_short_name_orange">Orange</string>
+    <string name="circuit_short_name_green">Vert</string>
+    <string name="circuit_short_name_blue">Blue</string>
+    <string name="circuit_short_name_skyblue">Bleu ciel</string>
+    <string name="circuit_short_name_salmon">Saumon</string>
+    <string name="circuit_short_name_red">Rouge</string>
+    <string name="circuit_short_name_white">Blanc</string>
+    <string name="circuit_short_name_white_for_kids">Blanc</string>
+    <string name="circuit_short_name_black">Noir</string>
+    <string name="circuit_short_name_off_circuit">Hors circuit</string>
 </resources>
