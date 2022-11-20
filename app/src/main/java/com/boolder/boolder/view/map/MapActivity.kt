@@ -55,10 +55,6 @@ class MapActivity : AppCompatActivity(), LocationCallback {
                 startActivity(intent, option.toBundle())
             }
         }
-
-
-        //TODO TO REMOVE
-        selectProblem(2102)
     }
 
     override fun onGPSLocation(location: Location) {
