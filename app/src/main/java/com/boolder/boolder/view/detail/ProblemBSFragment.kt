@@ -11,9 +11,11 @@ import com.boolder.boolder.R.layout
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import org.koin.android.ext.android.inject
 
 class ProblemBSFragment : BottomSheetDialogFragment() {
 
@@ -27,6 +29,8 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     }
 
     private val binding: BottomSheetBinding by viewBinding(BottomSheetBinding::bind)
+
+    private val curveAlgorithm: CubicCurveAlgorithm by inject()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(layout.bottom_sheet, container, false)
