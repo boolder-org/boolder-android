@@ -93,7 +93,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         }
 
         binding.reportIssue.setOnClickListener {
-            val intent = Intent(Intent.ACTION_SENDTO).apply {
+            Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, listOf(getString(string.contact_mail)).toTypedArray())
                 putExtra(Intent.EXTRA_SUBJECT, "Feedback")
