@@ -1,5 +1,6 @@
 package com.boolder.boolder.utils
 
+import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.domain.model.CircuitColor
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.dsl.generated.*
@@ -10,18 +11,14 @@ import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import com.mapbox.maps.extension.style.style
 
 class MapboxStyleFactory {
-    companion object {
-        private const val problemsSourceLayerId = "problems-ayes3a" // name of the layer in the mapbox tileset
-        private const val styleUri = "mapbox://styles/nmondollot/cl95n147u003k15qry7pvfmq2"
-    }
 
     fun buildStyle(): StyleExtension {
-        return style(styleUri) {
+        return style(BoolderMapConfig.styleUri) {
             +vectorSource("problems") {
-                url("mapbox://nmondollot.4xsv235p")
+                url(BoolderMapConfig.vectorSourceUrl)
             }
             +circleLayer("problems", "problems") {
-                sourceLayer(problemsSourceLayerId)
+                sourceLayer(BoolderMapConfig.problemsSourceLayerId)
                 minZoom(15.0)
                 filter(Expression.match {
                     geometryType()
@@ -101,7 +98,7 @@ class MapboxStyleFactory {
                 )
             }
             +symbolLayer("problems-text", "problems") {
-                sourceLayer(problemsSourceLayerId)
+                sourceLayer(BoolderMapConfig.problemsSourceLayerId)
                 minZoom(19.0)
                 filter(Expression.match {
                     geometryType()
