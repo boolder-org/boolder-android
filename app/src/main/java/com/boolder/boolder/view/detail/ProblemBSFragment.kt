@@ -19,6 +19,7 @@ import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.viewBinding
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
@@ -28,10 +29,9 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     companion object {
         private const val PROBLEM = "PROBLEM"
         private const val TOPO = "TOPO"
-        fun newInstance(problem: Problem, topo: Topo) = ProblemBSFragment()
-            .apply {
-                arguments = bundleOf(PROBLEM to problem, TOPO to topo)
-            }
+        fun newInstance(problem: Problem, topo: Topo) = ProblemBSFragment().apply {
+            arguments = bundleOf(PROBLEM to problem, TOPO to topo)
+        }
     }
 
     private val binding: BottomSheetBinding by viewBinding(BottomSheetBinding::bind)
@@ -45,17 +45,15 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val problem = requireArguments().getParcelable<Problem>(PROBLEM)
-            ?: error("No Problem in arguments")
+        val problem = requireArguments().getParcelable<Problem>(PROBLEM) ?: error("No Problem in arguments")
 
-        val topo = requireArguments().getParcelable<Topo>(TOPO)
-            ?: error("No Topo in arguments")
+        val topo = requireArguments().getParcelable<Topo>(TOPO) ?: error("No Topo in arguments")
 
-//        Glide.with(requireContext())
-//            .load(topo.url)
-//            .placeholder(R.drawable.ic_placeholder)
-//            .centerCrop()
-//            .into(binding.picture)
+        Glide.with(requireContext())
+            .load(topo.url)
+            .placeholder(R.drawable.ic_placeholder)
+            .centerCrop()
+            .into(binding.picture)
 
         binding.title.text = problem.name
         binding.grade.text = problem.grade
@@ -97,8 +95,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
                 putExtra(Intent.EXTRA_EMAIL, listOf(getString(string.contact_mail)).toTypedArray())
                 putExtra(Intent.EXTRA_SUBJECT, "Feedback")
                 putExtra(
-                    Intent.EXTRA_TEXT,
-                    """
+                    Intent.EXTRA_TEXT, """
                     ----
                     Problem #${problem.id} - ${problem.name ?: problem.defaultName()}
                     Boolder v.${BuildConfig.VERSION_NAME} (build n°${BuildConfig.VERSION_CODE})

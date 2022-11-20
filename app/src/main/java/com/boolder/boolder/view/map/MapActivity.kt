@@ -9,10 +9,12 @@ import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.*
+import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
 import com.boolder.boolder.utils.*
 import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.search.SearchActivity
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
@@ -153,6 +155,7 @@ class MapActivity : AppCompatActivity(), LocationCallback {
         lifecycleScope.launch {
             mapViewModel.fetchProblemAndTopo(problemId).collect { (problem, topo) ->
                 val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo)
+                bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
                 bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
             }
         }

@@ -10,4 +10,6 @@
 
     <color name="primary">#65C466</color>
     <color name="gray">#DFDFDF</color>
+
+    <color name="bottom_sheet_background">@color/white</color>
 </resources>
