@@ -77,7 +77,7 @@ class MapboxStyleFactory {
                 circleStrokeWidth(
                     Expression.switchCase {
                         boolean {
-                            featureState { get("selected") }
+                            featureState { literal("selected") }
                             literal(false)
                         }
                         literal(3.0)

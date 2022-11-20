@@ -11,6 +11,7 @@ import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.*
+import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
@@ -25,6 +26,10 @@ class BoolderMap @JvmOverloads constructor(
     defStyle: Int = 0
 ) : MapView(context, attrs, defStyle) {
 
+    companion object {
+        private const val TAG = "Boolder Map"
+    }
+
     interface BoolderClickListener {
         fun onProblemSelected(problemId: Int)
         fun onPoisSelected(poisId: String, stringProperty: String, geometry: Geometry?)
@@ -32,7 +37,7 @@ class BoolderMap @JvmOverloads constructor(
 
     private var listener: BoolderClickListener? = null
 
-    private var previousSelectedProblemId: String? = null
+    private var previousSelectedFeatureId: String? = null
     private var shouldClick = false
 
     init {
@@ -41,6 +46,22 @@ class BoolderMap @JvmOverloads constructor(
 
     fun setOnBoolderClickListener(listener: BoolderClickListener) {
         this.listener = listener
+    }
+
+    fun setup(listener: BoolderClickListener, buildStyle: StyleExtension) {
+        this.listener = listener
+        getMapboxMap().loadStyle(buildStyle)
+        getMapboxMap().addOnStyleLoadedListener {
+
+            getMapboxMap().getFeatureState("problems", BoolderMapConfig.problemsSourceLayerId, (1610).toString()) {
+                if (it.isValue) {
+                    println("VALUE FOR FEATURE ${it.value}")
+                } else {
+                    Log.w(TAG, "NO FEATURE STATE ${it.error}")
+                }
+            }
+        }
+
     }
 
     private fun init() {
@@ -148,11 +169,12 @@ class BoolderMap @JvmOverloads constructor(
             problemGeometry,
             problemsOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
-            if (features.isValue && features.value?.firstOrNull()?.feature != null) {
-                val feature = features.value?.firstOrNull()?.feature!!
+            if (features.isValue) {
+
+                val feature = features.value?.firstOrNull()?.feature ?: return@queryRenderedFeatures
 
                 if (feature.hasProperty("id") && feature.geometry() != null) {
-                    changeSelectState(feature.getNumberProperty("id").toString(), true)
+                    selectProblem(feature.id() ?: "")
                     listener?.onProblemSelected(feature.getNumberProperty("id").toInt())
 
                     // Move camera is problem is hidden by bottomSheet
@@ -170,13 +192,11 @@ class BoolderMap @JvmOverloads constructor(
                     }
 
                 } else {
-                    previousSelectedProblemId?.let { id ->
-                        changeSelectState(id, false)
-                    }
+                    unselectProblem()
                 }
 
             } else {
-                Log.w("MAP LAYERS", features.error ?: "No message")
+                Log.w(TAG, features.error ?: "No message")
             }
         }
     }
@@ -202,18 +222,36 @@ class BoolderMap @JvmOverloads constructor(
                     }
                 }
             } else {
-                Log.w("MAP LAYERS", features.error ?: "No message")
+                Log.w(TAG, features.error ?: "No message")
             }
         }
     }
 
-    private fun changeSelectState(problemFeatureId: String, select: Boolean) {
+    private fun selectProblem(featureId: String) {
         getMapboxMap().setFeatureState(
             "problems",
             BoolderMapConfig.problemsSourceLayerId,
-            problemFeatureId,
-            Value.valueOf(select)
+            featureId,
+            Value.fromJson("""{"selected": true}""").value!!
         )
+
+        if (featureId != previousSelectedFeatureId) {
+            unselectProblem()
+        }
+        previousSelectedFeatureId = featureId
+
+    }
+
+    private fun unselectProblem() {
+        previousSelectedFeatureId?.let {
+            getMapboxMap().setFeatureState(
+                "problems",
+                BoolderMapConfig.problemsSourceLayerId,
+                it,
+                Value.fromJson("""{"selected": false}""").value!!
+            )
+        }
+
     }
 
     // 3A. Build bounds around coordinate
@@ -240,7 +278,7 @@ class BoolderMap @JvmOverloads constructor(
                 }
             }
         } else {
-            Log.w("MAP LAYER", features.error ?: "No message")
+            Log.w(TAG, features.error ?: "No message")
         }
     }
 

@@ -69,8 +69,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
     }
 
     private fun setupMap() {
-        binding.mapView.getMapboxMap().loadStyle(layerFactory.buildStyle())
-        binding.mapView.setOnBoolderClickListener(this)
+//        binding.mapView.getMapboxMap().loadStyle()
+        binding.mapView.setup(this, layerFactory.buildStyle())
+//        binding.mapView.setOnBoolderClickListener(this)
     }
 
     // Triggered when user click on a Problem on Map
