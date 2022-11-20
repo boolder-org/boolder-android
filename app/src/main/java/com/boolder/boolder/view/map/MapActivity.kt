@@ -21,6 +21,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -76,9 +77,11 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
     override fun onProblemSelected(problemId: Int) {
         lifecycleScope.launch {
             mapViewModel.fetchProblemAndTopo(problemId).collect { (problem, topo) ->
-                val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo)
-                bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
-                bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+                with(Dispatchers.Main) {
+                    val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo)
+                    bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
+                    bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+                }
             }
         }
     }
