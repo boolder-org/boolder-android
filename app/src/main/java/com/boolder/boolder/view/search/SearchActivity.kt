@@ -6,20 +6,28 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivitySearchBinding
 import com.boolder.boolder.utils.NetworkObserver
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.utils.viewBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity(), NetworkObserver {
 
     private val binding by viewBinding(ActivitySearchBinding::inflate)
 
+    private val searchViewModel: SearchViewModel by viewModel()
     private val networkObserverImpl: NetworkObserverImpl by inject()
+
+    private val problemAdapter = ProblemAdapter()
+    private val areaAdapter = AreaAdapter()
 
     private val suggestions = listOf("Isatis", "La Marie-Rose", "Cul de Chien")
 
@@ -35,6 +43,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        // Listen to network change
         networkObserverImpl.subscribeOn(this, this)
 
         binding.searchComponent.searchBar.requestFocus()
@@ -48,15 +57,37 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
             setOnClickListener { finish() }
         }
 
+        binding.searchComponent.searchLastIcon.setOnClickListener {
+            binding.searchComponent.searchBar.text.clear()
+            refreshSuggestionsVisibility(isQueryEmpty)
+            refreshNoResultVisibility(isQueryProduceResult)
+        }
+
+        binding.recyclerView.apply {
+            adapter = ConcatAdapter(problemAdapter, areaAdapter)
+            layoutManager = LinearLayoutManager(this@SearchActivity)
+        }
+
         binding.searchComponent.searchBar.addTextChangedListener { query ->
             refreshSuggestionsVisibility(isQueryEmpty)
             refreshNoResultVisibility(isQueryProduceResult)
-
-            //TODO do the search
+            searchViewModel.search(query?.toString())
         }
 
         applySuggestions()
 
+        searchViewModel.connect()
+
+        lifecycleScope.launch {
+            searchViewModel.problems.collectLatest {
+                println("RESULT PROBLEMS $it")
+                problemAdapter.submitData(it)
+            }
+            searchViewModel.areas.collectLatest {
+                println("RESULT AREAS $it")
+                areaAdapter.submitData(it)
+            }
+        }
     }
 
     private fun applySuggestions() {
@@ -64,12 +95,12 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         binding.suggestionSecond.text = suggestions[1]
         binding.suggestionThird.text = suggestions[2]
 
-        binding.suggestionFirst.setOnClickListener { onQuerySelected() }
-        binding.suggestionSecond.setOnClickListener { onQuerySelected() }
-        binding.suggestionThird.setOnClickListener { onQuerySelected() }
+        binding.suggestionFirst.setOnClickListener { onSuggestionClick(binding.suggestionFirst.text.toString()) }
+        binding.suggestionSecond.setOnClickListener { onSuggestionClick(binding.suggestionFirst.text.toString()) }
+        binding.suggestionThird.setOnClickListener { onSuggestionClick(binding.suggestionFirst.text.toString()) }
     }
 
-    private fun onQuerySelected() {
+    private fun onSuggestionClick(text: String) {
 
     }
 

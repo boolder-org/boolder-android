@@ -1,4 +1,4 @@
-package com.boolder.boolder.data.network.`object`
+package com.boolder.boolder.data.network.model
 
 import kotlinx.serialization.Serializable
 

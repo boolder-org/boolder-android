@@ -47,17 +47,6 @@ class BoolderMap @JvmOverloads constructor(
     fun setup(listener: BoolderClickListener, buildStyle: StyleExtension) {
         this.listener = listener
         getMapboxMap().loadStyle(buildStyle)
-        getMapboxMap().addOnStyleLoadedListener {
-
-            getMapboxMap().getFeatureState("problems", BoolderMapConfig.problemsSourceLayerId, (1610).toString()) {
-                if (it.isValue) {
-                    println("VALUE FOR FEATURE ${it.value}")
-                } else {
-                    Log.w(TAG, "NO FEATURE STATE ${it.error}")
-                }
-            }
-        }
-
     }
 
     private fun init() {

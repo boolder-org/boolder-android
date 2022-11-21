@@ -47,9 +47,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
     // Algolia Search
-    implementation("com.algolia:algoliasearch-client-kotlin:2.0.0")
-    implementation("com.algolia:instantsearch-android:3.0.0")
-    implementation("com.algolia:instantsearch-android-paging3:3.0.0")
+    implementation("com.algolia:instantsearch-android:3.1.4")
+    implementation("com.algolia:instantsearch-android-paging3:3.1.4")
 
     //Ktor (core + okhttp are required by Algolia)
     implementation("io.ktor:ktor-client-core:2.1.3")
@@ -75,7 +74,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.4.3")
 
     // DI
-    implementation("io.insert-koin:koin-core:3.2.2")
     implementation("io.insert-koin:koin-android:3.2.2")
 
     // Glide

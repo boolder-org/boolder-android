@@ -1,7 +1,7 @@
 package com.boolder.boolder.data.network
 
 import android.util.Log
-import com.boolder.boolder.data.network.`object`.TopoRemote
+import com.boolder.boolder.data.network.model.TopoRemote
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
