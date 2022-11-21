@@ -12,4 +12,17 @@
     <color name="gray">#DFDFDF</color>
 
     <color name="bottom_sheet_background">@color/white</color>
+
+    <color name="circuit_color_yellow">#ffcc02</color>
+    <color name="circuit_color_purple">#d783FF</color>
+    <color name="circuit_color_orange">#FF9500</color>
+    <color name="circuit_color_green">#FF9500</color>
+    <color name="circuit_color_blue">#017AFF</color>
+    <color name="circuit_color_skyblue">#5AC7FA</color>
+    <color name="circuit_color_salmon">#FDAF8A</color>
+    <color name="circuit_color_red">#FF3B2F</color>
+    <color name="circuit_color_white">#FFFFFF</color>
+    <color name="circuit_color_white_for_kids">#FFFFFF</color>
+    <color name="circuit_color_black">#000000</color>
+    <color name="circuit_color_off_circuit">#878A8D</color>
 </resources>

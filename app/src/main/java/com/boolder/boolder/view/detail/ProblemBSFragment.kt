@@ -5,6 +5,7 @@ import android.graphics.PointF
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -106,27 +107,34 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
             }.run { startActivity(this) }
         }
 
-        drawCurves(line.coordinates)
+        val joke = line.coordinates?.contains("null") == true
+
+        if (!line.coordinates.isNullOrBlank() && !joke) {
+            drawCurves(line.coordinates, problem)
+        }
     }
 
-    private fun drawCurves(stringCoordinates: String?) {
+    private fun drawCurves(stringCoordinates: String, problem: Problem) {
         //[{"x":0.4325,"y":0.805}]
-        if (stringCoordinates.isNullOrBlank()) return
-        val coordinates = Json.decodeFromString(stringCoordinates) as List<Coordinates>
-        if (coordinates.isEmpty()) return
-        val points = coordinates.map { PointD(it.x, it.y) }.map { it.multiplyBy(1000) }
+        val color = problem.circuitColor?.let { CircuitColor.valueOf(it.uppercase()) } ?: CircuitColor.OFF_CIRCUIT
+        try {
+            val coordinates = Json.decodeFromString(stringCoordinates) as List<Coordinates>
+            if (coordinates.isNotEmpty()) {
+                val points = coordinates.map { PointD(it.x, it.y) }.map { it.scale() }
 
-        val segment = curveAlgorithm.controlPointsFromPoints(points)
-        val a = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
-        val b = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
-
-        binding.curveChart2.addDataPoints(points, a, b)
-
+                val segment = curveAlgorithm.controlPointsFromPoints(points)
+                val a = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
+                val b = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
+                binding.curveChart2.addDataPoints(points, a, b, color.getColor(requireContext()))
+            }
+        } catch (e: Exception) {
+            Log.w("TAG", e.message ?: "no message")
+        }
     }
 
-    //TODO REMOVE THIS
-    fun PointD.multiplyBy(coef: Int): PointD {
-        return PointD(this.x * coef, this.y * coef)
+
+    private fun PointD.scale(): PointD {
+        return PointD(this.x * 1060, this.y * 810)
     }
 
     private fun Problem.defaultName(): String {
@@ -135,7 +143,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         } else "No name"
     }
 
-    private fun String.localize(): Int {
+    private fun String.localize(): String {
         return CircuitColor.valueOf(this).localize(requireContext())
     }
 }

@@ -11,11 +11,11 @@
     <ImageView
         android:id="@+id/picture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:adjustViewBounds="true"
-        app:layout_constraintDimensionRatio="4:3"
         android:contentDescription="@string/cd_boolder_picture"
         android:src="@drawable/ic_placeholder"
+        app:layout_constraintDimensionRatio="4:3"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.boolder.boolder.view.detail.CurveGraphChart
@@ -30,7 +30,8 @@
     <com.boolder.boolder.view.detail.RallyLineGraphChart
         android:id="@+id/curve_chart_2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="4:3"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
