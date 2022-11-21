@@ -10,14 +10,12 @@
 
     <ImageView
         android:id="@+id/picture"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:adjustViewBounds="true"
+        app:layout_constraintDimensionRatio="4:3"
         android:contentDescription="@string/cd_boolder_picture"
         android:src="@drawable/ic_placeholder"
-        app:layout_constraintDimensionRatio="4:3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.boolder.boolder.view.detail.CurveGraphChart
@@ -31,11 +29,8 @@
 
     <com.boolder.boolder.view.detail.RallyLineGraphChart
         android:id="@+id/curve_chart_2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="4:3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -102,7 +97,6 @@
         app:chipIcon="@drawable/ic_outline_info"
         app:chipIconTint="@color/white"
         app:chipStartPadding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/save"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -139,7 +133,7 @@
         android:layout_marginStart="8dp"
         android:text="@string/share"
         android:textColor="@color/primary"
-        app:chipBackgroundColor="@android:color/transparent"
+        app:chipBackgroundColor="@color/white"
         app:chipEndPadding="8dp"
         app:chipIcon="@drawable/ic_share"
         app:chipIconTint="@color/primary"
@@ -159,7 +153,7 @@
         android:layout_marginStart="8dp"
         android:text="@string/report"
         android:textColor="@color/primary"
-        app:chipBackgroundColor="@android:color/transparent"
+        app:chipBackgroundColor="@color/white"
         app:chipEndPadding="8dp"
         app:chipIcon="@drawable/ic_outline_report"
         app:chipIconTint="@color/primary"

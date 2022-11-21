@@ -21,7 +21,7 @@ class MapViewModel(
         return flow {
             lineRepository.loadByProblemId(problemId)?.let {
                 val problem = problemRepository.loadById(problemId)
-                val topo = topoRepository.getTopoById(it.id)
+                val topo = topoRepository.getTopoById(it.topoId)
                 if (problem != null && (topo.isSuccess && topo.getOrNull() != null)) {
                     emit(CompleteProblem(problem.convert(), topo.getOrNull()!!.convert(), it.convert()))
                 } else {

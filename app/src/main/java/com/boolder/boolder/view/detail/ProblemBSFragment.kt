@@ -54,7 +54,6 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         Glide.with(requireContext())
             .load(topo.url)
             .placeholder(R.drawable.ic_placeholder)
-            .centerCrop()
             .into(binding.picture)
 
         binding.title.text = problem.name
@@ -116,20 +115,8 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         val coordinates = Json.decodeFromString(stringCoordinates) as List<Coordinates>
         if (coordinates.isEmpty()) return
         val points = coordinates.map { PointD(it.x, it.y) }.map { it.multiplyBy(1000) }
-//        val points = listOf(PointD(1.0, 1.0), PointD(2.0, 2.0), PointD(3.0, 3.0))
-//        val points = listOf(
-//            PointD(0.0, 0.0),
-//            PointD(0.0, 400.0),
-//            PointD(535.0, 400.0),
-//            PointD(535.0, 800.0),
-//            PointD(1070.0, 800.0),
-//            PointD(1070.0, 0.0)
-//        )
-//        println(pointsOriginal.map { it.multiplyBy(100) })
-        println(points)
 
         val segment = curveAlgorithm.controlPointsFromPoints(points)
-        println("SEGMENT $segment")
         val a = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
         val b = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
 

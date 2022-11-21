@@ -4,10 +4,9 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.Path.Direction.CW
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
-import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 
 
 class RallyLineGraphChart @JvmOverloads constructor(
@@ -22,15 +21,27 @@ class RallyLineGraphChart @JvmOverloads constructor(
     private val conPoint2 = mutableListOf<PointF>()
 
     private val path = Path()
-    private val borderPath = Path()
-    private val barPath = Path()
-    private val pathPaint = Paint()
-    private val borderPathPaint = Paint()
-    private val barPaint = Paint()
+//    private val borderPath = Path()
+//    private val pathPaint = Paint()
+//    private val borderPathPaint = Paint()
 
-    private var viewCanvas: Canvas? = null
-    private var bitmap: Bitmap? = null
-    private val bitmapPaint = Paint(Paint.DITHER_FLAG)
+    private val crtl1PointPath = Path()
+    private val crtl2PointPath = Path()
+    private val stopPoint = Path()
+    private val linePath = Path()
+
+    private val crtl1Paint = Paint().apply {
+        isAntiAlias = true
+        strokeWidth = 3f
+        style = Paint.Style.FILL
+        color = Color.WHITE
+    }
+    private val crtl2Paint = Paint().apply {
+        isAntiAlias = true
+        strokeWidth = 3f
+        style = Paint.Style.FILL
+        color = Color.WHITE
+    }
 
     private val borderPathWidth by lazy {
         TypedValue.applyDimension(
@@ -38,24 +49,24 @@ class RallyLineGraphChart @JvmOverloads constructor(
         )
     }
 
-    init {
-        init(attrs)
+    private val stopPaint = Paint().apply {
+        isAntiAlias = true
+        strokeWidth = borderPathWidth + borderPathWidth
+        style = Paint.Style.FILL
+        color = Color.BLUE
     }
 
-    private fun init(set: AttributeSet?) {
-        borderPathPaint.apply {
-            isAntiAlias = true
-            strokeWidth = borderPathWidth
-            style = Paint.Style.STROKE
-            color = Color.RED
-        }
-
-        pathPaint.apply {
-            isAntiAlias = true
-            style = Paint.Style.STROKE
-            color = Color.BLACK
-        }
+    private val linePaint = Paint().apply {
+        isAntiAlias = true
+        strokeWidth = borderPathWidth
+        style = Paint.Style.STROKE
+        color = Color.RED
     }
+
+
+    private var viewCanvas: Canvas? = null
+    private var bitmap: Bitmap? = null
+    private val bitmapPaint = Paint(Paint.DITHER_FLAG)
 
     override fun onSizeChanged(
         w: Int,
@@ -79,51 +90,35 @@ class RallyLineGraphChart @JvmOverloads constructor(
     }
 
     private fun drawBezierCurve(canvas: Canvas?) {
-
         try {
-
             if (points.isEmpty() && conPoint1.isEmpty() && conPoint2.isEmpty()) return
 
-            path.reset()
-            path.moveTo(points.first().x, points.first().y)
+            linePath.reset()
+            linePath.moveTo(points.first().x, points.first().y)
+
             points.forEach {
-                path.addCircle(it.x, it.y, 10f, CW)
+                stopPoint.addCircle(it.x, it.y, 10f, CW)
             }
-            conPoint1.forEach {
-                path.addCircle(it.x, it.y, 10f, CW)
-            }
-
-            conPoint2.forEach {
-                path.addCircle(it.x, it.y, 10f, CW)
-            }
-
-
             for (i in 1 until points.size) {
-                path.cubicTo(
+                println("POINT ${points[i]}")
+                linePath.cubicTo(
                     conPoint1[i - 1].x, conPoint1[i - 1].y, conPoint2[i - 1].x, conPoint2[i - 1].y,
                     points[i].x, points[i].y
                 )
             }
 
-            borderPath.set(path)
-
-
-            canvas?.drawPath(borderPath, borderPathPaint)
+            canvas?.drawPath(stopPoint, stopPaint)
+            canvas?.drawPath(linePath, linePaint)
 
         } catch (e: Exception) {
+            Log.e("TAG", e.message ?: "")
         }
     }
 
-    private fun getLargeBarHeight() = height / 3 * 2f
-
     fun addDataPoints(data: List<PointD>, point1: List<PointD>, point2: List<PointD>) {
-        //do calculation in worker thread // Note: You should use some safe thread mechanism
-        //Calculation logic here are not fine, should updated when more time available
         post {
             Thread(Runnable {
 
-                println("HEIGHT $height")
-                println("WIDTH $width")
                 points.addAll(data.toF())
                 conPoint1.addAll(point1.toF())
                 conPoint2.addAll(point2.toF())
@@ -134,25 +129,4 @@ class RallyLineGraphChart @JvmOverloads constructor(
             }).start()
         }
     }
-
-    private fun resetDataPoints() {
-        this.data.clear()
-        points.clear()
-        conPoint1.clear()
-        conPoint2.clear()
-    }
-
-    fun setCurveBorderColor(@ColorRes color: Int) {
-        borderPathPaint.color = ContextCompat.getColor(context, color)
-    }
-
-    companion object {
-        private const val INDEX_OF_LARGE_BAR = 8
-        private const val VERTICAL_BARS =
-            (INDEX_OF_LARGE_BAR * INDEX_OF_LARGE_BAR) + 6 // add fixed bars size
-        private const val CURVE_BOTTOM_MARGIN = 32f
-
-    }
 }
-
-data class DataPoint(val amount: Float)
