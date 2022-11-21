@@ -19,11 +19,11 @@ class MapViewModel(
     
     fun fetchProblemAndTopo(problemId: Int): Flow<CompleteProblem> {
         return flow {
-            lineRepository.loadByProblemId(problemId)?.topoId?.let {
+            lineRepository.loadByProblemId(problemId)?.let {
                 val problem = problemRepository.loadById(problemId)
-                val topo = topoRepository.getTopoById(it)
+                val topo = topoRepository.getTopoById(it.id)
                 if (problem != null && (topo.isSuccess && topo.getOrNull() != null)) {
-                    emit(CompleteProblem(problem.convert(), topo.getOrNull()!!.convert()))
+                    emit(CompleteProblem(problem.convert(), topo.getOrNull()!!.convert(), it.convert()))
                 } else {
                     //TODO handle edge(s) case(s)
                 }

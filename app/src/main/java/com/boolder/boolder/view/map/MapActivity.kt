@@ -75,9 +75,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
     // Triggered when user click on a Problem on Map
     override fun onProblemSelected(problemId: Int) {
         lifecycleScope.launch {
-            mapViewModel.fetchProblemAndTopo(problemId).collect { (problem, topo) ->
+            mapViewModel.fetchProblemAndTopo(problemId).collect { (problem, topo, line) ->
                 with(Dispatchers.Main) {
-                    val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo)
+                    val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo, line)
                     bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
                     bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                 }

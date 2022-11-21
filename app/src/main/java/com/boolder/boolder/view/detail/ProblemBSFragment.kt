@@ -1,6 +1,7 @@
 package com.boolder.boolder.view.detail
 
 import android.content.Intent
+import android.graphics.PointF
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,13 +15,13 @@ import com.boolder.boolder.R
 import com.boolder.boolder.R.layout
 import com.boolder.boolder.R.string
 import com.boolder.boolder.databinding.BottomSheetBinding
-import com.boolder.boolder.domain.model.CircuitColor
-import com.boolder.boolder.domain.model.Problem
-import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.*
 import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 
 
@@ -29,8 +30,9 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     companion object {
         private const val PROBLEM = "PROBLEM"
         private const val TOPO = "TOPO"
-        fun newInstance(problem: Problem, topo: Topo) = ProblemBSFragment().apply {
-            arguments = bundleOf(PROBLEM to problem, TOPO to topo)
+        private const val LINE = "LINE"
+        fun newInstance(problem: Problem, topo: Topo, line: Line) = ProblemBSFragment().apply {
+            arguments = bundleOf(PROBLEM to problem, TOPO to topo, LINE to line)
         }
     }
 
@@ -46,8 +48,8 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val problem = requireArguments().getParcelable<Problem>(PROBLEM) ?: error("No Problem in arguments")
-
         val topo = requireArguments().getParcelable<Topo>(TOPO) ?: error("No Topo in arguments")
+        val line = requireArguments().getParcelable<Line>(LINE) ?: error("No Line in arguments")
 
         Glide.with(requireContext())
             .load(topo.url)
@@ -104,6 +106,31 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
                 )
             }.run { startActivity(this) }
         }
+
+        drawCurves(line.coordinates)
+    }
+
+    private fun drawCurves(stringCoordinates: String?) {
+        //[{"x":0.4325,"y":0.805}]
+        if (stringCoordinates.isNullOrBlank()) return
+        val coordinates = Json.decodeFromString(stringCoordinates) as List<Coordinates>
+        if (coordinates.isEmpty()) return
+        val points = coordinates.map { PointF(it.x, it.y) }
+//        val cubicSegment = curveAlgorithm.controlPointsFromPoints(points)
+
+//        binding.curveChart.setup(points, cubicSegment)
+
+//        val a = cubicSegment.map { PointF(it.controlPoint1.x, it.controlPoint1.y) }
+//        val b = cubicSegment.map { PointF(it.controlPoint2.x, it.controlPoint2.y) }
+
+//        binding.curveChart2.addDataPoints(points, a, b)
+
+//        binding.curveChart2.addDataPoints(List(2) { DataPoint(it.toFloat()) } )
+//        binding.curveChart2.addDataPoints(points, a, b)
+
+
+        val aaa = curveAlgorithm.controlPointsFromPoints(listOf(PointF(1f, 1f), PointF(0.2f, 2f), PointF(3f, 3f)))
+        println("AAAAA $aaa")
     }
 
     private fun Problem.defaultName(): String {

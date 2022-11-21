@@ -1,16 +1,16 @@
 package com.boolder.boolder.utils
 
-import android.graphics.Point
+import android.graphics.PointF
 import android.util.Log
 
 class CubicCurveAlgorithm {
 
-    data class CubicCurveSegment(val controlPoint1: Point, val controlPoint2: Point)
+    data class CubicCurveSegment(val controlPoint1: PointF, val controlPoint2: PointF)
 
-    private val firstControlPoints = mutableListOf<Point>()
-    private val secondControlPoints = mutableListOf<Point>()
+    private var firstControlPoints = mutableListOf<PointF>()
+    private val secondControlPoints = mutableListOf<PointF>()
 
-    fun controlPointsFromPoints(dataPoints: List<Point>): List<CubicCurveSegment> {
+    fun controlPointsFromPoints(dataPoints: List<PointF>): List<CubicCurveSegment> {
         // Number of segments
         val count = dataPoints.size.dec()
 
@@ -20,40 +20,42 @@ class CubicCurveAlgorithm {
             val p3 = dataPoints[1]
 
 
-            //Calculate First Control Point
+            //Calculate First Control PointF
             //3P1 = 2P0 + P3
             val p1x = (2 * p0.x + p3.x) / 3
             val p1y = (2 * p0.y + p3.y) / 3
 
-            firstControlPoints.add(Point(p1x, p1y))
+            firstControlPoints.add(PointF(p1x, p1y))
 
-            //Calculate second Control Point
+            //Calculate second Control PointF
             //P2 = 2P1 - P0
             val p2x = (2 * p1x + p0.x)
             val p2y = (2 * p1y + p0.y)
 
-            secondControlPoints.add(Point(p2x, p2y))
+            secondControlPoints.add(PointF(p2x, p2y))
 
         } else {
 
-            val rhsArray = mutableListOf<Point>()
+            firstControlPoints = MutableList(count) { PointF(0f, 0f) }
+
+            val rhsArray = mutableListOf<PointF>()
             //Array of Coefficients
-            val a = mutableListOf<Int>()
-            val b = mutableListOf<Int>()
-            val c = mutableListOf<Int>()
+            val a = mutableListOf<Float>()
+            val b = mutableListOf<Float>()
+            val c = mutableListOf<Float>()
 
             for (i in 0 until count) {
-                var rhsValueX: Int
-                var rhsValueY: Int
+                var rhsValueX: Float
+                var rhsValueY: Float
 
                 val p0 = dataPoints[i]
                 val p3 = dataPoints[i.inc()]
 
                 when (i) {
                     0 -> {
-                        a.add(0)
-                        b.add(2)
-                        c.add(1)
+                        a.add(0f)
+                        b.add(2f)
+                        c.add(1f)
 
                         //rhs for first segment
                         rhsValueX = p0.x + 2 * p3.x
@@ -61,25 +63,25 @@ class CubicCurveAlgorithm {
 
                     }
                     count - 1 -> {
-                        a.add(2)
-                        b.add(7)
-                        c.add(0)
+                        a.add(2f)
+                        b.add(7f)
+                        c.add(0f)
 
                         //rhs for last segment
                         rhsValueX = 8 * p0.x + p3.x
                         rhsValueY = 8 * p0.y + p3.y
                     }
                     else -> {
-                        a.add(1)
-                        b.add(4)
-                        c.add(1)
+                        a.add(1f)
+                        b.add(4f)
+                        c.add(1f)
 
                         rhsValueX = 4 * p0.x + 2 * p3.x
                         rhsValueY = 4 * p0.y + 2 * p3.y
                     }
                 }
 
-                rhsArray.add(Point(rhsValueX, rhsValueY))
+                rhsArray.add(PointF(rhsValueX, rhsValueY))
             }
 
             //Solve Ax=B. Use Tridiagonal matrix algorithm a.k.a Thomas Algorithm
@@ -97,23 +99,23 @@ class CubicCurveAlgorithm {
                 val r2x = rhsValueX - m * prevRhsValueX
                 val r2y = rhsValueY - m * prevRhsValueY
 
-                rhsArray[i] = Point(r2x, r2y)
+                rhsArray[i] = PointF(r2x, r2y)
             }
 
             //Get First Control Points
 
-            //Last control Point
+            //Last control PointF
             val lastControlPointX = rhsArray[count.dec()].x / b[count.dec()]
             val lastControlPointY = rhsArray[count.dec()].y / b[count.dec()]
 
-            firstControlPoints[count.dec()] = Point(lastControlPointX, lastControlPointY)
+            firstControlPoints[count.dec()] = PointF(lastControlPointX, lastControlPointY)
 
             for (i in count - 2 downTo 0) {
                 try {
                     val nextControlPoint = firstControlPoints[i.inc()]
                     val controlPointX = (rhsArray[i].x - c[i] * nextControlPoint.x) / b[i]
                     val controlPointY = (rhsArray[i].y - c[i] * nextControlPoint.y) / b[i]
-                    firstControlPoints[i] = Point(controlPointX, controlPointY)
+                    firstControlPoints[i] = PointF(controlPointX, controlPointY)
                 } catch (e: Exception) {
                     Log.w("Cubic Curve Algorithm", e.message ?: "No message")
                 }
@@ -127,7 +129,7 @@ class CubicCurveAlgorithm {
                     if (p1 != null) {
                         val controlPointX = (p3.x + p1.x) / 2
                         val controlPointY = (p3.y + p1.y) / 2
-                        firstControlPoints[i] = Point(controlPointX, controlPointY)
+                        secondControlPoints.add(PointF(controlPointX, controlPointY))
                     }
                 } else {
                     val p3 = dataPoints[i.inc()]
@@ -135,7 +137,7 @@ class CubicCurveAlgorithm {
                     if (nextP1 != null) {
                         val controlPointX = 2 * p3.x - nextP1.x
                         val controlPointY = 2 * p3.y - nextP1.y
-                        firstControlPoints[i] = Point(controlPointX, controlPointY)
+                        secondControlPoints.add(PointF(controlPointX, controlPointY))
                     }
                 }
             }
