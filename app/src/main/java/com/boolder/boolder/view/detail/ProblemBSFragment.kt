@@ -115,22 +115,31 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         if (stringCoordinates.isNullOrBlank()) return
         val coordinates = Json.decodeFromString(stringCoordinates) as List<Coordinates>
         if (coordinates.isEmpty()) return
-        val points = coordinates.map { PointF(it.x, it.y) }
-//        val cubicSegment = curveAlgorithm.controlPointsFromPoints(points)
+        val points = coordinates.map { PointD(it.x, it.y) }.map { it.multiplyBy(1000) }
+//        val points = listOf(PointD(1.0, 1.0), PointD(2.0, 2.0), PointD(3.0, 3.0))
+//        val points = listOf(
+//            PointD(0.0, 0.0),
+//            PointD(0.0, 400.0),
+//            PointD(535.0, 400.0),
+//            PointD(535.0, 800.0),
+//            PointD(1070.0, 800.0),
+//            PointD(1070.0, 0.0)
+//        )
+//        println(pointsOriginal.map { it.multiplyBy(100) })
+        println(points)
 
-//        binding.curveChart.setup(points, cubicSegment)
+        val segment = curveAlgorithm.controlPointsFromPoints(points)
+        println("SEGMENT $segment")
+        val a = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
+        val b = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
 
-//        val a = cubicSegment.map { PointF(it.controlPoint1.x, it.controlPoint1.y) }
-//        val b = cubicSegment.map { PointF(it.controlPoint2.x, it.controlPoint2.y) }
+        binding.curveChart2.addDataPoints(points, a, b)
 
-//        binding.curveChart2.addDataPoints(points, a, b)
+    }
 
-//        binding.curveChart2.addDataPoints(List(2) { DataPoint(it.toFloat()) } )
-//        binding.curveChart2.addDataPoints(points, a, b)
-
-
-        val aaa = curveAlgorithm.controlPointsFromPoints(listOf(PointF(1f, 1f), PointF(0.2f, 2f), PointF(3f, 3f)))
-        println("AAAAA $aaa")
+    //TODO REMOVE THIS
+    fun PointD.multiplyBy(coef: Int): PointD {
+        return PointD(this.x * coef, this.y * coef)
     }
 
     private fun Problem.defaultName(): String {
@@ -143,3 +152,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         return CircuitColor.valueOf(this).localize(requireContext())
     }
 }
+
+data class PointD(val x: Double, val y: Double)
+
+fun List<PointD>.toF() = map { PointF(it.x.toFloat(), it.y.toFloat()) }

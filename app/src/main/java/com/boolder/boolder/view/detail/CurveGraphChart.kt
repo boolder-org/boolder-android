@@ -90,10 +90,10 @@ class CurveGraphChart @JvmOverloads constructor(
 
             for (i in 1 until points.size) {
                 path.cubicTo(
-                    segment[i.dec()].controlPoint1.x,
-                    segment[i.dec()].controlPoint1.y,
-                    segment[i.dec()].controlPoint2.x,
-                    segment[i.dec()].controlPoint2.y,
+                    segment[i.dec()].controlPoint1.x.toFloat(),
+                    segment[i.dec()].controlPoint1.y.toFloat(),
+                    segment[i.dec()].controlPoint2.x.toFloat(),
+                    segment[i.dec()].controlPoint2.y.toFloat(),
                     points[i].x,
                     points[i].y
                 )
