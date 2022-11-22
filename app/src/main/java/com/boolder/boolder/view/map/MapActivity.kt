@@ -8,10 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
+import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.viewBinding
+import com.boolder.boolder.view.detail.BottomSheetListener
 import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
 import com.boolder.boolder.view.search.SearchActivity
@@ -27,7 +29,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener {
+class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener, BottomSheetListener {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -75,9 +77,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
     // Triggered when user click on a Problem on Map
     override fun onProblemSelected(problemId: Int) {
         lifecycleScope.launch {
-            mapViewModel.fetchProblemAndTopo(problemId).collect { (problem, topo, line) ->
+            mapViewModel.fetchProblemAndTopo(problemId).collect { completeProblem ->
                 with(Dispatchers.Main) {
-                    val bottomSheetFragment = ProblemBSFragment.newInstance(problem, topo, line)
+                    val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem, this@MapActivity)
                     bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
                     bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                 }
@@ -87,5 +89,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
 
     override fun onPoisSelected(poisId: String, stringProperty: String, geometry: Geometry?) {
 
+    }
+
+    // Called from BottomSheet
+    override fun onProblemSelected(problem: Problem) {
+        // TODO binding.mapView.selectProblem()
     }
 }

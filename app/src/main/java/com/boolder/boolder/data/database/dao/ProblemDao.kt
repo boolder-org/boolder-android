@@ -12,4 +12,7 @@ interface ProblemDao {
 
     @Query("SELECT * FROM problems WHERE id == :problemId")
     suspend fun loadById(problemId: Int): ProblemEntity?
+
+    @Query("SELECT * FROM problems WHERE id IN (:problemIds)")
+    suspend fun loadAllByIds(problemIds: List<Int>): List<ProblemEntity>
 }

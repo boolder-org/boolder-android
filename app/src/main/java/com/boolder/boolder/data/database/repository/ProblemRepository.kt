@@ -14,4 +14,8 @@ class ProblemRepository(
     suspend fun loadById(problemId: Int): ProblemEntity? {
         return problemDao.loadById(problemId)
     }
+
+    suspend fun loadAllByIds(problemIds: List<Int>): List<ProblemEntity> {
+        return problemDao.loadAllByIds(problemIds)
+    }
 }

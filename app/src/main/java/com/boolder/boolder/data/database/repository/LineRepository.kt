@@ -11,8 +11,8 @@ class LineRepository(
         return lineDao.getAll()
     }
 
-    suspend fun loadById(lineId: Int): LineEntity? {
-        return lineDao.loadById(lineId)
+    suspend fun loadAllByTopoIds(topoId: Int): List<LineEntity> {
+        return lineDao.loadByTopoId(topoId)
     }
 
     suspend fun loadByProblemId(problemId: Int): LineEntity? {

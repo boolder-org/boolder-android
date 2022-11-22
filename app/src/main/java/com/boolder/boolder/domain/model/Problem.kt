@@ -20,4 +20,9 @@ data class Problem(
     val bleauInfoId: String?,
     val featured: Boolean,
     val parentId: Int?
-) : Parcelable
+) : Parcelable {
+
+    val circuitColorSafe
+        get() = circuitColor?.let { CircuitColor.valueOf(it.uppercase()) }
+            ?: CircuitColor.OFF_CIRCUIT
+}

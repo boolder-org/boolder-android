@@ -162,7 +162,7 @@ class BoolderMap @JvmOverloads constructor(
 
                         val cameraOption = CameraOptions.Builder()
                             .center(feature.geometry() as Point)
-                            .padding(EdgeInsets(60.0, 8.8, (screenHeight).toDouble(), 8.8))
+                            .padding(EdgeInsets(40.0, 8.8, (screenHeight).toDouble(), 8.8))
                             .build()
                         val mapAnimationOption = MapAnimationOptions.Builder()
                             .duration(500L)
@@ -207,7 +207,8 @@ class BoolderMap @JvmOverloads constructor(
         }
     }
 
-    private fun selectProblem(featureId: String) {
+    fun selectProblem(featureId: String) {
+        getMapboxMap()
         getMapboxMap().setFeatureState(
             "problems",
             BoolderMapConfig.problemsSourceLayerId,

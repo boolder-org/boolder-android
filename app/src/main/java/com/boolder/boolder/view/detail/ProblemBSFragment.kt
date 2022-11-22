@@ -1,14 +1,20 @@
 package com.boolder.boolder.view.detail
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.boolder.boolder.BuildConfig
@@ -16,30 +22,42 @@ import com.boolder.boolder.R
 import com.boolder.boolder.R.layout
 import com.boolder.boolder.R.string
 import com.boolder.boolder.databinding.BottomSheetBinding
-import com.boolder.boolder.domain.model.*
+import com.boolder.boolder.domain.model.CircuitColor
+import com.boolder.boolder.domain.model.CircuitColor.WHITE
+import com.boolder.boolder.domain.model.CompleteProblem
+import com.boolder.boolder.domain.model.Line
+import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.get
 
 
-class ProblemBSFragment : BottomSheetDialogFragment() {
+interface BottomSheetListener {
+    fun onProblemSelected(problem: Problem)
+}
+
+class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheetDialogFragment() {
 
     companion object {
-        private const val PROBLEM = "PROBLEM"
-        private const val TOPO = "TOPO"
-        private const val LINE = "LINE"
-        fun newInstance(problem: Problem, topo: Topo, line: Line) = ProblemBSFragment().apply {
-            arguments = bundleOf(PROBLEM to problem, TOPO to topo, LINE to line)
+        private const val COMPLETE_PROBLEM = "COMPLETE_PROBLEM"
+        fun newInstance(problem: CompleteProblem, listener: BottomSheetListener) = ProblemBSFragment(listener).apply {
+            arguments = bundleOf(COMPLETE_PROBLEM to problem)
         }
     }
 
     private val binding: BottomSheetBinding by viewBinding(BottomSheetBinding::bind)
+    private val curveAlgorithm: CubicCurveAlgorithm
+        get() = get()
 
-    private val curveAlgorithm: CubicCurveAlgorithm by inject()
+    private val completeProblem
+        get() = requireArguments().getParcelable<CompleteProblem>(COMPLETE_PROBLEM)
+            ?: error("No Problem in arguments")
+
+    private lateinit var selectedProblem: Problem
+    private val bleauUrl
+        get() = "https://bleau.info/a/${selectedProblem.bleauInfoId}.html"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(layout.bottom_sheet, container, false)
@@ -48,15 +66,83 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val problem = requireArguments().getParcelable<Problem>(PROBLEM) ?: error("No Problem in arguments")
-        val topo = requireArguments().getParcelable<Topo>(TOPO) ?: error("No Topo in arguments")
-        val line = requireArguments().getParcelable<Line>(LINE) ?: error("No Line in arguments")
+        selectedProblem = completeProblem.problem
 
         Glide.with(requireContext())
-            .load(topo.url)
+            .load(completeProblem.topo?.url)
             .placeholder(R.drawable.ic_placeholder)
             .into(binding.picture)
 
+        setupClickEvent()
+        setupViewFor(completeProblem.problem)
+
+        drawCurves(completeProblem.line.points(), completeProblem.problem)
+        drawCircuitNumberCircle(completeProblem.line, completeProblem.problem)
+
+        completeProblem.otherCompleteProblem.map {
+            drawCircuitNumberCircle(it.line, it.problem)
+        }
+    }
+
+    private fun drawCurves(points: List<PointD>, problem: Problem) {
+        if (points.isNotEmpty()) {
+
+            val segment = curveAlgorithm.controlPointsFromPoints(points)
+
+            val ctrl1 = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
+            val ctrl2 = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
+
+            //TODO Switch back to PointF, avoid home made object in custom views (re-usability)
+            binding.lineVector.addDataPoints(
+                points,
+                ctrl1,
+                ctrl2,
+                problem.drawColor()
+            )
+        }
+    }
+
+    private fun drawCircuitNumberCircle(line: Line, problem: Problem) {
+        val pointD = line.points().firstOrNull()
+        if (pointD != null) {
+            val match = ViewGroup.LayoutParams.MATCH_PARENT
+            val cardSize = 80
+            val offset = cardSize / 2
+            val cardParams = RelativeLayout.LayoutParams(cardSize, cardSize)
+
+            val text = TextView(requireContext()).apply {
+                val textColor = if (problem.circuitColorSafe == WHITE) {
+                    ColorStateList.valueOf(Color.BLACK)
+                } else ColorStateList.valueOf(Color.WHITE)
+
+                setTextColor(textColor)
+                setAutoSizeTextTypeUniformWithPresetSizes(intArrayOf(8, 10, 12), TypedValue.COMPLEX_UNIT_SP)
+                text = problem.circuitNumber
+                gravity = Gravity.CENTER
+            }
+
+            val card = CardView(requireContext())
+
+            card.apply {
+                backgroundTintList = ColorStateList.valueOf(problem.drawColor())
+                setOnClickListener { onNewProblemSelected(line, problem) }
+                addView(text, RelativeLayout.LayoutParams(match, match))
+                radius = 40f
+                translationX = pointD.x.toFloat() - offset
+                translationY = pointD.y.toFloat() - offset
+            }
+
+            binding.root.addView(card, cardParams)
+        }
+    }
+
+    private fun onNewProblemSelected(line: Line, problem: Problem) {
+        selectedProblem = problem
+        setupViewFor(problem)
+        drawCurves(line.points(), problem)
+    }
+
+    private fun setupViewFor(problem: Problem) {
         binding.title.text = problem.name
         binding.grade.text = problem.grade
 
@@ -72,9 +158,9 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         }
         binding.typeIcon.setImageDrawable(steepnessDrawable)
         binding.typeText.text = problem.steepness.replaceFirstChar { it.uppercaseChar() }
+    }
 
-        val bleauUrl = "https://bleau.info/a/${problem.bleauInfoId}.html"
-
+    private fun setupClickEvent() {
         binding.bleauInfo.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bleauUrl))
             startActivity(browserIntent)
@@ -99,7 +185,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
                 putExtra(
                     Intent.EXTRA_TEXT, """
                     ----
-                    Problem #${problem.id} - ${problem.name ?: problem.defaultName()}
+                    Problem #${selectedProblem.id} - ${selectedProblem.name ?: selectedProblem.defaultName()}
                     Boolder v.${BuildConfig.VERSION_NAME} (build n°${BuildConfig.VERSION_CODE})
                     Android SDK ${Build.VERSION.SDK_INT} (${Build.VERSION.RELEASE})
                     """
@@ -107,35 +193,9 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
             }.run { startActivity(this) }
         }
 
-        val joke = line.coordinates?.contains("null") == true
-
-        if (!line.coordinates.isNullOrBlank() && !joke) {
-            drawCurves(line.coordinates, problem)
-        }
     }
 
-    private fun drawCurves(stringCoordinates: String, problem: Problem) {
-        //[{"x":0.4325,"y":0.805}]
-        val color = problem.circuitColor?.let { CircuitColor.valueOf(it.uppercase()) } ?: CircuitColor.OFF_CIRCUIT
-        try {
-            val coordinates = Json.decodeFromString(stringCoordinates) as List<Coordinates>
-            if (coordinates.isNotEmpty()) {
-                val points = coordinates.map { PointD(it.x, it.y) }.map { it.scale() }
-
-                val segment = curveAlgorithm.controlPointsFromPoints(points)
-                val a = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
-                val b = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
-                binding.curveChart2.addDataPoints(points, a, b, color.getColor(requireContext()))
-            }
-        } catch (e: Exception) {
-            Log.w("TAG", e.message ?: "no message")
-        }
-    }
-
-
-    private fun PointD.scale(): PointD {
-        return PointD(this.x * 1060, this.y * 810)
-    }
+    private fun Problem.drawColor(): Int = circuitColorSafe.getColor(requireContext())
 
     private fun Problem.defaultName(): String {
         return if (!circuitColor.isNullOrBlank() && !circuitNumber.isNullOrBlank()) {

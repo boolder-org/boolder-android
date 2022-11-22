@@ -27,8 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.boolder.boolder.view.detail.RallyLineGraphChart
-        android:id="@+id/curve_chart_2"
+    <com.boolder.boolder.view.detail.LineVectorView
+        android:id="@+id/line_vector"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="4:3"
