@@ -3,6 +3,7 @@ package com.boolder.boolder.view.map
 import android.app.ActivityOptions
 import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -88,7 +89,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
     }
 
     override fun onPoisSelected(poisId: String, stringProperty: String, geometry: Geometry?) {
-
+        val sendIntent = Intent(Intent.ACTION_VIEW, Uri.parse(stringProperty))
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
     }
 
     // Called from BottomSheet
