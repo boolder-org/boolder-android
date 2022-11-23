@@ -52,9 +52,8 @@ class BoolderMap @JvmOverloads constructor(
     private fun init() {
         val cameraOptions = CameraOptions.Builder()
             .center(Point.fromLngLat(2.5968216, 48.3925623))
-            .center(Point.fromLngLat(2.605752646923065, 48.408801229423915))
+//            .center(Point.fromLngLat(2.605752646923065, 48.408801229423915)) // TODO to be removed
             .zoom(10.2)
-            .zoom(25.0)
             .build()
 
         getMapboxMap().apply {
@@ -62,7 +61,6 @@ class BoolderMap @JvmOverloads constructor(
         }
 
         gestures.pitchEnabled = false
-        gestures.simultaneousRotateAndPinchToZoomEnabled = false
         scalebar.enabled = false
 
         addClickEvent()

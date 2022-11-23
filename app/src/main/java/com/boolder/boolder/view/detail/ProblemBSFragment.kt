@@ -32,6 +32,7 @@ import com.boolder.boolder.utils.viewBinding
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.get
+import java.util.*
 
 
 interface BottomSheetListener {
@@ -58,6 +59,8 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     private lateinit var selectedProblem: Problem
     private val bleauUrl
         get() = "https://bleau.info/a/${selectedProblem.bleauInfoId}.html"
+    private val shareurl
+        get() = "https://www.boolder.com/${Locale.getDefault().language}/p/${selectedProblem.id}"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(layout.bottom_sheet, container, false)
@@ -169,7 +172,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         binding.share.setOnClickListener {
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, bleauUrl)
+                putExtra(Intent.EXTRA_TEXT, shareurl)
                 type = "text/plain"
             }
 
