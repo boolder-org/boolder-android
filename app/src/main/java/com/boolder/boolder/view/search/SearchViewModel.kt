@@ -3,18 +3,15 @@ package com.boolder.boolder.view.search
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagingConfig
 import com.algolia.instantsearch.android.paging3.Paginator
+import com.algolia.instantsearch.android.paging3.filterstate.connectPaginator
 import com.algolia.instantsearch.android.paging3.flow
-import com.algolia.instantsearch.android.paging3.liveData
-import com.algolia.instantsearch.android.paging3.searchbox.connectPaginator
 import com.algolia.instantsearch.core.connection.ConnectionHandler
 import com.algolia.instantsearch.filter.state.FilterState
-import com.algolia.instantsearch.searchbox.SearchBoxConnector
 import com.algolia.instantsearch.searcher.hits.addHitsSearcher
 import com.algolia.instantsearch.searcher.multi.MultiSearcher
 import com.algolia.search.model.APIKey
 import com.algolia.search.model.ApplicationID
 import com.algolia.search.model.IndexName
-import com.algolia.search.model.response.ResponseSearch
 import com.boolder.boolder.data.network.model.AreaRemote
 import com.boolder.boolder.data.network.model.ProblemRemote
 
@@ -32,16 +29,15 @@ class SearchViewModel : ViewModel() {
     private val pagingConfig = PagingConfig(pageSize = 50)
     private val indexProblem = IndexName(INDEX_PROBLEM)
     private val indexArea = IndexName(INDEX_AREA)
-    private val problemSearcher = searcher.addHitsSearcher(indexProblem)
-    private val areaSearcher = searcher.addHitsSearcher(indexArea)
+    private val problemSearcher = searcher.addHitsSearcher(indexName = indexProblem)
+    private val areaSearcher = searcher.addHitsSearcher(indexName = indexArea)
     private val filterState = FilterState()
-    private val searchBoxConnector = SearchBoxConnector(searcher)
-    private val connection = ConnectionHandler(searchBoxConnector)
+    private val connection = ConnectionHandler()
     private val problemPaginator = Paginator(
         problemSearcher,
         pagingConfig,
         transformer = { hit ->
-            println("Do we hit this ? (problem)")
+            println("Problem transform")
             hit.deserialize(ProblemRemote.serializer())
         }
     )
@@ -49,10 +45,15 @@ class SearchViewModel : ViewModel() {
         areaSearcher,
         pagingConfig,
         transformer = { hit ->
-            println("Do we hit this ? (area)")
+            println("Area transform")
             hit.deserialize(AreaRemote.serializer())
         }
     )
+
+    init {
+        connection += filterState.connectPaginator(problemPaginator)
+        connection += filterState.connectPaginator(areaPaginator)
+    }
 
     val problems
         get() = problemPaginator.flow
@@ -60,24 +61,9 @@ class SearchViewModel : ViewModel() {
     val areas
         get() = areaPaginator.flow
 
-    fun connect() {
-//        connection += filterState.connectPaginator(problemPaginator)
-//        connection += filterState.connectPaginator(areaPaginator)
-
-        connection += searchBoxConnector.connectPaginator(problemPaginator)
-        connection += searchBoxConnector.connectPaginator(areaPaginator)
-    }
-
     fun search(query: String? = "") {
         searcher.setQuery(query)
         searcher.searchAsync()
-        problemPaginator.liveData.observeForever {
-            println("Observe forever get hit")
-        }
-
-        searcher.response.subscribe {
-            println((it?.results?.firstOrNull()?.response as ResponseSearch).hitsOrNull?.firstOrNull())
-        }
     }
 
     override fun onCleared() {

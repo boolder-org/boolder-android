@@ -14,7 +14,6 @@ import com.boolder.boolder.utils.NetworkObserver
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.utils.viewBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -76,17 +75,17 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         applySuggestions()
 
-        searchViewModel.connect()
 
         lifecycleScope.launch {
-            searchViewModel.problems.collectLatest {
-                println("RESULT PROBLEMS $it")
+            searchViewModel.problems.collect {
+                println("RESULT PROBLEM $it")
                 problemAdapter.submitData(it)
             }
-            searchViewModel.areas.collectLatest {
+            searchViewModel.areas.collect {
                 println("RESULT AREAS $it")
                 areaAdapter.submitData(it)
             }
+
         }
     }
 
