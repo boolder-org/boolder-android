@@ -143,6 +143,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         selectedProblem = problem
         setupViewFor(problem)
         drawCurves(line.points(), problem)
+        listener.onProblemSelected(problem)
     }
 
     private fun setupViewFor(problem: Problem) {

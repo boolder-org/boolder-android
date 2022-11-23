@@ -96,6 +96,6 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
 
     // Called from BottomSheet
     override fun onProblemSelected(problem: Problem) {
-        // TODO binding.mapView.selectProblem()
+        binding.mapView.selectProblem(problem.id.toString())
     }
 }

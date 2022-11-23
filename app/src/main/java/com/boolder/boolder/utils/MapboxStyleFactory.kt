@@ -9,6 +9,7 @@ import com.mapbox.maps.extension.style.layers.generated.circleLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import com.mapbox.maps.extension.style.style
+import com.mapbox.maps.extension.style.types.PromoteId
 
 class MapboxStyleFactory {
 
@@ -16,6 +17,7 @@ class MapboxStyleFactory {
         return style(BoolderMapConfig.styleUri) {
             +vectorSource("problems") {
                 url(BoolderMapConfig.vectorSourceUrl)
+                promoteId(PromoteId("id"))
             }
             +circleLayer("problems", "problems") {
                 sourceLayer(BoolderMapConfig.problemsSourceLayerId)

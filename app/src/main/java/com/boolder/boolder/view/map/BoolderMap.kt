@@ -51,9 +51,10 @@ class BoolderMap @JvmOverloads constructor(
 
     private fun init() {
         val cameraOptions = CameraOptions.Builder()
-            .center(Point.fromLngLat(2.5968216, 48.3925623))
-//            .center(Point.fromLngLat(2.605752646923065, 48.408801229423915)) // TODO to be removed
-            .zoom(10.2)
+//            .center(Point.fromLngLat(2.5968216, 48.3925623))
+            .center(Point.fromLngLat(2.605752646923065, 48.408801229423915)) // TODO to be removed
+//            .zoom(10.2)
+            .zoom(25.0)
             .build()
 
         getMapboxMap().apply {
@@ -93,7 +94,7 @@ class BoolderMap @JvmOverloads constructor(
             queryAreaRenderedFeatures(geometry)
             queryClusterRenderedFeatures(geometry)
             queryPoisRenderedFeatures(geometry)
-            queryProblemRenderedFeatures(geometry, height / 2)
+            queryProblemRenderedFeatures(geometry)
         }
     }
 
@@ -124,10 +125,7 @@ class BoolderMap @JvmOverloads constructor(
         }
     }
 
-    private fun queryProblemRenderedFeatures(
-        geometry: RenderedQueryGeometry,
-        screenHeight: Int,
-    ) {
+    private fun queryProblemRenderedFeatures(geometry: RenderedQueryGeometry) {
 
         val problemGeometry = RenderedQueryGeometry(
             ScreenBox(
@@ -152,15 +150,15 @@ class BoolderMap @JvmOverloads constructor(
                 val feature = features.value?.firstOrNull()?.feature ?: return@queryRenderedFeatures
 
                 if (feature.hasProperty("id") && feature.geometry() != null) {
-                    selectProblem(feature.id() ?: "")
+                    selectProblem(feature.getNumberProperty("id").toString())
                     listener?.onProblemSelected(feature.getNumberProperty("id").toInt())
 
                     // Move camera is problem is hidden by bottomSheet
-                    if (geometry.screenCoordinate.y >= screenHeight) {
+                    if (geometry.screenCoordinate.y >= height / 2) {
 
                         val cameraOption = CameraOptions.Builder()
                             .center(feature.geometry() as Point)
-                            .padding(EdgeInsets(40.0, 8.8, (screenHeight).toDouble(), 8.8))
+                            .padding(EdgeInsets(40.0, 8.8, (height / 2).toDouble(), 8.8))
                             .build()
                         val mapAnimationOption = MapAnimationOptions.Builder()
                             .duration(500L)
@@ -206,7 +204,6 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     fun selectProblem(featureId: String) {
-        getMapboxMap()
         getMapboxMap().setFeatureState(
             "problems",
             BoolderMapConfig.problemsSourceLayerId,
@@ -218,7 +215,6 @@ class BoolderMap @JvmOverloads constructor(
             unselectProblem()
         }
         previousSelectedFeatureId = featureId
-
     }
 
     private fun unselectProblem() {
@@ -230,7 +226,6 @@ class BoolderMap @JvmOverloads constructor(
                 Value.fromJson("""{"selected": false}""").value!!
             )
         }
-
     }
 
     // 3A. Build bounds around coordinate
@@ -255,7 +250,7 @@ class BoolderMap @JvmOverloads constructor(
                     val coordinateBound = CoordinateBounds(southWest, northEst)
                     moveCamera(coordinateBound)
                 }
-            }
+            } ?: unselectProblem()
         } else {
             Log.w(TAG, features.error ?: "No message")
         }
