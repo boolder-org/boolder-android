@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivitySearchBinding
@@ -27,6 +26,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
     private val problemAdapter = ProblemAdapter()
     private val areaAdapter = AreaAdapter()
+    private val algoliaAdapter = AlgoliaAdapter()
 
     private val suggestions = listOf("Isatis", "La Marie-Rose", "Cul de Chien")
 
@@ -63,7 +63,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         }
 
         binding.recyclerView.apply {
-            adapter = ConcatAdapter(problemAdapter, areaAdapter)
+            adapter = algoliaAdapter
             layoutManager = LinearLayoutManager(this@SearchActivity)
         }
 
@@ -75,18 +75,19 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         applySuggestions()
 
+        searchViewModel.connect(algoliaAdapter)
 
-        lifecycleScope.launch {
-            searchViewModel.problems.collect {
-                println("RESULT PROBLEM $it")
-                problemAdapter.submitData(it)
-            }
-            searchViewModel.areas.collect {
-                println("RESULT AREAS $it")
-                areaAdapter.submitData(it)
-            }
-
-        }
+        // TODO Understand with either flow or livedata aren't updated on query changes
+        // Issue open on Github
+        // https://github.com/algolia/instantsearch-android/issues/374
+        //lifecycleScope.launch {
+        //    searchViewModel.problems.collect {
+        //        problemAdapter.submitData(it)
+        //    }
+        //    searchViewModel.areas.collect {
+        //        areaAdapter.submitData(it)
+        //    }
+        //}
     }
 
     private fun applySuggestions() {

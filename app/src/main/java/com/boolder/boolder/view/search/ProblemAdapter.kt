@@ -9,6 +9,9 @@ import com.boolder.boolder.data.network.model.ProblemRemote
 import com.boolder.boolder.databinding.SearchResultItemBinding
 import com.boolder.boolder.view.search.ProblemAdapter.SearchViewHolder
 
+// TODO Understand with either flow or livedata aren't updated on query changes
+// Issue open on Github
+// https://github.com/algolia/instantsearch-android/issues/374
 class ProblemAdapter : PagingDataAdapter<ProblemRemote, SearchViewHolder>(SearchDiffUtil) {
 
     inner class SearchViewHolder(private val binding: SearchResultItemBinding) : ViewHolder(binding.root) {

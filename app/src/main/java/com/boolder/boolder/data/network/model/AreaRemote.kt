@@ -1,5 +1,6 @@
 package com.boolder.boolder.data.network.model
 
+import com.boolder.boolder.view.search.BaseObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,7 +10,7 @@ data class AreaRemote(
     val objectID: String,
     val name: String,
     val bounds: BoundsRemote
-) {
+) : BaseObject {
     @Serializable
     data class BoundsRemote(
         @SerialName("south_west")

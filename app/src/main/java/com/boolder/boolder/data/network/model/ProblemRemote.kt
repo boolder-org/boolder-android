@@ -1,5 +1,6 @@
 package com.boolder.boolder.data.network.model
 
+import com.boolder.boolder.view.search.BaseObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,4 +11,4 @@ data class ProblemRemote(
     val grade: String,
     @SerialName("area_name")
     val areaName: String
-)
+) : BaseObject

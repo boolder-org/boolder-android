@@ -107,7 +107,6 @@ class CubicCurveAlgorithm {
             //Last control com.boolder.boolder.view.detail.PointD)
             val lastControlPointX = rhsArray[count.dec()].x / b[count.dec()]
             val lastControlPointY = rhsArray[count.dec()].y / b[count.dec()]
-            println("LAST CONTROL ${rhsArray[count.dec()].x} ${b[count.dec()]}")
             firstControlPoints[count.dec()] = PointD(lastControlPointX, lastControlPointY)
 
             for (i in count - 2 downTo 0) {
