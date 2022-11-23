@@ -16,6 +16,7 @@ import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.scalebar.scalebar
 
@@ -63,6 +64,7 @@ class BoolderMap @JvmOverloads constructor(
 
         gestures.pitchEnabled = false
         scalebar.enabled = false
+        compass.enabled = false
 
         addClickEvent()
     }

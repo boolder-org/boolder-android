@@ -59,16 +59,16 @@ class LineVectorView @JvmOverloads constructor(
             if (points.isEmpty() && controlPoint1.isEmpty() && controlPoint2.isEmpty()) return
 
             path.reset()
-            path.moveTo(points.first().x, points.first().y)
+            path.moveTo(points.first().x * width, points.first().y * height)
 
             for (i in 1 until points.size) {
                 path.cubicTo(
-                    controlPoint1[i.dec()].x,
-                    controlPoint1[i.dec()].y,
-                    controlPoint2[i.dec()].x,
-                    controlPoint2[i.dec()].y,
-                    points[i].x,
-                    points[i].y
+                    controlPoint1[i.dec()].x * width,
+                    controlPoint1[i.dec()].y * height,
+                    controlPoint2[i.dec()].x * width,
+                    controlPoint2[i.dec()].y * height,
+                    points[i].x * width,
+                    points[i].y * height
                 )
             }
 

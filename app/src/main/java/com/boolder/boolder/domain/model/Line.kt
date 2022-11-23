@@ -23,11 +23,7 @@ class Line(
     }
 
     fun points(): List<PointD> {
-        // Convert point to Double to avoid loose digit, and apply a scale factor
-        return coordinatesParsed().map { PointD(it.x, it.y) }.map { it.scale() }
-    }
-
-    private fun PointD.scale(): PointD {
-        return PointD(this.x * 1060, this.y * 810)
+        // Convert point to Double to avoid loose digit
+        return coordinatesParsed().map { PointD(it.x, it.y) }
     }
 }
