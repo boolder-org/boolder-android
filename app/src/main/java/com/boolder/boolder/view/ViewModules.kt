@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     single { MapViewModel(get(), get(), get(), get()) }
-    single { SearchViewModel() }
+    single { SearchViewModel(get(), get()) }
     single { NetworkObserverImpl() }
     factory { MapboxStyleFactory() }
     factory { CubicCurveAlgorithm() }

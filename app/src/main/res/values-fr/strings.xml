@@ -30,4 +30,6 @@
     <string name="no_internet_connection">No internet connection</string>
     <string name="no_result">No result</string>
     <string name="query_examples">Query examples:</string>
+    <string name="category_area">Areas</string>
+    <string name="category_problem">Problems</string>
 </resources>

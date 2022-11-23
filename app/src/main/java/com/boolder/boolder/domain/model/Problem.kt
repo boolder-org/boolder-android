@@ -1,6 +1,8 @@
 package com.boolder.boolder.domain.model
 
+import android.content.Context
 import android.os.Parcelable
+import com.boolder.boolder.view.search.BaseObject
 import kotlinx.parcelize.Parcelize
 
 
@@ -19,10 +21,14 @@ data class Problem(
     val areaId: Int,
     val bleauInfoId: String?,
     val featured: Boolean,
-    val parentId: Int?
-) : Parcelable {
+    val parentId: Int?,
+    val areaName: String?
+) : Parcelable, BaseObject {
 
     val circuitColorSafe
         get() = circuitColor?.let { CircuitColor.valueOf(it.uppercase()) }
             ?: CircuitColor.OFF_CIRCUIT
+
+    fun drawColor(context: Context): Int = circuitColorSafe.getColor(context)
+
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivitySearchBinding
@@ -24,17 +25,15 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
     private val searchViewModel: SearchViewModel by viewModel()
     private val networkObserverImpl: NetworkObserverImpl by inject()
 
-    private val problemAdapter = ProblemAdapter()
-    private val areaAdapter = AreaAdapter()
     private val algoliaAdapter = AlgoliaAdapter()
 
     private val suggestions = listOf("Isatis", "La Marie-Rose", "Cul de Chien")
 
-    private val isQueryEmpty: Boolean
-        get() = binding.searchComponent.searchBar.text?.isBlank() == true
+    private val query
+        get() = binding.searchComponent.searchBar.text
+    private val isQueryEmpty
+        get() = query == null || query.isEmpty() || query.isBlank()
 
-    private val isQueryProduceResult: Boolean
-        get() = true // TODO impl + rename
 
     private var isConnectedToNetwork = false
 
@@ -58,24 +57,37 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         binding.searchComponent.searchLastIcon.setOnClickListener {
             binding.searchComponent.searchBar.text.clear()
-            refreshSuggestionsVisibility(isQueryEmpty)
-            refreshNoResultVisibility(isQueryProduceResult)
+            refreshSuggestionsVisibility(true)
+            refreshNoResultVisibility(false)
+            algoliaAdapter.setHits(emptyList())
         }
 
         binding.recyclerView.apply {
             adapter = algoliaAdapter
+            addItemDecoration(DividerItemDecoration(this@SearchActivity, LinearLayoutManager.VERTICAL))
             layoutManager = LinearLayoutManager(this@SearchActivity)
         }
 
         binding.searchComponent.searchBar.addTextChangedListener { query ->
-            refreshSuggestionsVisibility(isQueryEmpty)
-            refreshNoResultVisibility(isQueryProduceResult)
-            searchViewModel.search(query?.toString())
+            if (isQueryEmpty) {
+                algoliaAdapter.setHits(emptyList())
+                refreshSuggestionsVisibility(true)
+            } else {
+                searchViewModel.search(query.toString())
+            }
         }
 
         applySuggestions()
 
-        searchViewModel.connect(algoliaAdapter)
+        searchViewModel.searchResult.observe(this) {
+            refreshNoResultVisibility(it.isEmpty())
+            refreshSuggestionsVisibility(false)
+            if (isQueryEmpty) {
+                algoliaAdapter.setHits(emptyList())
+            } else {
+                algoliaAdapter.setHits(it)
+            }
+        }
 
         // TODO Understand with either flow or livedata aren't updated on query changes
         // Issue open on Github
@@ -101,7 +113,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
     }
 
     private fun onSuggestionClick(text: String) {
-
+        searchViewModel.search(text)
     }
 
     override fun onConnectivityChange(connected: Boolean) {
@@ -109,8 +121,9 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         lifecycleScope.launch(Dispatchers.Main) {
             if (connected) {
                 binding.connectivityErrorMessage.visibility = View.GONE
+                val isNoResult = algoliaAdapter.items.isEmpty()
                 refreshSuggestionsVisibility(isQueryEmpty)
-                refreshNoResultVisibility(!isQueryProduceResult)
+                refreshNoResultVisibility(!isQueryEmpty && isNoResult)
             } else {
                 binding.connectivityErrorMessage.visibility = View.VISIBLE
                 refreshSuggestionsVisibility(false)
@@ -125,5 +138,10 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
     private fun refreshNoResultVisibility(show: Boolean) {
         binding.emptyQueryMessage.visibility = if (show && isConnectedToNetwork) View.VISIBLE else View.GONE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        algoliaAdapter.setHits(emptyList())
     }
 }

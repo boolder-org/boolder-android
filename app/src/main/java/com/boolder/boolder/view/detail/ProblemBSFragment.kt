@@ -100,7 +100,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 points,
                 ctrl1,
                 ctrl2,
-                problem.drawColor()
+                problem.drawColor(requireContext())
             )
         }
     }
@@ -127,7 +127,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             val card = CardView(requireContext())
 
             card.apply {
-                backgroundTintList = ColorStateList.valueOf(problem.drawColor())
+                backgroundTintList = ColorStateList.valueOf(problem.drawColor(requireContext()))
                 setOnClickListener { onNewProblemSelected(line, problem) }
                 addView(text, RelativeLayout.LayoutParams(match, match))
                 radius = 40f
@@ -198,8 +198,6 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }
 
     }
-
-    private fun Problem.drawColor(): Int = circuitColorSafe.getColor(requireContext())
 
     private fun Problem.defaultName(): String {
         return if (!circuitColor.isNullOrBlank() && !circuitNumber.isNullOrBlank()) {
