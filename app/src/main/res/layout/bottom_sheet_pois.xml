@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:text="Open"
+        android:text="@string/pois_bs_open"
         android:textAllCaps="false"
         android:textColor="@color/primary"
         app:layout_constraintTop_toBottomOf="@+id/pois_title" />
@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:text="Close"
+        android:text="@string/pois_bs_close"
         android:textAllCaps="false"
         android:textColor="@android:color/holo_red_dark"
         app:layout_constraintBottom_toBottomOf="parent"

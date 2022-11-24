@@ -33,6 +33,8 @@
     <string name="category_area">Secteurs</string>
     <string name="category_problem">Voies</string>
     <string name="sit_start">assis</string>
+    <string name="pois_bs_open">Ouvrir</string>
+    <string name="pois_bs_close">Fermer</string>
     <plurals name="variant">
         <item quantity="one">%d variante</item>
         <item quantity="other">%d variantes</item>
