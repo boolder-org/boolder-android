@@ -100,14 +100,14 @@ class AlgoliaAdapter(
 
     fun setHits(hits: List<BaseObject>) {
         items.clear()
-        if (hits.any { it is Problem }) {
-            items.add(problemHeader)
-            items.addAll(hits.filterIsInstance<Problem>())
-        }
-
         if (hits.any { it is Area }) {
             items.add(areaHeader)
             items.addAll(hits.filterIsInstance<Area>())
+        }
+
+        if (hits.any { it is Problem }) {
+            items.add(problemHeader)
+            items.addAll(hits.filterIsInstance<Problem>())
         }
 
         notifyDataSetChanged()
