@@ -32,7 +32,7 @@ class BoolderMap @JvmOverloads constructor(
 
     interface BoolderClickListener {
         fun onProblemSelected(problemId: Int)
-        fun onPoisSelected(poisId: String, stringProperty: String, geometry: Geometry?)
+        fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?)
     }
 
     private var listener: BoolderClickListener? = null

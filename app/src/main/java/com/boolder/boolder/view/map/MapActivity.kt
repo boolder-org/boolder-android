@@ -5,6 +5,9 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
@@ -20,6 +23,7 @@ import com.boolder.boolder.utils.viewBinding
 import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
 import com.boolder.boolder.view.search.SearchActivity
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
@@ -116,8 +120,26 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
         }
     }
 
-    override fun onPoisSelected(poisId: String, stringProperty: String, geometry: Geometry?) {
-        val sendIntent = Intent(Intent.ACTION_VIEW, Uri.parse(stringProperty))
+    override fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?) {
+
+        val view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_pois, binding.root, false)
+        val bottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
+
+        view.apply {
+            findViewById<TextView>(R.id.pois_title).text = poisName
+            findViewById<Button>(R.id.open).setOnClickListener {
+                openGoogleMaps(stringProperty)
+            }
+            findViewById<Button>(R.id.close).setOnClickListener { bottomSheet.dismiss() }
+        }
+        bottomSheet.setContentView(view)
+        bottomSheet.show()
+
+    }
+
+    private fun openGoogleMaps(url: String) {
+
+        val sendIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         val shareIntent = Intent.createChooser(sendIntent, null)
         try {
             startActivity(shareIntent)
