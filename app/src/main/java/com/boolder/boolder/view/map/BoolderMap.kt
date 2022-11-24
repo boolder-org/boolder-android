@@ -116,7 +116,7 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     private fun queryClusterRenderedFeatures(geometry: RenderedQueryGeometry) {
-        val clusterOption = RenderedQueryOptions(listOf("cluster"), null)
+        val clusterOption = RenderedQueryOptions(listOf("clusters"), null)
 
         getMapboxMap().queryRenderedFeatures(
             geometry,

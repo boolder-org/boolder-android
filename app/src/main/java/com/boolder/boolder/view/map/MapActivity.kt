@@ -23,8 +23,9 @@ import com.boolder.boolder.view.search.SearchActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
-import com.mapbox.geojson.Polygon
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
+import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
 import kotlinx.coroutines.Dispatchers
@@ -56,19 +57,21 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         val searchRegister = registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 result.data?.let {
-                    if (it.hasExtra("AREA")) {
+                    val cameraOptions = if (it.hasExtra("AREA")) {
                         val area = it.getParcelableExtra<Area>("AREA")
                         val southWest = Point.fromLngLat(area!!.southWestLon.toDouble(), area.southWestLat.toDouble())
                         val northEst = Point.fromLngLat(area.northEastLon.toDouble(), area.northEastLat.toDouble())
-                        val position = binding.mapView.getMapboxMap()
-                            .cameraForGeometry(Polygon.fromLngLats(listOf(listOf(southWest, northEst))))
-                        binding.mapView.getMapboxMap().setCamera(position)
+                        val coordinates = CoordinateBounds(southWest, northEst)
+                        CameraOptions.Builder().center(coordinates.center()).build()
                     } else if (it.hasExtra("PROBLEM")) {
                         val problem = it.getParcelableExtra<Problem>("PROBLEM")
                         onProblemSelected(problem!!.id)
                         val point = Point.fromLngLat(problem.longitude.toDouble(), problem.latitude.toDouble())
-                        val cameraOption = CameraOptions.Builder().center(point).zoom(22.0).build()
-                        binding.mapView.getMapboxMap().setCamera(cameraOption)
+                        CameraOptions.Builder().center(point).zoom(22.0).build()
+                    } else null
+
+                    cameraOptions?.let { option ->
+                        binding.mapView.camera.flyTo(option)
                     }
                 }
             }
