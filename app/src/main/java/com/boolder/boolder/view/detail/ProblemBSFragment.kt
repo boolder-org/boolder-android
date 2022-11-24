@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.setPadding
 import com.boolder.boolder.BuildConfig
 import com.boolder.boolder.R
 import com.boolder.boolder.R.layout
@@ -298,8 +299,8 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
 
     private fun loadBoolderImage() {
         Glide.with(requireContext())
-            .load(completeProblem.topo?.url ?: R.drawable.ic_placeholder)
-            .fallback(R.drawable.ic_placeholder)
+            .load(completeProblem.topo?.url)
+            .error(R.drawable.ic_placeholder)
             .addListener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -307,12 +308,8 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    binding.picture.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.ic_placeholder
-                        )
-                    )
+                    binding.picture.setBackgroundColor(R.color.gray_darker)
+                    binding.picture.setPadding(200)
                     binding.progressCircular.visibility = View.GONE
                     return false
                 }
