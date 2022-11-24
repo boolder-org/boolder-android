@@ -244,7 +244,9 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             ContextCompat.getDrawable(requireContext(), it)
         }
         binding.typeIcon.setImageDrawable(steepnessDrawable)
-        binding.typeText.text = selectedProblem.steepness.replaceFirstChar { it.uppercaseChar() }
+        if (!selectedProblem.steepness.contentEquals("other", true)) {
+            binding.typeText.text = selectedProblem.steepness.replaceFirstChar { it.uppercaseChar() }
+        }
     }
 
     private fun setupChipClick() {
@@ -280,11 +282,12 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 putExtra(Intent.EXTRA_SUBJECT, "Feedback")
                 putExtra(
                     Intent.EXTRA_TEXT, """
-                    ----
+                    =====
                     Problem #${selectedProblem.id} - ${selectedProblem.name ?: selectedProblem.defaultName()}
                     Boolder v.${BuildConfig.VERSION_NAME} (build n°${BuildConfig.VERSION_CODE})
                     Android SDK ${Build.VERSION.SDK_INT} (${Build.VERSION.RELEASE})
-                    """
+                    =====
+                    """.trimIndent()
                 )
             }.run {
                 try {
