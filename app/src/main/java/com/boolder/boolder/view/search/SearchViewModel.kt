@@ -30,8 +30,8 @@ class SearchViewModel(
         apiKey = APIKey(AlgoliaConfig.apiKey),
         coroutineScope = viewModelScope
     ).apply {
-        addHitsSearcher(IndexName("Problem"))
         addHitsSearcher(IndexName("Area"))
+        addHitsSearcher(IndexName("Problem"))
     }
     private val searchBox = SearchBoxConnector(searcher)
     private val connection = ConnectionHandler(searchBox)
@@ -41,8 +41,8 @@ class SearchViewModel(
 
     init {
         searcher.response.subscribe { response ->
-            val problemHits = (response?.results?.firstOrNull()?.response as? ResponseSearch)?.hits
-            val areaHits = (response?.results?.getOrNull(1)?.response as? ResponseSearch)?.hits
+            val problemHits = (response?.results?.getOrNull(1)?.response as? ResponseSearch)?.hits
+            val areaHits = (response?.results?.firstOrNull()?.response as? ResponseSearch)?.hits
 
             viewModelScope.launch {
                 val problemsIds = problemHits?.associate {

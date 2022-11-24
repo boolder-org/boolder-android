@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.search
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -15,17 +16,26 @@ import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.utils.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity(), NetworkObserver {
 
     private val binding by viewBinding(ActivitySearchBinding::inflate)
 
-    private val searchViewModel: SearchViewModel by viewModel()
+    private val searchViewModel: SearchViewModel = SearchViewModel(get(), get())
     private val networkObserverImpl: NetworkObserverImpl by inject()
 
-    private val algoliaAdapter = AlgoliaAdapter()
+    private val algoliaAdapter = AlgoliaAdapter(
+        onAreaClick = { area ->
+            setResult(RESULT_OK, Intent().apply { putExtra("AREA", area) })
+            finish()
+        },
+        onProblemClick = { problem ->
+            setResult(RESULT_OK, Intent().apply { putExtra("PROBLEM", problem) })
+            finish()
+        }
+    )
 
     private val suggestions = listOf("Isatis", "La Marie-Rose", "Cul de Chien")
 
@@ -88,18 +98,6 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
                 algoliaAdapter.setHits(it)
             }
         }
-
-        // TODO Understand with either flow or livedata aren't updated on query changes
-        // Issue open on Github
-        // https://github.com/algolia/instantsearch-android/issues/374
-        //lifecycleScope.launch {
-        //    searchViewModel.problems.collect {
-        //        problemAdapter.submitData(it)
-        //    }
-        //    searchViewModel.areas.collect {
-        //        areaAdapter.submitData(it)
-        //    }
-        //}
     }
 
     private fun applySuggestions() {
@@ -107,13 +105,14 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         binding.suggestionSecond.text = suggestions[1]
         binding.suggestionThird.text = suggestions[2]
 
-        binding.suggestionFirst.setOnClickListener { onSuggestionClick(binding.suggestionFirst.text.toString()) }
-        binding.suggestionSecond.setOnClickListener { onSuggestionClick(binding.suggestionFirst.text.toString()) }
-        binding.suggestionThird.setOnClickListener { onSuggestionClick(binding.suggestionFirst.text.toString()) }
+        binding.suggestionFirst.setOnClickListener { onSuggestionClick(suggestions[0]) }
+        binding.suggestionSecond.setOnClickListener { onSuggestionClick(suggestions[1]) }
+        binding.suggestionThird.setOnClickListener { onSuggestionClick(suggestions[2]) }
     }
 
     private fun onSuggestionClick(text: String) {
-        searchViewModel.search(text)
+        binding.searchComponent.searchBar.setText(text)
+        binding.searchComponent.searchBar.setSelection(text.length)
     }
 
     override fun onConnectivityChange(connected: Boolean) {

@@ -1,14 +1,16 @@
 package com.boolder.boolder.view.map
 
-import android.app.ActivityOptions
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
+import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
@@ -21,6 +23,7 @@ import com.boolder.boolder.view.search.SearchActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
+import com.mapbox.geojson.Polygon
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -50,12 +53,33 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
             locationProvider.askForPosition()
         }
 
+        val searchRegister = registerForActivityResult(StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let {
+                    if (it.hasExtra("AREA")) {
+                        val area = it.getParcelableExtra<Area>("AREA")
+                        val southWest = Point.fromLngLat(area!!.southWestLon.toDouble(), area.southWestLat.toDouble())
+                        val northEst = Point.fromLngLat(area.northEastLon.toDouble(), area.northEastLat.toDouble())
+                        val position = binding.mapView.getMapboxMap()
+                            .cameraForGeometry(Polygon.fromLngLats(listOf(listOf(southWest, northEst))))
+                        binding.mapView.getMapboxMap().setCamera(position)
+                    } else if (it.hasExtra("PROBLEM")) {
+                        val problem = it.getParcelableExtra<Problem>("PROBLEM")
+                        onProblemSelected(problem!!.id)
+                        val point = Point.fromLngLat(problem.longitude.toDouble(), problem.latitude.toDouble())
+                        val cameraOption = CameraOptions.Builder().center(point).zoom(22.0).build()
+                        binding.mapView.getMapboxMap().setCamera(cameraOption)
+                    }
+                }
+            }
+        }
+
         binding.searchComponent.searchBar.isFocusable = false
         binding.searchComponent.searchBar.isClickable = false
         binding.searchComponent.searchBar.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
-            val option: ActivityOptions = ActivityOptions.makeSceneTransitionAnimation(this)
-            startActivity(intent, option.toBundle())
+            val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
+            searchRegister.launch(intent, option)
         }
     }
 

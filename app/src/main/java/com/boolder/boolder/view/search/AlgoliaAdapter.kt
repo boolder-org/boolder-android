@@ -19,7 +19,10 @@ interface BaseObject
 data class CategoryHeader(val titleId: Int) : BaseObject
 abstract class BaseViewHolder(view: View) : ViewHolder(view)
 
-class AlgoliaAdapter : RecyclerView.Adapter<BaseViewHolder>() {
+class AlgoliaAdapter(
+    private val onProblemClick: (Problem) -> Unit,
+    private val onAreaClick: (Area) -> Unit
+) : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -32,12 +35,14 @@ class AlgoliaAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     inner class CategoryHeaderViewHolder(private val binding: SearchResultItemBinding) : BaseViewHolder(binding.root) {
         fun bind(header: CategoryHeader) {
             binding.title.text = binding.root.context.getString(header.titleId)
+
         }
     }
 
     inner class AreaViewHolder(private val binding: SearchResultAreaItemBinding) : BaseViewHolder(binding.root) {
         fun bind(area: Area) {
             binding.areaName.text = area.name
+            binding.root.setOnClickListener { onAreaClick(area) }
         }
     }
 
@@ -55,6 +60,8 @@ class AlgoliaAdapter : RecyclerView.Adapter<BaseViewHolder>() {
             binding.circuitColor.backgroundTintList = ColorStateList.valueOf(problem.drawColor(binding.root.context))
 
             binding.problemArea.text = problem.areaName
+
+            binding.root.setOnClickListener { onProblemClick(problem) }
         }
     }
 

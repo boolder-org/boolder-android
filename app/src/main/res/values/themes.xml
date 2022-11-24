@@ -15,6 +15,7 @@
 
         <!-- Customize your theme here. -->
         <item name="android:windowActivityTransitions">true</item>
+
     </style>
 
 
