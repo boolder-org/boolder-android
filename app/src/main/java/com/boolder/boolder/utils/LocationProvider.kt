@@ -33,7 +33,7 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
     ) {
 
         if ((it[permission.ACCESS_FINE_LOCATION] == true || it[permission.ACCESS_COARSE_LOCATION] == true) && isWaitingPosition) {
-            moveCameraToUserPosition()
+            enableGPS()
         } else {
             // No location access granted.
         }

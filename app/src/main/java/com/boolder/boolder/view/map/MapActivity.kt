@@ -91,7 +91,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         val point = Point.fromLngLat(location.longitude, location.latitude)
 
         binding.mapView.getMapboxMap()
-            .setCamera(CameraOptions.Builder().center(point).bearing(location.bearing.toDouble()).build())
+            .setCamera(CameraOptions.Builder().center(point).zoom(16.0).bearing(location.bearing.toDouble()).build())
         binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
         binding.mapView.location.updateSettings {
             enabled = true

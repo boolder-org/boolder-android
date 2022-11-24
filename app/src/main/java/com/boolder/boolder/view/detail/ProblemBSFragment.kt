@@ -1,6 +1,5 @@
 package com.boolder.boolder.view.detail
 
-import BuildConfig
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -20,6 +19,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import com.boolder.boolder.BuildConfig
 import com.boolder.boolder.R
 import com.boolder.boolder.R.layout
 import com.boolder.boolder.R.string
@@ -177,7 +177,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         val pointD = selectedLine.points().firstOrNull()
         if (pointD != null) {
             val match = ViewGroup.LayoutParams.MATCH_PARENT
-            val cardSize = 80
+            val cardSize = 60
             val offset = cardSize / 2
             val cardParams = RelativeLayout.LayoutParams(cardSize, cardSize)
 
