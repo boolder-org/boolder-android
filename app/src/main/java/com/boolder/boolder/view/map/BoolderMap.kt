@@ -1,10 +1,8 @@
 package com.boolder.boolder.view.map
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
-import android.view.MotionEvent
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -17,6 +15,7 @@ import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.scalebar.scalebar
 
@@ -39,7 +38,6 @@ class BoolderMap @JvmOverloads constructor(
     private var listener: BoolderClickListener? = null
 
     private var previousSelectedFeatureId: String? = null
-    private var shouldClick = false
 
     init {
         init()
@@ -68,21 +66,11 @@ class BoolderMap @JvmOverloads constructor(
         addClickEvent()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    // 1. Catch a tap on screen
     private fun addClickEvent() {
-        setOnTouchListener { _, event: MotionEvent ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    shouldClick = true
-                }
-                MotionEvent.ACTION_UP -> {
-                    if (shouldClick) {
-                        installRenderedFeatures(event.x.toDouble(), event.y.toDouble())
-                    }
-                }
-            }
-            false
+        getMapboxMap().addOnMapClickListener {
+            val event = getMapboxMap().pixelForCoordinate(it)
+            installRenderedFeatures(event.x, event.y)
+            true
         }
     }
 
@@ -149,7 +137,7 @@ class BoolderMap @JvmOverloads constructor(
             if (features.isValue) {
 
                 val feature = features.value?.firstOrNull()?.feature ?: return@queryRenderedFeatures
-
+                if (getMapboxMap().cameraState.zoom < 18) return@queryRenderedFeatures
                 if (feature.hasProperty("id") && feature.geometry() != null) {
                     selectProblem(feature.getNumberProperty("id").toString())
                     listener?.onProblemSelected(feature.getNumberProperty("id").toInt())
@@ -262,6 +250,7 @@ class BoolderMap @JvmOverloads constructor(
         val cameraOption = CameraOptions.Builder()
             .center(coordinates.center())
             .bearing(0.0)
+            .zoom(16.0)
             .padding(EdgeInsets(60.0, 8.0, 8.0, 8.0))
             .pitch(0.0)
             .build()
