@@ -41,15 +41,11 @@ import org.koin.android.ext.android.get
 import java.util.*
 
 
-interface BottomSheetListener {
-    fun onProblemSelected(problem: Problem)
-}
-
-class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheetDialogFragment() {
+class ProblemBSFragment() : BottomSheetDialogFragment() {
 
     companion object {
         private const val COMPLETE_PROBLEM = "COMPLETE_PROBLEM"
-        fun newInstance(problem: CompleteProblem, listener: BottomSheetListener) = ProblemBSFragment(listener).apply {
+        fun newInstance(problem: CompleteProblem) = ProblemBSFragment().apply {
             arguments = bundleOf(COMPLETE_PROBLEM to problem)
         }
     }

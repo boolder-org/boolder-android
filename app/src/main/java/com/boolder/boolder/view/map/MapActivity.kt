@@ -17,7 +17,6 @@ import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.viewBinding
-import com.boolder.boolder.view.detail.BottomSheetListener
 import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
 import com.boolder.boolder.view.search.SearchActivity
@@ -35,7 +34,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener, BottomSheetListener {
+class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -67,6 +66,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
                     } else if (it.hasExtra("PROBLEM")) {
                         val problem = it.getParcelableExtra<Problem>("PROBLEM")
                         onProblemSelected(problem!!.id)
+                        binding.mapView.selectProblem(problem.id.toString())
                         val point = Point.fromLngLat(problem.longitude.toDouble(), problem.latitude.toDouble())
                         CameraOptions.Builder().center(point).zoom(22.0).build()
                     } else null
@@ -108,7 +108,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         lifecycleScope.launch {
             mapViewModel.fetchProblemAndTopo(problemId).collect { completeProblem ->
                 with(Dispatchers.Main) {
-                    val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem, this@MapActivity)
+                    val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem)
                     bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
                     bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                 }
@@ -124,10 +124,5 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         } catch (e: Exception) {
             Log.i("MAP", "No apps can handle this kind of intent")
         }
-    }
-
-    // Called from BottomSheet
-    override fun onProblemSelected(problem: Problem) {
-        binding.mapView.selectProblem(problem.id.toString())
     }
 }
