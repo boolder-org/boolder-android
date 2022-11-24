@@ -50,8 +50,10 @@ class BoolderMap @JvmOverloads constructor(
 
     private fun init() {
         val cameraOptions = CameraOptions.Builder()
-            .center(Point.fromLngLat(2.5968216, 48.3925623))
+//            .center(Point.fromLngLat(2.5968216, 48.3925623))
+            .center(Point.fromLngLat(2.5479773, 48.3919446))
             .zoom(10.2)
+            .zoom(22.0)
             .build()
 
         getMapboxMap().apply {

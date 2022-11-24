@@ -18,33 +18,34 @@ class MapViewModel(
     private val problemRepository: ProblemRepository,
     private val topoRepository: TopoRepository
 ) : ViewModel() {
-    
+
     fun fetchProblemAndTopo(problemId: Int): Flow<CompleteProblem> {
-        //TODO handle edge(s) case(s)
         return flow {
             val problem: ProblemEntity = problemRepository.loadById(problemId) ?: return@flow
-            val line: LineEntity = lineRepository.loadByProblemId(problemId) ?: return@flow
-            val topo = topoRepository.getTopoById(line.topoId).getOrNull()?.convert()
-            val otherLines: List<LineEntity> = lineRepository.loadAllByTopoIds(line.topoId)
-                .filter { it.id != line.id }
-            val otherProblems: List<ProblemEntity> = problemRepository.loadAllByIds(otherLines.map { it.problemId })
-                .filter { it.id != problemId }
+            val line = lineRepository.loadByProblemId(problemId)
+            val result = if (line != null) {
+                val topo = topoRepository.getTopoById(line.topoId).getOrNull()?.convert()
+                val otherLines: List<LineEntity> = lineRepository.loadAllByTopoIds(line.topoId)
+                    .filter { it.id != line.id }
+                val otherProblems: List<ProblemEntity> = problemRepository.loadAllByIds(otherLines.map { it.problemId })
+                    .filter { it.id != problemId }
 
-            val others = otherProblems.map { other ->
+                val others = otherProblems.map { other ->
+                    CompleteProblem(
+                        other.convert(),
+                        topo,
+                        otherLines.first { it.problemId == other.id }.convert(),
+                        emptyList()
+                    )
+                }
+
                 CompleteProblem(
-                    other.convert(),
+                    problem.convert(),
                     topo,
-                    otherLines.first { it.problemId == other.id }.convert(),
-                    emptyList()
+                    line.convert(),
+                    others
                 )
-            }
-
-            val result = CompleteProblem(
-                problem.convert(),
-                topo,
-                line.convert(),
-                others
-            )
+            } else CompleteProblem(problem.convert(), null, null, emptyList())
 
             emit(result)
 

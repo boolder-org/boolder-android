@@ -41,7 +41,7 @@ import org.koin.android.ext.android.get
 import java.util.*
 
 
-class ProblemBSFragment() : BottomSheetDialogFragment() {
+class ProblemBSFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val COMPLETE_PROBLEM = "COMPLETE_PROBLEM"
@@ -59,7 +59,7 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
             ?: error("No Problem in arguments")
 
     private lateinit var selectedProblem: Problem
-    private lateinit var selectedLine: Line
+    private var selectedLine: Line? = null
     private var isVariantSelected = false
     private val variantsCount
         get() = completeProblem.otherCompleteProblem.count { it.problem.parentId == completeProblem.problem.id }
@@ -138,7 +138,7 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
         binding.variantSelector.visibility = View.GONE
     }
 
-    private fun onVariantSelected(line: Line, problem: Problem) {
+    private fun onVariantSelected(line: Line?, problem: Problem) {
         isVariantSelected = true
         selectedLine = line
         selectedProblem = problem
@@ -151,8 +151,8 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
 
     //region Draw
     private fun drawCurves() {
-        val points = selectedLine.points()
-        if (points.isNotEmpty()) {
+        val points = selectedLine?.points()
+        if (points != null && points.isNotEmpty()) {
 
             val segment = curveAlgorithm.controlPointsFromPoints(points)
 
@@ -170,7 +170,7 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
     }
 
     private fun drawCircuitNumberCircle() {
-        val pointD = selectedLine.points().firstOrNull()
+        val pointD = selectedLine?.points()?.firstOrNull()
         if (pointD != null) {
             val match = ViewGroup.LayoutParams.MATCH_PARENT
             val cardSize = 60
@@ -224,9 +224,9 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
 
     private fun updateLabels() {
         val sitStartText = if (selectedProblem.sitStart) {
-            requireContext().getString(R.string.sit_start)
+            requireContext().getString(string.sit_start)
         } else ""
-        binding.title.text = "${selectedProblem.name} $sitStartText"
+        binding.title.text = "${selectedProblem.nameSafe()} $sitStartText"
         binding.grade.text = selectedProblem.grade
 
         val steepnessDrawable = when (selectedProblem.steepness) {
@@ -307,6 +307,13 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
+                    binding.picture.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.ic_placeholder
+                        )
+                    )
+                    binding.progressCircular.visibility = View.GONE
                     return false
                 }
 
@@ -337,7 +344,7 @@ class ProblemBSFragment() : BottomSheetDialogFragment() {
     }
 
     private fun String.localize(): String {
-        return CircuitColor.valueOf(this).localize(requireContext())
+        return CircuitColor.valueOf(this.uppercase()).localize(requireContext())
     }
     //endregion
 }
