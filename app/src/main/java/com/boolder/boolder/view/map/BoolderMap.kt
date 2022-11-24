@@ -99,7 +99,7 @@ class BoolderMap @JvmOverloads constructor(
             geometry,
             areaOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
-            buildCoordinateBounds(features)
+            buildCoordinateBounds(features, 15.0)
         }
     }
 
@@ -110,7 +110,7 @@ class BoolderMap @JvmOverloads constructor(
             geometry,
             clusterOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
-            buildCoordinateBounds(features)
+            buildCoordinateBounds(features, 13.0)
         }
     }
 
@@ -219,7 +219,8 @@ class BoolderMap @JvmOverloads constructor(
 
     // 3A. Build bounds around coordinate
     private fun buildCoordinateBounds(
-        features: Expected<String, MutableList<QueriedFeature>>
+        features: Expected<String, MutableList<QueriedFeature>>,
+        zoom: Double
     ) {
         if (features.isValue) {
             features.value?.firstOrNull()?.feature?.let {
@@ -237,7 +238,7 @@ class BoolderMap @JvmOverloads constructor(
                         it.getStringProperty("northEastLat").toDouble()
                     )
                     val coordinateBound = CoordinateBounds(southWest, northEst)
-                    moveCamera(coordinateBound)
+                    moveCamera(coordinateBound, zoom)
                 }
             } ?: unselectProblem()
         } else {
@@ -246,11 +247,11 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     // Triggered when user click on a Area or Cluster on Map
-    private fun moveCamera(coordinates: CoordinateBounds) {
+    private fun moveCamera(coordinates: CoordinateBounds, zoom: Double) {
         val cameraOption = CameraOptions.Builder()
             .center(coordinates.center())
             .bearing(0.0)
-            .zoom(16.0)
+            .zoom(zoom)
             .padding(EdgeInsets(60.0, 8.0, 8.0, 8.0))
             .pitch(0.0)
             .build()
