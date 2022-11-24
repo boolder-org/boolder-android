@@ -283,7 +283,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
 
     private fun loadBoolderImage() {
         Glide.with(requireContext())
-            .load(completeProblem.topo?.url)
+            .load(completeProblem.topo?.url ?: R.drawable.ic_placeholder)
             .fallback(R.drawable.ic_placeholder)
             .addListener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(

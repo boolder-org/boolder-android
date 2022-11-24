@@ -63,7 +63,7 @@ class MapboxStyleFactory {
                         literal("blue")
                         CircuitColor.BLUE.rgb(this)
                         literal("skyblue")
-                        CircuitColor.SKY_BLUE.rgb(this)
+                        CircuitColor.SKYBLUE.rgb(this)
                         literal("salmon")
                         CircuitColor.SALMON.rgb(this)
                         literal("red")
