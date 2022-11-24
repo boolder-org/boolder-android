@@ -4,9 +4,9 @@
     android:id="@+id/search_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_background"
     android:elevation="10dp"
-    android:padding="14dp">
+    android:background="@drawable/round_background"
+    android:padding="8dp">
 
     <ImageView
         android:id="@+id/search_first_icon"
@@ -15,6 +15,7 @@
         android:clickable="true"
         android:contentDescription="@string/cd_go_back"
         android:focusable="true"
+        android:padding="8dp"
         android:src="@drawable/ic_search"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,10 +29,11 @@
         android:background="@android:color/transparent"
         android:hint="@string/search_query_hint"
         android:imeOptions="actionSearch"
-        android:inputType="text"
+        android:inputType="textFilter"
         android:textColor="@color/black"
         android:textColorHint="@android:color/darker_gray"
         android:paddingHorizontal="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/search_first_icon"
         app:layout_constraintEnd_toStartOf="@id/search_last_icon"
         app:layout_constraintStart_toEndOf="@+id/search_first_icon"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,9 +46,10 @@
         android:contentDescription="@string/cancel_search"
         android:focusable="true"
         android:src="@drawable/ic_close"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/search_first_icon"
+        app:layout_constraintTop_toTopOf="@id/search_first_icon" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

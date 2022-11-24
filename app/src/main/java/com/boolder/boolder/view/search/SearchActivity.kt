@@ -80,9 +80,11 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         binding.searchComponent.searchBar.addTextChangedListener { query ->
             if (isQueryEmpty) {
+                binding.searchComponent.searchLastIcon.visibility = View.GONE
                 algoliaAdapter.setHits(emptyList())
                 refreshSuggestionsVisibility(true)
             } else {
+                binding.searchComponent.searchLastIcon.visibility = View.VISIBLE
                 searchViewModel.search(query.toString())
             }
         }
