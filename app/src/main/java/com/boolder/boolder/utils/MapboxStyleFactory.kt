@@ -53,7 +53,7 @@ class MapboxStyleFactory {
                     match {
                         get { literal("circuitColor") }
                         literal("yellow")
-                        CircuitColor.YELLOW.rgb(this) //TODO make it better
+                        CircuitColor.YELLOW.rgb(this)
                         literal("purple")
                         CircuitColor.PURPLE.rgb(this)
                         literal("orange")

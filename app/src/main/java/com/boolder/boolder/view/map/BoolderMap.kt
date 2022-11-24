@@ -19,7 +19,6 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.scalebar.scalebar
 
-//TODO Document this
 class BoolderMap @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

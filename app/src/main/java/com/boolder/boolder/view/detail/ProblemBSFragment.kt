@@ -160,7 +160,6 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
             val ctrl1 = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
             val ctrl2 = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
 
-            //TODO Switch back to PointF, avoid home made object in custom views (re-usability)
             binding.lineVector.addDataPoints(
                 points,
                 ctrl1,

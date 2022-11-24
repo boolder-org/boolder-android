@@ -29,7 +29,7 @@ enum class CircuitColor {
         SALMON -> expressionBuilder.rgb(253.0, 175.0, 138.0)
         RED -> expressionBuilder.rgb(255.0, 59.0, 47.0)
         WHITE -> expressionBuilder.rgb(255.0, 255.0, 255.0)
-        WHITEFORKIDS -> expressionBuilder.rgb(255.0, 255.0, 255.0) // TODO
+        WHITEFORKIDS -> expressionBuilder.rgb(255.0, 255.0, 255.0)
         BLACK -> expressionBuilder.rgb(0.0, 0.0, 0.0)
         OFF_CIRCUIT -> expressionBuilder.rgb(135.0, 138.0, 141.0)
     }
