@@ -52,7 +52,6 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
 
     // Entry point
     fun askForPosition() {
-        showRationaleDialog()
         isWaitingPosition = true
         if (checkPermission()) {
             enableGPS()
