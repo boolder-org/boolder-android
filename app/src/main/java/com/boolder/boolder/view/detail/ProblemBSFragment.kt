@@ -283,7 +283,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 putExtra(
                     Intent.EXTRA_TEXT, """
                     =====
-                    Problem #${selectedProblem.id} - ${selectedProblem.name ?: selectedProblem.defaultName()}
+                    Problem #${selectedProblem.id} - ${selectedProblem.nameSafe()}
                     Boolder v.${BuildConfig.VERSION_NAME} (build n°${BuildConfig.VERSION_CODE})
                     Android SDK ${Build.VERSION.SDK_INT} (${Build.VERSION.RELEASE})
                     =====
@@ -332,10 +332,12 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     //endregion
 
     //region Extensions
-    private fun Problem.defaultName(): String {
-        return if (!circuitColor.isNullOrBlank() && !circuitNumber.isNullOrBlank()) {
-            "${circuitColor.localize()} $circuitNumber"
-        } else "No name"
+    private fun Problem.nameSafe(): String {
+        return if (name.isNullOrBlank() || name.contains("null", true)) {
+            if (!circuitColor.isNullOrBlank() && !circuitNumber.isNullOrBlank()) {
+                "${circuitColor.localize()} $circuitNumber"
+            } else "No name"
+        } else name
     }
 
     private fun String.localize(): String {
