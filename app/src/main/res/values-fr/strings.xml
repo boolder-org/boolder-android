@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_query_hint">Problem or area name</string>
+    <string name="search_query_hint">Nom de la Voie ou du secteur</string>
     <string name="cd_find_my_position">Localiser moi</string>
     <string name="cancel_search">Annuler la recherche</string>
     <string name="cd_go_back">Retour</string>
@@ -10,10 +10,10 @@
     <string name="rationale_message">Afin de vous localiser sur la carte, nous avons besoin que vous nous donniez accès à votre GPS.\nAucune données collectées.</string>
     <string name="rationale_positive_btn">D\'accord</string>
     <string name="rationale_negative_Btn">Non, merci</string>
-    <string name="share">Share</string>
-    <string name="save">Save</string>
+    <string name="share">Partager</string>
+    <string name="save">Sauvegarder</string>
     <string name="bleau_info">Bleau.info</string>
-    <string name="report">Report</string>
+    <string name="report">Signaler</string>
 
     <string name="circuit_short_name_yellow">Jaune</string>
     <string name="circuit_short_name_purple">Violet</string>
@@ -27,11 +27,15 @@
     <string name="circuit_short_name_white_for_kids">Blanc</string>
     <string name="circuit_short_name_black">Noir</string>
     <string name="circuit_short_name_off_circuit">Hors circuit</string>
-    <string name="no_internet_connection">No internet connection</string>
-    <string name="no_result">No result</string>
-    <string name="query_examples">Query examples:</string>
-    <string name="category_area">Areas</string>
-    <string name="category_problem">Problems</string>
-    <string name="sit_start">sit</string>
-    <plurals name="variant">a</plurals>
+    <string name="no_internet_connection">Pas de connexion Internet</string>
+    <string name="no_result">Aucun résultat</string>
+    <string name="query_examples">Exemples</string>
+    <string name="category_area">Secteurs</string>
+    <string name="category_problem">Voies</string>
+    <string name="sit_start">assis</string>
+    <plurals name="variant">
+        <item quantity="one">%d variante</item>
+        <item quantity="other">%d variantes</item>
+    </plurals>
+
 </resources>
