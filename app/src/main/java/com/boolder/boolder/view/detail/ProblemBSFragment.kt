@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.detail
 
+import BuildConfig
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -18,7 +20,6 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import com.boolder.boolder.BuildConfig
 import com.boolder.boolder.R
 import com.boolder.boolder.R.layout
 import com.boolder.boolder.R.string
@@ -248,8 +249,13 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
 
     private fun setupChipClick() {
         binding.bleauInfo.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bleauUrl))
-            startActivity(browserIntent)
+            try {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bleauUrl))
+                startActivity(browserIntent)
+            } catch (e: Exception) {
+                Log.i("Bottom Sheet", "No apps can handle this kind of intent")
+            }
+
         }
 
         binding.share.setOnClickListener {
@@ -259,8 +265,12 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 type = "text/plain"
             }
 
-            val shareIntent = Intent.createChooser(sendIntent, null)
-            startActivity(shareIntent)
+            try {
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                startActivity(shareIntent)
+            } catch (e: Exception) {
+                Log.i("Bottom Sheet", "No apps can handle this kind of intent")
+            }
         }
 
         binding.reportIssue.setOnClickListener {
@@ -276,7 +286,13 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                     Android SDK ${Build.VERSION.SDK_INT} (${Build.VERSION.RELEASE})
                     """
                 )
-            }.run { startActivity(this) }
+            }.run {
+                try {
+                    startActivity(this)
+                } catch (e: Exception) {
+                    Log.i("Bottom Sheet", "No apps can handle this kind of intent")
+                }
+            }
         }
 
     }

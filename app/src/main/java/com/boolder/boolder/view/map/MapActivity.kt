@@ -4,6 +4,7 @@ import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
@@ -118,7 +119,11 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
     override fun onPoisSelected(poisId: String, stringProperty: String, geometry: Geometry?) {
         val sendIntent = Intent(Intent.ACTION_VIEW, Uri.parse(stringProperty))
         val shareIntent = Intent.createChooser(sendIntent, null)
-        startActivity(shareIntent)
+        try {
+            startActivity(shareIntent)
+        } catch (e: Exception) {
+            Log.i("MAP", "No apps can handle this kind of intent")
+        }
     }
 
     // Called from BottomSheet
