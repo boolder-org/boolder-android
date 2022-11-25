@@ -37,7 +37,7 @@
     <string name="category_area">Areas</string>
     <string name="category_problem">Problems</string>
     <string name="sit_start">sit start</string>
-    <string name="pois_bs_open">Open</string>
+    <string name="pois_bs_open">See in Google Maps</string>
     <string name="pois_bs_close">Close</string>
 
     <plurals name="variant">
