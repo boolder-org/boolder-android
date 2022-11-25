@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -184,7 +183,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
                 } else ColorStateList.valueOf(Color.WHITE)
 
                 setTextColor(textColor)
-                setAutoSizeTextTypeUniformWithPresetSizes(intArrayOf(8, 10, 12), TypedValue.COMPLEX_UNIT_SP)
+                textSize = 12f
                 text = selectedProblem.circuitNumber
                 gravity = Gravity.CENTER
             }

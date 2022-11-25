@@ -29,6 +29,7 @@ import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
+import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -66,7 +67,12 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
                         val southWest = Point.fromLngLat(area!!.southWestLon.toDouble(), area.southWestLat.toDouble())
                         val northEst = Point.fromLngLat(area.northEastLon.toDouble(), area.northEastLat.toDouble())
                         val coordinates = CoordinateBounds(southWest, northEst)
-                        CameraOptions.Builder().center(coordinates.center()).build()
+                        binding.mapView.getMapboxMap().cameraForCoordinateBounds(
+                            coordinates,
+                            EdgeInsets(60.0, 8.0, 8.0, 8.0),
+                            0.0,
+                            0.0
+                        )
                     } else if (it.hasExtra("PROBLEM")) {
                         val problem = it.getParcelableExtra<Problem>("PROBLEM")
                         onProblemSelected(problem!!.id)
