@@ -6,12 +6,12 @@
     <string name="cd_find_my_position">Find my position</string>
     <string name="cancel_search">Cancel search</string>
     <string name="cd_go_back">Go Back</string>
-    <string name="cd_boolder_picture">Boolder picture</string>
-    <string name="cd_type">Boolder type</string>
-    <string name="rational_title">We need your permission !</string>
-    <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS.\nNo data is collected.</string>
-    <string name="rationale_positive_btn">Yes, I agree</string>
-    <string name="rationale_negative_Btn">No, Just Exit</string>
+    <string name="cd_boolder_picture">Topo photo</string>
+    <string name="cd_type">Problem type</string>
+    <string name="rational_title">Share location?</string>
+    <string name="rationale_message">Your location will be displayed on the map to help you find your way around.</string>
+    <string name="rationale_positive_btn">Share location</string>
+    <string name="rationale_negative_Btn">Maybe later</string>
     <string name="share">Share</string>
     <string name="save">Save</string>
     <string name="bleau_info">Bleau.info</string>
@@ -33,11 +33,11 @@
     <string name="contact_mail" translatable="false">hello@boolder.com</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="no_result">No result</string>
-    <string name="query_examples">Query examples:</string>
+    <string name="query_examples">Examples:</string>
     <string name="category_area">Areas</string>
     <string name="category_problem">Problems</string>
-    <string name="sit_start">(sit)</string>
-    <string name="pois_bs_open">Open</string>
+    <string name="sit_start">sit start</string>
+    <string name="pois_bs_open">See in Google Maps</string>
     <string name="pois_bs_close">Close</string>
 
     <plurals name="variant">
