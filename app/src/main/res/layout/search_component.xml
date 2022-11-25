@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:elevation="10dp"
     android:background="@drawable/round_background"
-    android:padding="8dp">
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/search_first_icon"
@@ -33,6 +33,7 @@
         android:textColor="@color/black"
         android:textColorHint="@android:color/darker_gray"
         android:paddingHorizontal="4dp"
+        android:paddingVertical="8dp"
         app:layout_constraintBottom_toBottomOf="@id/search_first_icon"
         app:layout_constraintEnd_toStartOf="@id/search_last_icon"
         app:layout_constraintStart_toEndOf="@+id/search_first_icon"

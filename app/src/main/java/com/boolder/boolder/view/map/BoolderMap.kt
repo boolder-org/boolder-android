@@ -49,10 +49,8 @@ class BoolderMap @JvmOverloads constructor(
 
     private fun init() {
         val cameraOptions = CameraOptions.Builder()
-//            .center(Point.fromLngLat(2.5968216, 48.3925623))
-            .center(Point.fromLngLat(2.5479773, 48.3919446))
+            .center(Point.fromLngLat(2.5968216, 48.3925623))
             .zoom(10.2)
-            .zoom(22.0)
             .build()
 
         getMapboxMap().apply {
@@ -100,7 +98,7 @@ class BoolderMap @JvmOverloads constructor(
             geometry,
             areaOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
-            buildCoordinateBounds(features, 15.0)
+            buildCoordinateBounds(features)
         }
     }
 
@@ -111,7 +109,7 @@ class BoolderMap @JvmOverloads constructor(
             geometry,
             clusterOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
-            buildCoordinateBounds(features, 13.0)
+            buildCoordinateBounds(features)
         }
     }
 
@@ -220,8 +218,7 @@ class BoolderMap @JvmOverloads constructor(
 
     // 3A. Build bounds around coordinate
     private fun buildCoordinateBounds(
-        features: Expected<String, MutableList<QueriedFeature>>,
-        zoom: Double
+        features: Expected<String, MutableList<QueriedFeature>>
     ) {
         if (features.isValue) {
             features.value?.firstOrNull()?.feature?.let {
@@ -239,7 +236,7 @@ class BoolderMap @JvmOverloads constructor(
                         it.getStringProperty("northEastLat").toDouble()
                     )
                     val coordinateBound = CoordinateBounds(southWest, northEst)
-                    moveCamera(coordinateBound, zoom)
+                    moveCamera(coordinateBound)
                 }
             } ?: unselectProblem()
         } else {
@@ -248,14 +245,14 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     // Triggered when user click on a Area or Cluster on Map
-    private fun moveCamera(coordinates: CoordinateBounds, zoom: Double) {
-        val cameraOption = CameraOptions.Builder()
-            .center(coordinates.center())
-            .bearing(0.0)
-            .zoom(zoom)
-            .padding(EdgeInsets(60.0, 8.0, 8.0, 8.0))
-            .pitch(0.0)
-            .build()
+    private fun moveCamera(coordinates: CoordinateBounds) {
+        val cameraOption = getMapboxMap().cameraForCoordinateBounds(
+            coordinates,
+            EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            0.0,
+            0.0
+        )
+
         val mapAnimationOption = MapAnimationOptions.Builder()
             .duration(500L)
             .build()

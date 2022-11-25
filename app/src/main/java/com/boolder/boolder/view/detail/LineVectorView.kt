@@ -105,4 +105,11 @@ class LineVectorView @JvmOverloads constructor(
             }.start()
         }
     }
+
+    fun clearPath() {
+        points.clear()
+        controlPoint1.clear()
+        controlPoint2.clear()
+        postInvalidate()
+    }
 }

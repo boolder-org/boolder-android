@@ -12,6 +12,8 @@
     <color name="gray">#F2F2F2</color>
     <color name="gray_darker">#E5E5E5</color>
     <color name="dark_gray">@android:color/darker_gray</color>
+    <color name="picture_placeholder">#EAEAEA</color>
+    <color name="icon_tint">#8E8D91</color>
 
     <color name="bottom_sheet_background">@color/white</color>
 

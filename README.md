@@ -5,4 +5,4 @@ Add this and replace {TOKEN} by the actual private key MAPBOX_DOWNLOAD_TOKEN={TO
 
 And Voilà!
 
-Stack Algolia Instant Search SDK Ktor KotlinX.Serialization Room Mapbox SDK Koin Glide
+Stack Algolia Instant Search SDK Ktor KotlinX.Serialization Room Mapbox SDK Koin Picasso
