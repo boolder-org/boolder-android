@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_query_hint">Nom de la voie ou du secteur</string>
+    <string name="search_query_hint">Nom de voie ou secteur</string>
     <string name="cd_find_my_position">Me localiser</string>
     <string name="cancel_search">Annuler la recherche</string>
     <string name="cd_go_back">Retour</string>

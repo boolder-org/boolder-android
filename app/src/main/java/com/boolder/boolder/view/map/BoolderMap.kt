@@ -119,11 +119,11 @@ class BoolderMap @JvmOverloads constructor(
         val problemGeometry = RenderedQueryGeometry(
             ScreenBox(
                 ScreenCoordinate(
-                    geometry.screenCoordinate.x - 12.0, geometry.screenCoordinate.y - 12.0
+                    geometry.screenCoordinate.x - 16.0, geometry.screenCoordinate.y - 16.0
                 ),
                 ScreenCoordinate(
-                    geometry.screenCoordinate.x + 12.0,
-                    geometry.screenCoordinate.y + 12.0
+                    geometry.screenCoordinate.x + 16.0,
+                    geometry.screenCoordinate.y + 16.0
                 )
             )
         )
