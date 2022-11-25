@@ -44,4 +44,13 @@
         <item quantity="one">%d variant</item>
         <item quantity="other">%d variants</item>
     </plurals>
+
+    <string name="stepness_wall">Wall</string>
+    <string name="stepness_slab">Slab</string>
+    <string name="stepness_overhang">Overhang</string>
+    <string name="stepness_roof">Roof</string>
+    <string name="stepness_traverse">Traverse</string>
+
+    <string name="no_name">No name</string>
+
 </resources>

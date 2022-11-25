@@ -40,4 +40,13 @@
         <item quantity="other">%d variantes</item>
     </plurals>
 
+    <string name="stepness_wall">Mur vertical</string>
+    <string name="stepness_slab">Dalle</string>
+    <string name="stepness_overhang">Dévers</string>
+    <string name="stepness_roof">Toit</string>
+    <string name="stepness_traverse">Traversée</string>
+
+    <string name="no_name">Sans nom</string>
+
+
 </resources>

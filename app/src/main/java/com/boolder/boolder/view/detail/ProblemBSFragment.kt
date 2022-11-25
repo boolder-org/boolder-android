@@ -20,10 +20,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.setPadding
 import com.boolder.boolder.BuildConfig
 import com.boolder.boolder.R
-import com.boolder.boolder.R.layout
-import com.boolder.boolder.R.string
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.CircuitColor
+import com.boolder.boolder.domain.model.CircuitColor.OFF_CIRCUIT
 import com.boolder.boolder.domain.model.CircuitColor.WHITE
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Line
@@ -40,11 +39,15 @@ import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
 
 
-class ProblemBSFragment : BottomSheetDialogFragment() {
+interface BottomSheetListener {
+    fun onProblemSelected(problem: Problem)
+}
+
+class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheetDialogFragment() {
 
     companion object {
         private const val COMPLETE_PROBLEM = "COMPLETE_PROBLEM"
-        fun newInstance(problem: CompleteProblem) = ProblemBSFragment().apply {
+        fun newInstance(problem: CompleteProblem, listener: BottomSheetListener) = ProblemBSFragment(listener).apply {
             arguments = bundleOf(COMPLETE_PROBLEM to problem)
         }
     }
@@ -70,7 +73,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     private var isVariantSelectorOpen = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(layout.bottom_sheet, container, false)
+        return inflater.inflate(R.layout.bottom_sheet, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -103,22 +106,27 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         binding.variantSelector.removeAllViews()
 
         completeProblem.otherCompleteProblem
-            .filter { it.problem.parentId == selectedProblem.id }
+            .filter { it.problem.parentId == completeProblem.problem.id }
+            .filter { it.problem.id != selectedProblem.id }
             .map { variants ->
                 buildVariantText(variants.problem) { onVariantSelected(variants.line, variants.problem) }
             }.forEach { binding.variantSelector.addView(it) }
 
         // Add parent in variant only if a variant is currently displayed
         if (isVariantSelected) {
-            binding.variantSelector.addView(buildVariantText(completeProblem.problem) { markParentAsSelected() }, 0)
+            binding.variantSelector
+                .addView(buildVariantText(completeProblem.problem) {
+                    listener.onProblemSelected(completeProblem.problem)
+                    markParentAsSelected()
+                }, 0)
         }
     }
 
     private fun buildVariantText(problem: Problem, selectVariant: () -> Unit): TextView {
         return TextView(requireContext()).apply {
-            text = problem.name
+            text = "${problem.name} ${problem.grade}"
             tag = problem.id
-            setTextColor(ColorStateList.valueOf(Color.BLACK))
+            setTextColor(ColorStateList.valueOf(Color.WHITE))
             setPadding(32, 16, 32, 16)
             setOnClickListener { selectVariant() }
         }
@@ -138,6 +146,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
     }
 
     private fun onVariantSelected(line: Line?, problem: Problem) {
+        listener.onProblemSelected(problem)
         isVariantSelected = true
         selectedLine = line
         selectedProblem = problem
@@ -173,7 +182,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         val pointD = selectedLine?.points()?.firstOrNull()
         if (pointD != null) {
             val match = ViewGroup.LayoutParams.MATCH_PARENT
-            val cardSize = 60
+            val cardSize = if (selectedProblem.circuitColorSafe == OFF_CIRCUIT) 30 else 60
             val offset = cardSize / 2
             val cardParams = RelativeLayout.LayoutParams(cardSize, cardSize)
 
@@ -224,9 +233,9 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
 
     private fun updateLabels() {
         val sitStartText = if (selectedProblem.sitStart) {
-            requireContext().getString(string.sit_start)
+            requireContext().getString(R.string.sit_start)
         } else ""
-        binding.title.text = "${selectedProblem.nameSafe()} $sitStartText"
+        binding.title.text = selectedProblem.nameSafe()
         binding.grade.text = selectedProblem.grade
 
         val steepnessDrawable = when (selectedProblem.steepness) {
@@ -240,8 +249,25 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
             ContextCompat.getDrawable(requireContext(), it)
         }
         binding.typeIcon.setImageDrawable(steepnessDrawable)
-        if (!selectedProblem.steepness.contentEquals("other", true)) {
-            binding.typeText.text = selectedProblem.steepness.replaceFirstChar { it.uppercaseChar() }
+
+        when (selectedProblem.steepness) {
+            "slab" -> R.string.stepness_slab
+            "overhang" -> R.string.stepness_overhang
+            "roof" -> R.string.stepness_roof
+            "wall" -> R.string.stepness_wall
+            "traverse" -> R.string.stepness_traverse
+            else -> null
+        }?.let {
+            binding.typeText.text = getString(it) + " • $sitStartText"
+        }
+
+        if (steepnessDrawable == null && selectedProblem.steepness.contains(
+                "other",
+                true
+            ) && !selectedProblem.sitStart
+        ) {
+            binding.typeIcon.visibility = View.GONE
+            binding.typeText.visibility = View.GONE
         }
     }
 
@@ -274,7 +300,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         binding.reportIssue.setOnClickListener {
             Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
-                putExtra(Intent.EXTRA_EMAIL, listOf(getString(string.contact_mail)).toTypedArray())
+                putExtra(Intent.EXTRA_EMAIL, listOf(getString(R.string.contact_mail)).toTypedArray())
                 putExtra(Intent.EXTRA_SUBJECT, "Feedback")
                 putExtra(
                     Intent.EXTRA_TEXT, """
@@ -298,32 +324,38 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
 
 
     private fun loadBoolderImage() {
-        val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(10, SECONDS)
-            .build()
+        if (completeProblem.topo != null) {
+            val okHttpClient = OkHttpClient.Builder()
+                .connectTimeout(10, SECONDS)
+                .build()
 
-        Picasso.Builder(requireContext())
-            .downloader(OkHttp3Downloader(okHttpClient))
-            .build()
-            .load(completeProblem.topo?.url)
-            .error(R.drawable.ic_placeholder)
-            .into(binding.picture, object : Callback {
-                override fun onSuccess() {
-                    context?.let {
-                        binding.picture.setPadding(0)
-                        binding.progressCircular.visibility = View.GONE
-                        markParentAsSelected()
+            Picasso.Builder(requireContext())
+                .downloader(OkHttp3Downloader(okHttpClient))
+                .build()
+                .load(completeProblem.topo?.url)
+                .error(R.drawable.ic_placeholder)
+                .into(binding.picture, object : Callback {
+                    override fun onSuccess() {
+                        context?.let {
+                            binding.picture.setPadding(0)
+                            binding.progressCircular.visibility = View.GONE
+                            markParentAsSelected()
+                        }
                     }
-                }
 
-                override fun onError(e: java.lang.Exception?) {
-                    context?.let {
-                        binding.picture.setBackgroundColor(R.color.picture_placeholder)
-                        binding.picture.setPadding(200)
-                        binding.progressCircular.visibility = View.GONE
+                    override fun onError(e: java.lang.Exception?) {
+                        loadErrorPicture()
                     }
-                }
-            })
+                })
+        } else loadErrorPicture()
+    }
+
+    private fun loadErrorPicture() {
+        context?.let {
+            binding.picture.setImageDrawable(ContextCompat.getDrawable(it, R.drawable.ic_placeholder))
+            binding.picture.setPadding(200)
+            binding.progressCircular.visibility = View.GONE
+        }
     }
     //endregion
 
@@ -332,7 +364,7 @@ class ProblemBSFragment : BottomSheetDialogFragment() {
         return if (name.isNullOrBlank() || name.contains("null", true)) {
             if (!circuitColor.isNullOrBlank() && !circuitNumber.isNullOrBlank()) {
                 "${circuitColor.localize()} $circuitNumber"
-            } else "No name"
+            } else getString(R.string.no_name)
         } else name
     }
 

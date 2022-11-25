@@ -20,6 +20,7 @@ import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.viewBinding
+import com.boolder.boolder.view.detail.BottomSheetListener
 import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
 import com.boolder.boolder.view.search.SearchActivity
@@ -31,7 +32,6 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.plugin.animation.camera
-import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener {
+class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener, BottomSheetListener {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -102,7 +102,6 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
 
         binding.mapView.getMapboxMap()
             .setCamera(CameraOptions.Builder().center(point).zoom(16.0).bearing(location.bearing.toDouble()).build())
-        binding.mapView.gestures.focalPoint = binding.mapView.getMapboxMap().pixelForCoordinate(point)
         binding.mapView.location.updateSettings {
             enabled = true
             pulsingEnabled = true
@@ -118,7 +117,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
         lifecycleScope.launch {
             mapViewModel.fetchProblemAndTopo(problemId).collect { completeProblem ->
                 with(Dispatchers.Main) {
-                    val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem)
+                    val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem, this@MapActivity)
                     bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
                     bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                 }
@@ -152,5 +151,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
         } catch (e: Exception) {
             Log.i("MAP", "No apps can handle this kind of intent")
         }
+    }
+
+    override fun onProblemSelected(problem: Problem) {
+        binding.mapView.selectProblemAndCenter(problem)
     }
 }

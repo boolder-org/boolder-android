@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import com.boolder.boolder.domain.model.BoolderMapConfig
+import com.boolder.boolder.domain.model.Problem
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Geometry
@@ -60,7 +61,7 @@ class BoolderMap @JvmOverloads constructor(
         gestures.pitchEnabled = false
         scalebar.enabled = false
         compass.visibility = true
-        compass.marginTop = 250f
+        compass.marginTop = 235f
         compass.marginRight = 50f
         addClickEvent()
     }
@@ -142,7 +143,7 @@ class BoolderMap @JvmOverloads constructor(
                     listener?.onProblemSelected(feature.getNumberProperty("id").toInt())
 
                     // Move camera is problem is hidden by bottomSheet
-                    if (geometry.screenCoordinate.y >= height / 2) {
+                    if (geometry.screenCoordinate.y >= (height / 2) - 100) {
 
                         val cameraOption = CameraOptions.Builder()
                             .center(feature.geometry() as Point)
@@ -203,6 +204,30 @@ class BoolderMap @JvmOverloads constructor(
             unselectProblem()
         }
         previousSelectedFeatureId = featureId
+    }
+
+    fun selectProblemAndCenter(problem: Problem) {
+        selectProblem(problem.id.toString())
+        val point = Point.fromLngLat(
+            problem.longitude.toDouble(),
+            problem.latitude.toDouble()
+        )
+
+        val coordinates = getMapboxMap().pixelForCoordinate(point)
+
+        // Move camera is problem is hidden by bottomSheet
+        if (coordinates.y >= height / 2) {
+
+            val cameraOption = CameraOptions.Builder()
+                .center(point)
+                .padding(EdgeInsets(40.0, 8.8, (height / 2).toDouble(), 8.8))
+                .build()
+            val mapAnimationOption = MapAnimationOptions.Builder()
+                .duration(500L)
+                .build()
+
+            getMapboxMap().easeTo(cameraOption, mapAnimationOption)
+        }
     }
 
     private fun unselectProblem() {
