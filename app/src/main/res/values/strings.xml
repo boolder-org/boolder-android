@@ -8,10 +8,10 @@
     <string name="cd_go_back">Go Back</string>
     <string name="cd_boolder_picture">Topo photo</string>
     <string name="cd_type">Problem type</string>
-    <string name="rational_title">We need your permission !</string>
-    <string name="rationale_message">In order to find you on the map, we need you to grant an access to your GPS.\nNo data is collected.</string>
-    <string name="rationale_positive_btn">Yes, I agree</string>
-    <string name="rationale_negative_Btn">No, Just Exit</string>
+    <string name="rational_title">Share location?</string>
+    <string name="rationale_message">Your location will be displayed on the map to help you find your way around.</string>
+    <string name="rationale_positive_btn">Share location</string>
+    <string name="rationale_negative_Btn">Maybe later</string>
     <string name="share">Share</string>
     <string name="save">Save</string>
     <string name="bleau_info">Bleau.info</string>
