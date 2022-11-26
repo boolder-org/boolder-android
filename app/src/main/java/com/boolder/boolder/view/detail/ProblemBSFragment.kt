@@ -182,7 +182,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         val pointD = selectedLine?.points()?.firstOrNull()
         if (pointD != null) {
             val match = ViewGroup.LayoutParams.MATCH_PARENT
-            val cardSize = if (selectedProblem.circuitColorSafe == OFF_CIRCUIT) 30 else 60
+            val cardSize = if (selectedProblem.circuitColorSafe == OFF_CIRCUIT) 30 else 48
             val offset = cardSize / 2
             val cardParams = RelativeLayout.LayoutParams(cardSize, cardSize)
 
@@ -192,7 +192,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 } else ColorStateList.valueOf(Color.WHITE)
 
                 setTextColor(textColor)
-                textSize = 12f
+                textSize = 16f
                 text = selectedProblem.circuitNumber
                 gravity = Gravity.CENTER
             }
