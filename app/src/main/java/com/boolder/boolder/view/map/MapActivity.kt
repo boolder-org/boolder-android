@@ -78,7 +78,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
                         onProblemSelected(problem!!.id)
                         binding.mapView.selectProblem(problem.id.toString())
                         val point = Point.fromLngLat(problem.longitude.toDouble(), problem.latitude.toDouble())
-                        CameraOptions.Builder().center(point).zoom(22.0).build()
+                        CameraOptions.Builder().center(point).zoom(20.0).build()
                     } else null
 
                     cameraOptions?.let { option ->
