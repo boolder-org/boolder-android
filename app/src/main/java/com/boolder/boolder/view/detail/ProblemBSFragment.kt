@@ -232,9 +232,6 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     }
 
     private fun updateLabels() {
-        val sitStartText = if (selectedProblem.sitStart) {
-            requireContext().getString(R.string.sit_start)
-        } else ""
         binding.title.text = selectedProblem.nameSafe()
         binding.grade.text = selectedProblem.grade
 
@@ -250,6 +247,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }
         binding.typeIcon.setImageDrawable(steepnessDrawable)
 
+        var steepnessText: String? = null
         when (selectedProblem.steepness) {
             "slab" -> R.string.stepness_slab
             "overhang" -> R.string.stepness_overhang
@@ -258,17 +256,17 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             "traverse" -> R.string.stepness_traverse
             else -> null
         }?.let {
-            binding.typeText.text = getString(it) + " • $sitStartText"
+            steepnessText = getString(it)
         }
 
-        if (steepnessDrawable == null && selectedProblem.steepness.contains(
-                "other",
-                true
-            ) && !selectedProblem.sitStart
-        ) {
-            binding.typeIcon.visibility = View.GONE
-            binding.typeText.visibility = View.GONE
-        }
+        val sitStartText = if (selectedProblem.sitStart) {
+            requireContext().getString(R.string.sit_start)
+        } else null
+
+        binding.typeText.text = listOf(steepnessText, sitStartText).filterNotNull().joinToString(separator = " • ")
+
+        binding.typeIcon.visibility = if(selectedProblem.steepness.contains("other", true)) View.INVISIBLE else View.VISIBLE
+        binding.typeText.visibility = if(binding.typeText.text == null) View.GONE else View.VISIBLE
     }
 
     private fun setupChipClick() {
