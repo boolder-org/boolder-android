@@ -297,7 +297,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             }
         }
 
-        binding.reportIssue.setOnClickListener {
+      /*  binding.reportIssue.setOnClickListener {
             Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, listOf(getString(R.string.contact_mail)).toTypedArray())
@@ -318,7 +318,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                     Log.i("Bottom Sheet", "No apps can handle this kind of intent")
                 }
             }
-        }
+        }*/
 
     }
 

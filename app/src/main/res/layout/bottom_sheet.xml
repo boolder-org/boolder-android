@@ -108,13 +108,13 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_margin="8dp"
-        android:tint="@color/black"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/cd_type"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         tools:src="@drawable/ic_steepness_overhang"
-        tools:text="5a" />
+        tools:text="5a"
+        app:tint="@color/black" />
 
     <TextView
         android:id="@+id/type_text"
@@ -185,28 +185,8 @@
         app:chipStartPadding="8dp"
         app:chipStrokeColor="@color/primary"
         app:chipStrokeWidth="1dp"
-        app:layout_constraintEnd_toStartOf="@id/report_issue"
-        app:layout_constraintStart_toEndOf="@id/save"
-        app:layout_constraintTop_toBottomOf="@id/type_text" />
-
-    <com.google.android.material.chip.Chip
-        android:id="@+id/report_issue"
-        style="@style/Widget.MaterialComponents.Chip.Action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/report"
-        android:textColor="@color/primary"
-        app:chipBackgroundColor="@color/white"
-        app:chipEndPadding="8dp"
-        app:chipIcon="@drawable/ic_outline_report"
-        app:chipIconTint="@color/primary"
-        app:chipStartPadding="8dp"
-        app:chipStrokeColor="@color/primary"
-        app:chipStrokeWidth="1dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/share"
+        app:layout_constraintStart_toEndOf="@id/save"
         app:layout_constraintTop_toBottomOf="@id/type_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
