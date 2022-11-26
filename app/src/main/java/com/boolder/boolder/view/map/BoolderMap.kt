@@ -61,8 +61,8 @@ class BoolderMap @JvmOverloads constructor(
         gestures.pitchEnabled = false
         scalebar.enabled = false
         compass.visibility = true
-        compass.marginTop = 235f
-        compass.marginRight = 50f
+        compass.marginTop = 180f
+        compass.marginRight = 36f
         addClickEvent()
     }
 
