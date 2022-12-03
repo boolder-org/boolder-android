@@ -21,3 +21,7 @@ More info [here](https://docs.mapbox.com/help/troubleshooting/private-access-tok
 - Mapbox SDK 
 - Koin 
 - Picasso
+
+# Watch me
+
+Here is a video overview of the codebase: https://youtu.be/Kf2B34ZWqqI
