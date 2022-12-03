@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Boolder</string>
-    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoibm1vbmRvbGxvdCIsImEiOiJjbDlyNHo2OGMwZjNyM3ZsNzk5d2M1NDVlIn0.HUjcpmT5EZyhuR_VjN6eog</string>
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoibm1vbmRvbGxvdCIsImEiOiJjbGI4MzkwaTgwaGUwM3RsanVwaDV1ODdxIn0.65x8Cd14jj4vV4EOrC9SMw</string>
 
     <string name="search_query_hint">Problem or area name</string>
     <string name="cd_find_my_position">Find my position</string>
