@@ -1,8 +1,23 @@
-Build
+# Build the app
 
-Create a file named gradle.properties in your .gradle (under /Users/{name}.gradle)
-Add this and replace {TOKEN} by the actual private key MAPBOX_DOWNLOAD_TOKEN={TOKEN}
+## Config
 
-And Voilà!
+Create a file named `gradle.properties` in the `~/.gradle/` directory, with the following content:
 
-Stack Algolia Instant Search SDK Ktor KotlinX.Serialization Room Mapbox SDK Koin Picasso
+```
+MAPBOX_DOWNLOAD_TOKEN={TOKEN}
+```
+
+Replace `{TOKEN}` with mapbox secret key.
+
+More info [here](https://docs.mapbox.com/help/troubleshooting/private-access-token-android-and-ios/).
+
+# Stack 
+
+- Algolia Instant Search SDK 
+- Ktor 
+- KotlinX.Serialization 
+- Room 
+- Mapbox SDK 
+- Koin 
+- Picasso
