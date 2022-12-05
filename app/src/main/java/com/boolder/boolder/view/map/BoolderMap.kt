@@ -3,7 +3,9 @@ package com.boolder.boolder.view.map
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import com.boolder.boolder.domain.model.BoolderMapConfig
+import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.Problem
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -116,14 +118,16 @@ class BoolderMap @JvmOverloads constructor(
 
     private fun queryProblemRenderedFeatures(geometry: RenderedQueryGeometry) {
 
+        val tapSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30f, resources.displayMetrics)
         val problemGeometry = RenderedQueryGeometry(
             ScreenBox(
                 ScreenCoordinate(
-                    geometry.screenCoordinate.x - 16.0, geometry.screenCoordinate.y - 16.0
+                    geometry.screenCoordinate.x - tapSize/2,
+                    geometry.screenCoordinate.y - tapSize/2
                 ),
                 ScreenCoordinate(
-                    geometry.screenCoordinate.x + 16.0,
-                    geometry.screenCoordinate.y + 16.0
+                    geometry.screenCoordinate.x + tapSize/2,
+                    geometry.screenCoordinate.y + tapSize/2
                 )
             )
         )
