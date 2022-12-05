@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -114,9 +115,9 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         val pointD = selectedLine?.points()?.firstOrNull()
         if (pointD != null) {
             val match = ViewGroup.LayoutParams.MATCH_PARENT
-            val cardSize = if (selectedProblem.circuitColorSafe == OFF_CIRCUIT) 30 else 48
+            val cardSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, if (selectedProblem.circuitColorSafe == OFF_CIRCUIT) 16f else 28f, resources.displayMetrics)
             val offset = cardSize / 2
-            val cardParams = RelativeLayout.LayoutParams(cardSize, cardSize)
+            val cardParams = RelativeLayout.LayoutParams(cardSize.toInt(), cardSize.toInt())
 
             val text = TextView(requireContext()).apply {
                 val textColor = if (selectedProblem.circuitColorSafe == WHITE) {
@@ -124,7 +125,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 } else ColorStateList.valueOf(Color.WHITE)
 
                 setTextColor(textColor)
-                textSize = 16f
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                 text = selectedProblem.circuitNumber
                 gravity = Gravity.CENTER
             }
@@ -135,6 +136,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 backgroundTintList = ColorStateList.valueOf(selectedProblem.drawColor(requireContext()))
                 addView(text, RelativeLayout.LayoutParams(match, match))
                 radius = 40f
+
                 translationX = ((pointD.x * binding.picture.measuredWidth) - offset).toFloat()
                 translationY = ((pointD.y * binding.picture.measuredHeight) - offset).toFloat()
             }
