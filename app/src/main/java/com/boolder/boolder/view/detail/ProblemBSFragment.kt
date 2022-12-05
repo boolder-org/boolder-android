@@ -62,15 +62,11 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
 
     private lateinit var selectedProblem: Problem
     private var selectedLine: Line? = null
-    private var isVariantSelected = false
-    private val variantsCount
-        get() = completeProblem.otherCompleteProblem.count { it.problem.parentId == completeProblem.problem.id }
 
     private val bleauUrl
         get() = "https://bleau.info/a/${selectedProblem.bleauInfoId}.html"
     private val shareUrl
         get() = "https://www.boolder.com/${Locale.getDefault().language}/p/${selectedProblem.id}"
-    private var isVariantSelectorOpen = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.bottom_sheet, container, false)
@@ -83,79 +79,15 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         loadBoolderImage()
         updateLabels()
         setupChipClick()
-        setupVariant()
-        binding.root.setOnClickListener {
-            if (isVariantSelectorOpen) {
-                closeVariantSelector()
-            }
-        }
     }
 
     private fun markParentAsSelected() {
         selectedLine = completeProblem.line
         selectedProblem = completeProblem.problem
-        isVariantSelected = false
-        closeVariantSelector()
         drawCurves()
         drawCircuitNumberCircle()
         updateLabels()
     }
-
-    //region Variant(s)
-    private fun buildVariantsView() {
-        binding.variantSelector.removeAllViews()
-
-        completeProblem.otherCompleteProblem
-            .filter { it.problem.parentId == completeProblem.problem.id }
-            .filter { it.problem.id != selectedProblem.id }
-            .map { variants ->
-                buildVariantText(variants.problem) { onVariantSelected(variants.line, variants.problem) }
-            }.forEach { binding.variantSelector.addView(it) }
-
-        // Add parent in variant only if a variant is currently displayed
-        if (isVariantSelected) {
-            binding.variantSelector
-                .addView(buildVariantText(completeProblem.problem) {
-                    listener.onProblemSelected(completeProblem.problem)
-                    markParentAsSelected()
-                }, 0)
-        }
-    }
-
-    private fun buildVariantText(problem: Problem, selectVariant: () -> Unit): TextView {
-        return TextView(requireContext()).apply {
-            text = "${problem.name} ${problem.grade}"
-            tag = problem.id
-            setTextColor(ColorStateList.valueOf(Color.WHITE))
-            setPadding(32, 16, 32, 16)
-            setOnClickListener { selectVariant() }
-        }
-    }
-
-    private fun openVariantSelection() {
-        isVariantSelectorOpen = true
-        buildVariantsView()
-        binding.variant.visibility = View.INVISIBLE
-        binding.variantSelector.visibility = View.VISIBLE
-    }
-
-    private fun closeVariantSelector() {
-        isVariantSelectorOpen = false
-        binding.variant.visibility = if (variantsCount > 0) View.VISIBLE else View.INVISIBLE
-        binding.variantSelector.visibility = View.GONE
-    }
-
-    private fun onVariantSelected(line: Line?, problem: Problem) {
-        listener.onProblemSelected(problem)
-        isVariantSelected = true
-        selectedLine = line
-        selectedProblem = problem
-        closeVariantSelector()
-        drawCurves()
-        drawCircuitNumberCircle()
-        updateLabels()
-    }
-    //endregion
 
     //region Draw
     private fun drawCurves() {
@@ -211,25 +143,6 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }
     }
     //endregion
-
-    // region View setup
-    private fun setupVariant() {
-        binding.variant.let { chip ->
-            if (variantsCount == 0) chip.visibility = View.GONE
-            else {
-                chip.text = requireContext().resources.getQuantityString(
-                    R.plurals.variant,
-                    variantsCount,
-                    variantsCount
-                )
-                chip.visibility = View.VISIBLE
-                chip.setOnClickListener {
-                    openVariantSelection()
-                    isVariantSelectorOpen = true
-                }
-            }
-        }
-    }
 
     private fun updateLabels() {
         binding.title.text = selectedProblem.nameSafe()
@@ -319,7 +232,6 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }*/
 
     }
-
 
     private fun loadBoolderImage() {
         if (completeProblem.topo != null) {
