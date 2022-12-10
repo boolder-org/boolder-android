@@ -22,6 +22,6 @@ More info [here](https://docs.mapbox.com/help/troubleshooting/private-access-tok
 - Koin 
 - Picasso
 
-# Watch me
+# Codebase overview
 
-Here is a video overview of the codebase: https://youtu.be/Kf2B34ZWqqI
+Here is a video overview of the codebase: https://youtu.be/Qk7gX1CaMk4
