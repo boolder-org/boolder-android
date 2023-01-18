@@ -46,3 +46,4 @@ MAPBOX_DOWNLOAD_TOKEN={TOKEN}
 Replace `{TOKEN}` with mapbox secret key.
 
 More info [here](https://docs.mapbox.com/help/troubleshooting/private-access-token-android-and-ios/).
+
