@@ -13,6 +13,7 @@ Here are a few ways you can contribute:
 - Open an issue if you want to suggest an improvement
 
 If you want to contribute more significantly: **we are looking for an official maintainer**.
+
 We already have a lot of features waiting to be built, and lots of new ideas to try out!
 We'd be happy to share the fun with you :)
 
@@ -32,7 +33,7 @@ The app is written in Kotlin, and uses several libraries:
 - Koin 
 - Picasso
 
-15-min video describing the architecture of the app : https://youtu.be/Qk7gX1CaMk4
+Here is a 15-min video describing the architecture of the app : https://youtu.be/Qk7gX1CaMk4
 
 ### Mapbox setup
 
