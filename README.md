@@ -4,6 +4,8 @@ Boolder is the best way to discover bouldering in Fontainebleau.
 
 The app is available at https://www.boolder.com/en/app
 
+More info: https://www.boolder.com/en/about
+
 ## Contribute
 
 Want to help us improve the app for thousands of climbers? Great!
