@@ -6,14 +6,22 @@
     android:background="@color/gray"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/search_component"
-        layout="@layout/search_component"
+    <FrameLayout
+        android:id="@+id/search_component_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginTop="36dp"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:fitsSystemWindows="true"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            android:id="@+id/search_component"
+            layout="@layout/search_component"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp" />
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -22,7 +30,7 @@
         android:layout_marginTop="8dp"
         android:background="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_component" />
+        app:layout_constraintTop_toBottomOf="@+id/search_component_wrapper" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/suggestion_container"
@@ -89,7 +97,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/suggestion_second"
             tools:text="Isatis" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
