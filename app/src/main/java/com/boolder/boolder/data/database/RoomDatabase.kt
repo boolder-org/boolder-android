@@ -15,7 +15,7 @@ import com.boolder.boolder.data.database.entity.ProblemEntity
         LineEntity::class,
         ProblemEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class BoolderAppDatabase : RoomDatabase() {

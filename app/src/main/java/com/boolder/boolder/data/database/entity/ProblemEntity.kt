@@ -50,6 +50,7 @@ data class ProblemEntity(
     @ColumnInfo(name = "bleau_info_id")
     val bleauInfoId: String?,
     val featured: Boolean,
+    val popularity: Int?,
     @ColumnInfo(name = "parent_id")
     val parentId: Int?
 )
