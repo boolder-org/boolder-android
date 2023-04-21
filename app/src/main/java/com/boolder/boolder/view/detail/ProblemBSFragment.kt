@@ -5,7 +5,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PointF
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -13,13 +12,15 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.core.view.setPadding
-import com.boolder.boolder.BuildConfig
+import androidx.fragment.app.findFragment
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.CircuitColor
@@ -77,6 +78,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         super.onViewCreated(view, savedInstanceState)
         selectedLine = completeProblem.line
         selectedProblem = completeProblem.problem
+        hideBleauButton(view)
         loadBoolderImage()
         updateLabels()
         setupChipClick()
@@ -88,6 +90,14 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         drawCurves()
         drawCircuitNumberCircle()
         updateLabels()
+    }
+
+    // Hide bleau.info button if bleauInfoId if empty
+    private fun hideBleauButton(view: View) {
+        if(selectedProblem.bleauInfoId == "") {
+            val bleauInfo = view.findViewById<Button>(R.id.bleau_info)
+            bleauInfo.visibility = View.INVISIBLE
+        }
     }
 
     //region Draw
