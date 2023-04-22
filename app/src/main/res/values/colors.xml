@@ -29,5 +29,5 @@
     <color name="circuit_color_white">#FFFFFF</color>
     <color name="circuit_color_white_for_kids">#FFFFFF</color>
     <color name="circuit_color_black">#000000</color>
-    <color name="circuit_color_off_circuit">#878A8D</color>
+    <color name="circuit_color_off_circuit">#CCCCCC</color>
 </resources>
