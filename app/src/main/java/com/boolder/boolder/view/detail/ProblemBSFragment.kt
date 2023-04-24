@@ -96,7 +96,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     private fun hideBleauButton(view: View) {
         if(selectedProblem.bleauInfoId == "") {
             val bleauInfo = view.findViewById<Button>(R.id.bleau_info)
-            bleauInfo.visibility = View.INVISIBLE
+            bleauInfo.visibility = View.GONE
         }
     }
 
