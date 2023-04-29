@@ -115,7 +115,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         val pointD = selectedLine?.points()?.firstOrNull()
         if (pointD != null) {
             val match = ViewGroup.LayoutParams.MATCH_PARENT
-            val cardSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, if (selectedProblem.circuitColorSafe == OFF_CIRCUIT) 16f else 28f, resources.displayMetrics)
+            val cardSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, if (selectedProblem.circuitNumber.isNullOrBlank()) 16f else 28f, resources.displayMetrics)
             val offset = cardSize / 2
             val cardParams = RelativeLayout.LayoutParams(cardSize.toInt(), cardSize.toInt())
 

@@ -40,7 +40,7 @@ class MapboxStyleFactory {
                         literal(22.0)
                         switchCase {
                             boolean {
-                                has("circuitColor")
+                                has("circuitNumber")
                                 literal(false)
                             }
                             literal(16.0)
