@@ -3,8 +3,11 @@ package com.boolder.boolder.view.search
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,6 +16,7 @@ import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivitySearchBinding
 import com.boolder.boolder.utils.NetworkObserver
 import com.boolder.boolder.utils.NetworkObserverImpl
+import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
 import com.boolder.boolder.utils.viewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,6 +54,14 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.root.setOnApplyWindowTopInsetListener { topInset ->
+            val topMargin = topInset + resources.getDimensionPixelSize(R.dimen.margin_search_component)
+
+            binding.searchComponent
+                .searchContainer
+                .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
+        }
 
         // Listen to network change
         networkObserverImpl.subscribeOn(this, this)
