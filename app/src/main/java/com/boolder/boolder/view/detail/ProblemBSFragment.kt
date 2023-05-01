@@ -273,11 +273,12 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
 
     //region Extensions
     private fun Problem.nameSafe(): String {
-        return if (name.isNullOrBlank() || name.contains("null", true)) {
-            if (!circuitColor.isNullOrBlank() && !circuitNumber.isNullOrBlank()) {
-                "${circuitColor.localize()} $circuitNumber"
-            } else getString(R.string.no_name)
-        } else name
+        if(Locale.getDefault().language == "fr") {
+            return name ?: ""
+        }
+        else {
+            return nameEn ?: ""
+        }
     }
 
     private fun String.localize(): String {
