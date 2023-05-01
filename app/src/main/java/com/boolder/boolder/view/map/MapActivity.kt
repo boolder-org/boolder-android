@@ -6,11 +6,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
@@ -19,6 +22,7 @@ import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
+import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
 import com.boolder.boolder.utils.viewBinding
 import com.boolder.boolder.view.detail.BottomSheetListener
 import com.boolder.boolder.view.detail.ProblemBSFragment
@@ -51,6 +55,15 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.root.setOnApplyWindowTopInsetListener { topInset ->
+            val topMargin = topInset + resources.getDimensionPixelSize(R.dimen.margin_search_component)
+
+            binding.searchComponent
+                .searchContainer
+                .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
+        }
+
         locationProvider = LocationProvider(this, this)
 
         setupMap()
