@@ -10,6 +10,7 @@ import kotlinx.parcelize.Parcelize
 data class Problem(
     val id: Int,
     val name: String?,
+    val nameEn: String?,
     val grade: String?,
     val latitude: Float,
     val longitude: Float,

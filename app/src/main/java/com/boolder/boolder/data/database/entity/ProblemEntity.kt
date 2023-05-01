@@ -33,6 +33,8 @@ data class ProblemEntity(
     @PrimaryKey
     val id: Int,
     val name: String?,
+    @ColumnInfo(name = "name_en")
+    val nameEn: String?,
     val grade: String?,
     val latitude: Float,
     val longitude: Float,

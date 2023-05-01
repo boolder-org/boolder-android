@@ -13,6 +13,7 @@ fun ProblemEntity.convert(areaName: String? = null): Problem {
     return Problem(
         id,
         name,
+        nameEn,
         grade,
         latitude,
         longitude,
