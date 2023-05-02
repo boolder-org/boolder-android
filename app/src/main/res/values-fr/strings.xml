@@ -48,5 +48,13 @@
 
     <string name="no_name">Sans nom</string>
 
+    <string name="grade">Niveau</string>
+    <string name="grades">Niveaux</string>
+    <string name="beginner">Débutant</string>
+    <string name="grade_min">Cotation min</string>
+    <string name="grade_max">Cotation max</string>
+    <string name="reset">Effacer</string>
+    <string name="apply">Appliquer</string>
+    <string name="custom">Personnalisé</string>
 
 </resources>

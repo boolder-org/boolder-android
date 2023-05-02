@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <com.boolder.boolder.view.map.BoolderMap
         android:id="@+id/mapView"
@@ -10,24 +11,18 @@
         android:layout_height="match_parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:contentDescription="@string/cd_find_my_position"
         android:id="@+id/fab_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="@dimen/margin_map_controls"
+        android:layout_marginBottom="@dimen/margin_map_controls"
         android:backgroundTint="@color/white"
+        android:contentDescription="@string/cd_find_my_position"
         android:src="@drawable/ic_fab_near_me"
         app:borderWidth="0dp"
         app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <androidx.fragment.app.FragmentContainerView xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/host_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".view.map.MapActivity" />
 
     <include
         android:id="@+id/search_component"
@@ -37,6 +32,17 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="@dimen/margin_search_component"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/grades_filter_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_map_controls"
+        app:icon="@drawable/ic_tune_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Grades" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

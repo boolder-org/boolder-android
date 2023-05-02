@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.boolder.boolder"
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.boolder.boolder"
         minSdk = 21
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 10 // bump when new version
         versionName = "1.6" // bump when new version
 
@@ -21,10 +21,6 @@ android {
     }
 
     buildTypes {
-        buildFeatures {
-            viewBinding = true
-        }
-
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -33,12 +29,21 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+        compose = true
+    }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.2"
     }
 }
 
@@ -69,16 +74,24 @@ dependencies {
     implementation("androidx.room:room-ktx:2.4.3")
 
     // DI
-    implementation("io.insert-koin:koin-android:3.2.2")
+    implementation("io.insert-koin:koin-android:3.3.3")
 
     // Picasso
     implementation("com.squareup.picasso:picasso:2.8")
 
+    // Jetpack compose
+    val composeBom = platform("androidx.compose:compose-bom:2023.01.00")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.5.1")
     implementation("com.google.android.material:material:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     testImplementation("io.insert-koin:koin-test-junit4:3.2.2")
     testImplementation("org.mockito:mockito-core:4.9.0")
     testImplementation("junit:junit:4.13.2")

@@ -15,11 +15,11 @@ class MapboxStyleFactory {
 
     fun buildStyle(): StyleExtension {
         return style(BoolderMapConfig.styleUri) {
-            +vectorSource("problems") {
+            +vectorSource(LAYER_PROBLEMS) {
                 url(BoolderMapConfig.vectorSourceUrl)
                 promoteId(PromoteId("id"))
             }
-            +circleLayer("problems", "problems") {
+            +circleLayer(LAYER_PROBLEMS, "problems") {
                 sourceLayer(BoolderMapConfig.problemsSourceLayerId)
                 minZoom(15.0)
                 filter(Expression.match {
@@ -99,7 +99,7 @@ class MapboxStyleFactory {
                     }
                 )
             }
-            +symbolLayer("problems-text", "problems") {
+            +symbolLayer(LAYER_PROBLEMS_TEXT, "problems") {
                 sourceLayer(BoolderMapConfig.problemsSourceLayerId)
                 minZoom(19.0)
                 filter(Expression.match {
@@ -133,5 +133,10 @@ class MapboxStyleFactory {
                 })
             }
         }
+    }
+
+    companion object {
+        const val LAYER_PROBLEMS = "problems"
+        const val LAYER_PROBLEMS_TEXT = "problems-text"
     }
 }
