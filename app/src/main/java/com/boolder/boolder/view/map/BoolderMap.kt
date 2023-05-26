@@ -178,6 +178,7 @@ class BoolderMap @JvmOverloads constructor(
             geometry,
             poisOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
+            if (getMapboxMap().cameraState.zoom < 12) return@queryRenderedFeatures
             if (features.isValue) {
                 features.value?.firstOrNull()?.feature?.let {
                     if (it.hasProperty("name") &&
