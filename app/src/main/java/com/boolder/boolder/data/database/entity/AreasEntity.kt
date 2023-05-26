@@ -18,6 +18,9 @@ data class AreasEntity(
     @PrimaryKey
     val id: Int,
     val name: String,
+    @ColumnInfo(name = "name_searchable")
+    val nameSearchable: String,
+    val priority: Int,
     @ColumnInfo(name = "description_fr")
     val descriptionFr: String?,
     @ColumnInfo(name = "description_en")

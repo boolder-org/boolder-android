@@ -35,6 +35,8 @@ data class ProblemEntity(
     val name: String?,
     @ColumnInfo(name = "name_en")
     val nameEn: String?,
+    @ColumnInfo(name = "name_searchable")
+    val nameSearchable: String?,
     val grade: String?,
     val latitude: Float,
     val longitude: Float,
