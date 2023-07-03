@@ -4,14 +4,22 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
+import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
-import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.Problem
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
-import com.mapbox.maps.*
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
+import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.MapView
+import com.mapbox.maps.QueriedFeature
+import com.mapbox.maps.RenderedQueryGeometry
+import com.mapbox.maps.RenderedQueryOptions
+import com.mapbox.maps.ScreenBox
+import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
@@ -63,8 +71,8 @@ class BoolderMap @JvmOverloads constructor(
         gestures.pitchEnabled = false
         scalebar.enabled = false
         compass.visibility = true
-        compass.marginTop = 180f
-        compass.marginRight = 36f
+        compass.marginTop = resources.getDimension(R.dimen.margin_compass_top)
+        compass.marginRight = resources.getDimension(R.dimen.margin_compass_end)
         addClickEvent()
     }
 
@@ -288,5 +296,9 @@ class BoolderMap @JvmOverloads constructor(
             .build()
 
         getMapboxMap().flyTo(cameraOption, mapAnimationOption)
+    }
+
+    fun applyCompassTopInset(topInset: Float) {
+        compass.marginTop = resources.getDimension(R.dimen.margin_compass_top) + topInset
     }
 }

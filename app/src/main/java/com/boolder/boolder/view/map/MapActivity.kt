@@ -62,6 +62,8 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
             binding.searchComponent
                 .searchContainer
                 .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
+
+            binding.mapView.applyCompassTopInset(topInset.toFloat())
         }
 
         locationProvider = LocationProvider(this, this)
