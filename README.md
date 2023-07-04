@@ -31,7 +31,6 @@ The app is written in Kotlin, and uses several libraries:
 - KotlinX.Serialization 
 - Room 
 - Mapbox SDK 
-- Algolia Instant Search SDK 
 - Koin 
 - Picasso
 
