@@ -14,12 +14,13 @@ import com.boolder.boolder.databinding.SearchResultProblemItemBinding
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.CircuitColor.WHITE
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.view.search.model.SearchResult
 
 interface BaseObject
 data class CategoryHeader(val titleId: Int) : BaseObject
 abstract class BaseViewHolder(view: View) : ViewHolder(view)
 
-class AlgoliaAdapter(
+class SearchAdapter(
     private val onProblemClick: (Problem) -> Unit,
     private val onAreaClick: (Area) -> Unit
 ) : RecyclerView.Adapter<BaseViewHolder>() {
@@ -68,6 +69,7 @@ class AlgoliaAdapter(
     private val problemHeader = CategoryHeader(R.string.category_problem)
     private val areaHeader = CategoryHeader(R.string.category_area)
     var items: MutableList<BaseObject> = mutableListOf()
+        private set
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -98,16 +100,16 @@ class AlgoliaAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    fun setHits(hits: List<BaseObject>) {
+    fun setItems(searchResult: SearchResult) {
         items.clear()
-        if (hits.any { it is Area }) {
+        if (searchResult.areas.isNotEmpty()) {
             items.add(areaHeader)
-            items.addAll(hits.filterIsInstance<Area>())
+            items.addAll(searchResult.areas)
         }
 
-        if (hits.any { it is Problem }) {
+        if (searchResult.problems.isNotEmpty()) {
             items.add(problemHeader)
-            items.addAll(hits.filterIsInstance<Problem>())
+            items.addAll(searchResult.problems)
         }
 
         notifyDataSetChanged()

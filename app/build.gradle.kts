@@ -46,12 +46,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
-    // Algolia Search
-    implementation("com.algolia:instantsearch-android:3.1.4")
-    implementation("com.algolia:instantsearch-android-paging3:3.1.4")
-
-    //Ktor (core + okhttp are required by Algolia)
-    implementation("io.ktor:ktor-client-core:2.1.3")
+    //Ktor
     implementation("io.ktor:ktor-client-okhttp:2.1.3")
     implementation("io.ktor:ktor-client-resources:2.1.3")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")

@@ -18,6 +18,7 @@ import com.boolder.boolder.utils.NetworkObserver
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
 import com.boolder.boolder.utils.viewBinding
+import com.boolder.boolder.view.search.model.SearchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
@@ -30,7 +31,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
     private val searchViewModel: SearchViewModel = SearchViewModel(get(), get())
     private val networkObserverImpl: NetworkObserverImpl by inject()
 
-    private val algoliaAdapter = AlgoliaAdapter(
+    private val searchAdapter = SearchAdapter(
         onAreaClick = { area ->
             setResult(RESULT_OK, Intent().apply { putExtra("AREA", area) })
             finish()
@@ -81,11 +82,11 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
             binding.searchComponent.searchBar.text.clear()
             refreshSuggestionsVisibility(true)
             refreshNoResultVisibility(false)
-            algoliaAdapter.setHits(emptyList())
+            searchAdapter.setItems(SearchResult.EMPTY)
         }
 
         binding.recyclerView.apply {
-            adapter = algoliaAdapter
+            adapter = searchAdapter
             addItemDecoration(DividerItemDecoration(this@SearchActivity, LinearLayoutManager.VERTICAL))
             layoutManager = LinearLayoutManager(this@SearchActivity)
         }
@@ -93,7 +94,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         binding.searchComponent.searchBar.addTextChangedListener { query ->
             if (isQueryEmpty) {
                 binding.searchComponent.searchLastIcon.visibility = View.GONE
-                algoliaAdapter.setHits(emptyList())
+                searchAdapter.setItems(SearchResult.EMPTY)
                 refreshSuggestionsVisibility(true)
             } else {
                 binding.searchComponent.searchLastIcon.visibility = View.VISIBLE
@@ -107,9 +108,9 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
             refreshNoResultVisibility(it.isEmpty())
             refreshSuggestionsVisibility(false)
             if (isQueryEmpty) {
-                algoliaAdapter.setHits(emptyList())
+                searchAdapter.setItems(SearchResult.EMPTY)
             } else {
-                algoliaAdapter.setHits(it)
+                searchAdapter.setItems(it)
             }
         }
     }
@@ -134,7 +135,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         lifecycleScope.launch(Dispatchers.Main) {
             if (connected) {
                 binding.connectivityErrorMessage.visibility = View.GONE
-                val isNoResult = algoliaAdapter.items.isEmpty()
+                val isNoResult = searchAdapter.items.isEmpty()
                 refreshSuggestionsVisibility(isQueryEmpty)
                 refreshNoResultVisibility(!isQueryEmpty && isNoResult)
             } else {
@@ -151,10 +152,5 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
     private fun refreshNoResultVisibility(show: Boolean) {
         binding.emptyQueryMessage.visibility = if (show && isConnectedToNetwork) View.VISIBLE else View.GONE
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        algoliaAdapter.setHits(emptyList())
     }
 }

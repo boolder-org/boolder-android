@@ -8,12 +8,7 @@ class AreaRepository(
     private val areaDao: AreaDao
 ) {
 
-    suspend fun getAll(): List<AreasEntity> {
-        return areaDao.getAll()
-    }
-
-    suspend fun loadAllByIds(areaIds: List<Int>): List<AreasEntity> {
-        return areaDao.loadAllByIds(areaIds)
-    }
+    suspend fun areasByName(name: String): List<AreasEntity> =
+        areaDao.areasByName(name)
 }
 

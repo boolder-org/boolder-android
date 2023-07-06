@@ -4,75 +4,47 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.algolia.instantsearch.core.connection.ConnectionHandler
-import com.algolia.instantsearch.searchbox.SearchBoxConnector
-import com.algolia.instantsearch.searcher.hits.addHitsSearcher
-import com.algolia.instantsearch.searcher.multi.MultiSearcher
-import com.algolia.search.model.APIKey
-import com.algolia.search.model.ApplicationID
-import com.algolia.search.model.IndexName
-import com.algolia.search.model.response.ResponseSearch
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
-import com.boolder.boolder.data.network.model.AreaRemote
-import com.boolder.boolder.data.network.model.ProblemRemote
 import com.boolder.boolder.domain.convert
-import com.boolder.boolder.domain.model.AlgoliaConfig
+import com.boolder.boolder.view.search.model.SearchResult
 import kotlinx.coroutines.launch
+import java.text.Normalizer
 
 class SearchViewModel(
     private val problemRepository: ProblemRepository,
     private val areaRepository: AreaRepository
 ) : ViewModel() {
 
-    private val searcher = MultiSearcher(
-        applicationID = ApplicationID(AlgoliaConfig.applicationId),
-        apiKey = APIKey(AlgoliaConfig.apiKey),
-        coroutineScope = viewModelScope
-    ).apply {
-        addHitsSearcher(IndexName("Area"))
-        addHitsSearcher(IndexName("Problem"))
-    }
-    private val searchBox = SearchBoxConnector(searcher)
-    private val connection = ConnectionHandler(searchBox)
+    private val _result = MutableLiveData<SearchResult>()
+    val searchResult: LiveData<SearchResult> = _result
 
-    private val _result = MutableLiveData<List<BaseObject>>()
-    val searchResult: LiveData<List<BaseObject>> = _result
+    fun search(query: String?) {
+        viewModelScope.launch {
+            val pattern = query
+                ?.takeIf { it.isNotBlank() }
+                ?.let { "%${it.normalized()}%" }
+                .orEmpty()
 
-    init {
-        searcher.response.subscribe { response ->
-            val problemHits = (response?.results?.getOrNull(1)?.response as? ResponseSearch)?.hits
-            val areaHits = (response?.results?.firstOrNull()?.response as? ResponseSearch)?.hits
+            val areas = areaRepository.areasByName(pattern)
+                .map { it.convert() }
 
-            viewModelScope.launch {
-                val problemsIds = problemHits?.associate {
-                    val remote = it.deserialize(ProblemRemote.serializer())
-                    Integer.parseInt(remote.objectID) to remote.areaName
-                } ?: emptyMap()
+            val problems = problemRepository.problemsByName(pattern)
+                .map { it.convert() }
 
-                val problems = problemRepository.loadAllByIds(problemsIds.keys.toList())
-                    .map { it.convert(problemsIds[it.id]) }
-
-                val areasIds = areaHits?.map {
-                    val id = it.deserialize(AreaRemote.serializer()).objectID
-                    Integer.parseInt(id)
-                } ?: emptyList()
-
-                val areas = areaRepository.loadAllByIds(areasIds).map { it.convert() }
-
-                _result.value = problems + areas
-            }
+            _result.value = SearchResult(
+                areas = areas,
+                problems = problems
+            )
         }
     }
 
-    fun search(query: String?) {
-        searcher.setQuery(query)
-        searcher.searchAsync()
-    }
+    private fun String.normalized() =
+        Normalizer.normalize(this, Normalizer.Form.NFD)
+            .replace(REGEX_EXCLUDED_CHARS, "")
+            .lowercase()
 
-    override fun onCleared() {
-        super.onCleared()
-        searcher.cancel()
-        connection.disconnect()
+    companion object {
+        private val REGEX_EXCLUDED_CHARS = Regex("[^0-9a-zA-Z]")
     }
 }
