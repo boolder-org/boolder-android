@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.domain.convert
-import com.boolder.boolder.view.search.model.SearchResult
 import kotlinx.coroutines.launch
 import java.text.Normalizer
 
@@ -16,8 +16,8 @@ class SearchViewModel(
     private val areaRepository: AreaRepository
 ) : ViewModel() {
 
-    private val _result = MutableLiveData<SearchResult>()
-    val searchResult: LiveData<SearchResult> = _result
+    private val _result = MutableLiveData<List<BaseObject>>()
+    val searchResult: LiveData<List<BaseObject>> = _result
 
     fun search(query: String?) {
         viewModelScope.launch {
@@ -32,10 +32,16 @@ class SearchViewModel(
             val problems = problemRepository.problemsByName(pattern)
                 .map { it.convert() }
 
-            _result.value = SearchResult(
-                areas = areas,
-                problems = problems
-            )
+            _result.value = buildList {
+                if (areas.isNotEmpty()) {
+                    add(CategoryHeader(R.string.category_area))
+                    addAll(areas)
+                }
+                if (problems.isNotEmpty()) {
+                    add(CategoryHeader(R.string.category_problem))
+                    addAll(problems)
+                }
+            }
         }
     }
 

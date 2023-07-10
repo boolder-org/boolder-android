@@ -1,117 +1,51 @@
 package com.boolder.boolder.view.search
 
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.boolder.boolder.R
-import com.boolder.boolder.databinding.SearchResultAreaItemBinding
-import com.boolder.boolder.databinding.SearchResultItemBinding
-import com.boolder.boolder.databinding.SearchResultProblemItemBinding
 import com.boolder.boolder.domain.model.Area
-import com.boolder.boolder.domain.model.CircuitColor.WHITE
 import com.boolder.boolder.domain.model.Problem
-import com.boolder.boolder.view.search.model.SearchResult
+import com.boolder.boolder.view.search.viewholder.AreaViewHolder
+import com.boolder.boolder.view.search.viewholder.CategoryHeaderViewHolder
+import com.boolder.boolder.view.search.viewholder.ProblemViewHolder
 
 interface BaseObject
 data class CategoryHeader(val titleId: Int) : BaseObject
 abstract class BaseViewHolder(view: View) : ViewHolder(view)
 
 class SearchAdapter(
-    private val onProblemClick: (Problem) -> Unit,
-    private val onAreaClick: (Area) -> Unit
-) : RecyclerView.Adapter<BaseViewHolder>() {
+    private val onProblemClicked: (Problem) -> Unit,
+    private val onAreaClicked: (Area) -> Unit
+) : ListAdapter<BaseObject, BaseViewHolder>(SearchAdapterDiffCallback()) {
 
-    override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is CategoryHeader -> 0
-            is Problem -> 1
-            else -> 2
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder =
+        when (viewType) {
+            VIEW_TYPE_HEADER -> CategoryHeaderViewHolder.create(parent)
+            VIEW_TYPE_PROBLEM -> ProblemViewHolder.create(parent, onProblemClicked)
+            VIEW_TYPE_AREA -> AreaViewHolder.create(parent, onAreaClicked)
+            else -> throw IllegalArgumentException("Unsupported view type")
         }
-    }
-
-    inner class CategoryHeaderViewHolder(private val binding: SearchResultItemBinding) : BaseViewHolder(binding.root) {
-        fun bind(header: CategoryHeader) {
-            binding.title.text = binding.root.context.getString(header.titleId)
-
-        }
-    }
-
-    inner class AreaViewHolder(private val binding: SearchResultAreaItemBinding) : BaseViewHolder(binding.root) {
-        fun bind(area: Area) {
-            binding.areaName.text = area.name
-            binding.root.setOnClickListener { onAreaClick(area) }
-        }
-    }
-
-    inner class ProblemViewHolder(private val binding: SearchResultProblemItemBinding) : BaseViewHolder(binding.root) {
-        fun bind(problem: Problem) {
-            binding.problemName.text = problem.name
-            binding.problemGrade.text = problem.grade
-            binding.circuitNumber.text = problem.circuitNumber
-
-            val textColor = if (problem.circuitColorSafe == WHITE) {
-                ColorStateList.valueOf(Color.BLACK)
-            } else ColorStateList.valueOf(Color.WHITE)
-
-            binding.circuitNumber.setTextColor(textColor)
-            binding.circuitColor.backgroundTintList = ColorStateList.valueOf(problem.drawColor(binding.root.context))
-
-            binding.problemArea.text = problem.areaName
-
-            binding.root.setOnClickListener { onProblemClick(problem) }
-        }
-    }
-
-    private val problemHeader = CategoryHeader(R.string.category_problem)
-    private val areaHeader = CategoryHeader(R.string.category_area)
-    var items: MutableList<BaseObject> = mutableListOf()
-        private set
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
-            0 -> CategoryHeaderViewHolder(SearchResultItemBinding.inflate(inflater, parent, false))
-            1 -> ProblemViewHolder(SearchResultProblemItemBinding.inflate(inflater, parent, false))
-            else -> AreaViewHolder(SearchResultAreaItemBinding.inflate(inflater, parent, false))
-        }
-    }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder) {
-            is CategoryHeaderViewHolder -> {
-                holder.bind(getItem(position) as CategoryHeader)
-            }
-            is ProblemViewHolder -> {
-                holder.bind(getItem(position) as Problem)
-            }
-            else -> {
-                (holder as AreaViewHolder).bind(getItem(position) as Area)
-            }
+            is CategoryHeaderViewHolder -> holder.bind(getItem(position) as CategoryHeader)
+            is ProblemViewHolder -> holder.bind(getItem(position) as Problem)
+            is AreaViewHolder -> holder.bind(getItem(position) as Area)
         }
     }
 
-    private fun getItem(position: Int): BaseObject {
-        return items[position]
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    fun setItems(searchResult: SearchResult) {
-        items.clear()
-        if (searchResult.areas.isNotEmpty()) {
-            items.add(areaHeader)
-            items.addAll(searchResult.areas)
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is CategoryHeader -> VIEW_TYPE_HEADER
+            is Problem -> VIEW_TYPE_PROBLEM
+            is Area -> VIEW_TYPE_AREA
+            else -> throw IllegalArgumentException("Unsupported item")
         }
 
-        if (searchResult.problems.isNotEmpty()) {
-            items.add(problemHeader)
-            items.addAll(searchResult.problems)
-        }
-
-        notifyDataSetChanged()
+    companion object {
+        private const val VIEW_TYPE_HEADER = 0
+        private const val VIEW_TYPE_PROBLEM = 1
+        private const val VIEW_TYPE_AREA = 2
     }
 }

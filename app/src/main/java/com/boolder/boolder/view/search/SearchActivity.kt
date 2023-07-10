@@ -18,7 +18,6 @@ import com.boolder.boolder.utils.NetworkObserver
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
 import com.boolder.boolder.utils.viewBinding
-import com.boolder.boolder.view.search.model.SearchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
@@ -32,11 +31,11 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
     private val networkObserverImpl: NetworkObserverImpl by inject()
 
     private val searchAdapter = SearchAdapter(
-        onAreaClick = { area ->
+        onAreaClicked = { area ->
             setResult(RESULT_OK, Intent().apply { putExtra("AREA", area) })
             finish()
         },
-        onProblemClick = { problem ->
+        onProblemClicked = { problem ->
             setResult(RESULT_OK, Intent().apply { putExtra("PROBLEM", problem) })
             finish()
         }
@@ -82,7 +81,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
             binding.searchComponent.searchBar.text.clear()
             refreshSuggestionsVisibility(true)
             refreshNoResultVisibility(false)
-            searchAdapter.setItems(SearchResult.EMPTY)
+            searchAdapter.submitList(emptyList())
         }
 
         binding.recyclerView.apply {
@@ -94,7 +93,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         binding.searchComponent.searchBar.addTextChangedListener { query ->
             if (isQueryEmpty) {
                 binding.searchComponent.searchLastIcon.visibility = View.GONE
-                searchAdapter.setItems(SearchResult.EMPTY)
+                searchAdapter.submitList(emptyList())
                 refreshSuggestionsVisibility(true)
             } else {
                 binding.searchComponent.searchLastIcon.visibility = View.VISIBLE
@@ -108,9 +107,9 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
             refreshNoResultVisibility(it.isEmpty())
             refreshSuggestionsVisibility(false)
             if (isQueryEmpty) {
-                searchAdapter.setItems(SearchResult.EMPTY)
+                searchAdapter.submitList(emptyList())
             } else {
-                searchAdapter.setItems(it)
+                searchAdapter.submitList(it)
             }
         }
     }
@@ -135,7 +134,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         lifecycleScope.launch(Dispatchers.Main) {
             if (connected) {
                 binding.connectivityErrorMessage.visibility = View.GONE
-                val isNoResult = searchAdapter.items.isEmpty()
+                val isNoResult = searchAdapter.currentList.isEmpty()
                 refreshSuggestionsVisibility(isQueryEmpty)
                 refreshNoResultVisibility(!isQueryEmpty && isNoResult)
             } else {
