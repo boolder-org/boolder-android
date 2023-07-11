@@ -85,7 +85,7 @@ class MapViewModel(
         val grades = with(ALL_GRADES) {
             subList(
                 fromIndex = indexOf(gradeRange.min),
-                toIndex = indexOf(gradeRange.max)
+                toIndex = indexOf(gradeRange.max) + 1
             )
         }
 

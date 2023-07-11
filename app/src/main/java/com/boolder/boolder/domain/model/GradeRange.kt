@@ -28,7 +28,7 @@ data class GradeRange(
 
 fun Resources.gradeRangeLevelDisplay(gradeRange: GradeRange): String =
     when (gradeRange) {
-        GradeRange.BEGINNER -> "${getString(R.string.grade)} 1 -> 3"
+        GradeRange.BEGINNER -> "${getString(R.string.grade)} 1 → 3"
         GradeRange.LEVEL1 -> "${getString(R.string.grade)} 1"
         GradeRange.LEVEL2 -> "${getString(R.string.grade)} 2"
         GradeRange.LEVEL3 -> "${getString(R.string.grade)} 3"
@@ -37,5 +37,5 @@ fun Resources.gradeRangeLevelDisplay(gradeRange: GradeRange): String =
         GradeRange.LEVEL6 -> "${getString(R.string.grade)} 6"
         GradeRange.LEVEL7 -> "${getString(R.string.grade)} 7"
         GradeRange.LEVEL8 -> "${getString(R.string.grade)} 8"
-        else -> "${gradeRange.min} -> ${gradeRange.max}"
+        else -> "${gradeRange.min} → ${gradeRange.max}"
     }
