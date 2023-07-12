@@ -6,30 +6,35 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
 import com.boolder.boolder.domain.model.Area
+import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
-import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
+import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.viewBinding
 import com.boolder.boolder.view.detail.BottomSheetListener
 import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
+import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment
+import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment.STYLE_NORMAL
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -56,14 +61,24 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        binding.root.setOnApplyWindowTopInsetListener { topInset ->
-            val topMargin = topInset + resources.getDimensionPixelSize(R.dimen.margin_search_component)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val topMargin = systemInsets.top + resources.getDimensionPixelSize(R.dimen.margin_search_component)
+            val bottomMargin = systemInsets.bottom + resources.getDimensionPixelSize(R.dimen.margin_map_controls)
 
             binding.searchComponent
                 .searchContainer
-                .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
+                .updateLayoutParams<MarginLayoutParams> { updateMargins(top = topMargin) }
 
-            binding.mapView.applyCompassTopInset(topInset.toFloat())
+            binding.mapView.applyCompassTopInset(systemInsets.top.toFloat())
+
+            binding.gradesFilterButton
+                .updateLayoutParams<MarginLayoutParams> { updateMargins(bottom = bottomMargin) }
+
+            binding.fabLocation
+                .updateLayoutParams<MarginLayoutParams> { updateMargins(bottom = bottomMargin) }
+
+            WindowInsetsCompat.CONSUMED
         }
 
         locationProvider = LocationProvider(this, this)
@@ -110,6 +125,28 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
             val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
             searchRegister.launch(intent, option)
         }
+
+        binding.gradesFilterButton.setOnClickListener {
+            mapViewModel.withCurrentGradeRange {
+                GradesFilterBottomSheetDialogFragment.newInstance(it)
+                    .apply { setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme) }
+                    .show(supportFragmentManager, GradesFilterBottomSheetDialogFragment.TAG)
+            }
+        }
+
+        mapViewModel.gradeStateFlow.launchAndCollectIn(owner = this) {
+            binding.mapView.filterGrades(it.grades)
+            binding.gradesFilterButton.text = it.gradeRangeButtonTitle
+        }
+
+        supportFragmentManager.setFragmentResultListener(
+            /* requestKey = */ GradesFilterBottomSheetDialogFragment.REQUEST_KEY,
+            /* lifecycleOwner = */ this
+        ) { _, bundle ->
+            val gradeRange = requireNotNull(bundle.getParcelable<GradeRange>(RESULT_GRADE_RANGE))
+
+            mapViewModel.onGradeRangeSelected(gradeRange)
+        }
     }
 
     override fun onGPSLocation(location: Location) {
@@ -133,7 +170,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
             mapViewModel.fetchProblemAndTopo(problemId).collect { completeProblem ->
                 with(Dispatchers.Main) {
                     val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem, this@MapActivity)
-                    bottomSheetFragment.setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
+                    bottomSheetFragment.setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
                     bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                 }
             }

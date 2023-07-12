@@ -53,4 +53,13 @@
 
     <string name="no_name">No name</string>
 
+    <string name="grade">Grade</string>
+    <string name="grades">Grades</string>
+    <string name="beginner">Beginner</string>
+    <string name="grade_min">Min grade</string>
+    <string name="grade_max">Max grade</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+    <string name="custom">Custom</string>
+
 </resources>

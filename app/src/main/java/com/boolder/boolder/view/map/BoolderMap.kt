@@ -7,6 +7,7 @@ import android.util.TypedValue
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.utils.MapboxStyleFactory
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Geometry
@@ -21,7 +22,12 @@ import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenBox
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
+import com.mapbox.maps.extension.style.expressions.dsl.generated.match
 import com.mapbox.maps.extension.style.expressions.generated.Expression
+import com.mapbox.maps.extension.style.layers.Layer
+import com.mapbox.maps.extension.style.layers.generated.CircleLayer
+import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.layers.getLayer
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
@@ -300,5 +306,23 @@ class BoolderMap @JvmOverloads constructor(
 
     fun applyCompassTopInset(topInset: Float) {
         compass.marginTop = resources.getDimension(R.dimen.margin_compass_top) + topInset
+    }
+
+    private fun getLayer(layerId: String): Layer? =
+        getMapboxMap().getStyle()?.getLayer(layerId)
+
+    fun filterGrades(grades: List<String>) {
+        val problemsLayer = getLayer(MapboxStyleFactory.LAYER_PROBLEMS) as? CircleLayer
+        val problemsTextLayer = getLayer(MapboxStyleFactory.LAYER_PROBLEMS_TEXT) as? SymbolLayer
+
+        val query = match {
+            get { literal("grade") }
+            literal(grades)
+            literal(true)
+            literal(false)
+        }
+
+        problemsLayer?.filter(query)
+        problemsTextLayer?.filter(query)
     }
 }
