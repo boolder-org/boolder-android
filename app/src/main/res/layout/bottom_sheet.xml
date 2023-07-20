@@ -41,9 +41,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:ellipsize="end"
+        android:textColor="@color/black"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/grade"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -56,9 +56,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:textColor="@color/black"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/title"
         app:layout_constraintTop_toBottomOf="@+id/picture"
@@ -69,24 +69,22 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_margin="8dp"
-        android:layout_marginBottom="8dp"
         android:contentDescription="@string/cd_type"
+        app:layout_constraintBottom_toBottomOf="@+id/type_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        tools:src="@drawable/ic_steepness_overhang"
-        tools:text="5a"
-        app:tint="@color/black" />
+        app:layout_constraintTop_toTopOf="@+id/type_text"
+        app:tint="@color/black"
+        tools:src="@drawable/ic_steepness_overhang" />
 
     <TextView
         android:id="@+id/type_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textSize="18sp"
+        android:layout_margin="8dp"
         android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="@id/type_icon"
+        android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/type_icon"
-        app:layout_constraintTop_toTopOf="@id/type_icon"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         tools:text="Wall" />
 
     <com.google.android.material.chip.Chip
