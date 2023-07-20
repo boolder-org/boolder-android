@@ -18,17 +18,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.core.view.setPadding
-import androidx.fragment.app.findFragment
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.CircuitColor
-import com.boolder.boolder.domain.model.CircuitColor.OFF_CIRCUIT
 import com.boolder.boolder.domain.model.CircuitColor.WHITE
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -37,7 +36,7 @@ import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.get
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit.SECONDS
 
 
@@ -159,38 +158,26 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         binding.title.text = selectedProblem.nameSafe()
         binding.grade.text = selectedProblem.grade
 
-        val steepnessDrawable = when (selectedProblem.steepness) {
-            "slab" -> R.drawable.ic_steepness_slab
-            "overhang" -> R.drawable.ic_steepness_overhang
-            "roof" -> R.drawable.ic_steepness_roof
-            "wall" -> R.drawable.ic_steepness_wall
-            "traverse" -> R.drawable.ic_steepness_traverse_left_right
-            else -> null
-        }?.let {
-            ContextCompat.getDrawable(requireContext(), it)
-        }
-        binding.typeIcon.setImageDrawable(steepnessDrawable)
+        val steepness = Steepness.fromTextValue(selectedProblem.steepness)
 
-        var steepnessText: String? = null
-        when (selectedProblem.steepness) {
-            "slab" -> R.string.stepness_slab
-            "overhang" -> R.string.stepness_overhang
-            "roof" -> R.string.stepness_roof
-            "wall" -> R.string.stepness_wall
-            "traverse" -> R.string.stepness_traverse
-            else -> null
-        }?.let {
-            steepnessText = getString(it)
+        binding.typeIcon.apply {
+            val steepnessDrawable = steepness.iconRes
+                ?.let { ContextCompat.getDrawable(context, it) }
+
+            setImageDrawable(steepnessDrawable)
+            isVisible = steepnessDrawable != null
         }
 
-        val sitStartText = if (selectedProblem.sitStart) {
-            requireContext().getString(R.string.sit_start)
-        } else null
+        binding.typeText.apply {
+            val steepnessText = steepness.textRes?.let(::getString)
 
-        binding.typeText.text = listOf(steepnessText, sitStartText).filterNotNull().joinToString(separator = " • ")
+            val sitStartText = if (selectedProblem.sitStart) {
+                resources.getString(R.string.sit_start)
+            } else null
 
-        binding.typeIcon.visibility = if(selectedProblem.steepness.contains("other", true)) View.INVISIBLE else View.VISIBLE
-        binding.typeText.visibility = if(binding.typeText.text == null) View.GONE else View.VISIBLE
+            text = listOfNotNull(steepnessText, sitStartText).joinToString(separator = " • ")
+            isVisible = !text.isNullOrEmpty()
+        }
     }
 
     private fun setupChipClick() {
