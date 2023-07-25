@@ -30,4 +30,6 @@
     <color name="circuit_color_white_for_kids">#FFFFFF</color>
     <color name="circuit_color_black">#000000</color>
     <color name="circuit_color_off_circuit">#CCCCCC</color>
+
+    <color name="problem_line_shadow">#99333333</color>
 </resources>

@@ -31,7 +31,7 @@ class ProblemViewHolder private constructor(
 
             circuitNumber.setTextColor(ColorStateList.valueOf(textColor))
             circuitColor.backgroundTintList =
-                ColorStateList.valueOf(problem.drawColor(root.context))
+                ColorStateList.valueOf(problem.getColor(root.context))
         }
     }
 

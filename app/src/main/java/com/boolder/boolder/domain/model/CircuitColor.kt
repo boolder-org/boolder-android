@@ -1,6 +1,7 @@
 package com.boolder.boolder.domain.model
 
 import android.content.Context
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.boolder.boolder.R
 import com.mapbox.maps.extension.style.expressions.generated.Expression.ExpressionBuilder
@@ -52,6 +53,7 @@ enum class CircuitColor {
         return context.getString(id)
     }
 
+    @ColorInt
     fun getColor(context: Context): Int {
         val id = when (this) {
             YELLOW -> R.color.circuit_color_yellow

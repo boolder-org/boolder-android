@@ -27,13 +27,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.boolder.boolder.view.detail.LineVectorView
+    <com.boolder.boolder.view.detail.ProblemLineView
         android:id="@+id/line_vector"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="4:3"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <TextView
         android:id="@+id/title"
