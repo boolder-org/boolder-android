@@ -103,12 +103,15 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             val ctrl1 = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
             val ctrl2 = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
 
-            binding.lineVector.addDataPoints(
-                points,
-                ctrl1,
-                ctrl2,
-                selectedProblem.getColor(requireContext())
-            )
+            binding.lineVector.apply {
+                addDataPoints(
+                    data = points,
+                    point1 = ctrl1,
+                    point2 = ctrl2,
+                    drawColor = selectedProblem.getColor(requireContext())
+                )
+                animatePath()
+            }
         } else {
             binding.lineVector.clearPath()
         }
