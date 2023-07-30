@@ -23,4 +23,7 @@ interface ProblemDao {
         """
     )
     suspend fun problemsByName(name: String): List<ProblemWithAreaName>
+
+    @Query("SELECT problems.*, areas.name AS 'areaName' FROM problems JOIN areas ON problems.area_id = areas.id WHERE problems.id IN (:problemIds) ORDER BY problems.popularity DESC")
+    suspend fun getProblemsWithAreaNamesByIds(problemIds: List<Int>): List<ProblemWithAreaName>
 }

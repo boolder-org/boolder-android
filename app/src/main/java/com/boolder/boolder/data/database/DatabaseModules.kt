@@ -6,6 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.data.database.repository.TickRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -21,4 +22,17 @@ val databaseModule = module {
     single { LineRepository(get<BoolderAppDatabase>().lineDao()) }
     single { ProblemRepository(get<BoolderAppDatabase>().problemDao()) }
 
+}
+
+val tickDatabaseModule = module {
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            TickDatabase::class.java,
+            "tick.db"
+        ).build()
+    }
+
+    single { TickRepository(get<TickDatabase>().tickDao(), get<BoolderAppDatabase>().problemDao()) }
+    single { ProblemRepository(get<BoolderAppDatabase>().problemDao()) }
 }

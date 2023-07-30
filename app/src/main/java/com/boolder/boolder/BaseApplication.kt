@@ -2,6 +2,7 @@ package com.boolder.boolder
 
 import android.app.Application
 import com.boolder.boolder.data.database.databaseModule
+import com.boolder.boolder.data.database.tickDatabaseModule
 import com.boolder.boolder.data.network.networkModule
 import com.boolder.boolder.view.viewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -17,7 +18,7 @@ class BaseApplication : Application() {
         startKoin {
             androidLogger(INFO)
             androidContext(this@BaseApplication)
-            modules(listOf(databaseModule, networkModule, viewModelModule))
+            modules(listOf(databaseModule, networkModule, viewModelModule, tickDatabaseModule))
         }
     }
 }

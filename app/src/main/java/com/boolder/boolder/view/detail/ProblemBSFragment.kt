@@ -17,6 +17,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import com.boolder.boolder.R
+import com.boolder.boolder.data.database.entity.Tick
+import com.boolder.boolder.data.database.repository.TickRepository
+import com.boolder.boolder.data.database.tickDatabaseModule
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.CompleteProblem
@@ -29,6 +32,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.get
 import java.util.Locale
@@ -198,6 +202,19 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 startActivity(shareIntent)
             } catch (e: Exception) {
                 Log.i("Bottom Sheet", "No apps can handle this kind of intent")
+            }
+        }
+
+        binding.tick.setOnClickListener{
+            val tickRepository: TickRepository = get()
+            val idToWrite = 123
+
+            runBlocking {
+                val existingTick = tickRepository.loadById(idToWrite)
+                if (existingTick == null) {
+                    val tick = Tick(idToWrite)
+                    tickRepository.insertTick(tick)
+                }
             }
         }
 

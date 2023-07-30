@@ -5,9 +5,11 @@ import androidx.room.RoomDatabase
 import com.boolder.boolder.data.database.dao.AreaDao
 import com.boolder.boolder.data.database.dao.LineDao
 import com.boolder.boolder.data.database.dao.ProblemDao
+import com.boolder.boolder.data.database.dao.TickDao
 import com.boolder.boolder.data.database.entity.AreasEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
+import com.boolder.boolder.data.database.entity.Tick
 
 @Database(
     entities = [
@@ -25,3 +27,7 @@ abstract class BoolderAppDatabase : RoomDatabase() {
 }
 
 
+@Database(entities = [Tick::class], version = 1, exportSchema = false)
+abstract class TickDatabase : RoomDatabase() {
+    abstract fun tickDao(): TickDao
+}
