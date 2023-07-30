@@ -8,6 +8,30 @@
     android:background="@color/bottom_sheet_background"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/share5"
+        style="@style/Widget.MaterialComponents.Chip.Action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Tick"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        app:chipBackgroundColor="@color/white"
+        app:chipEndPadding="8dp"
+        app:chipIcon="@drawable/ic_checkmark"
+        app:chipIconTint="@color/primary"
+        app:chipMinHeight="36dp"
+        app:chipStartPadding="8dp"
+        app:chipStrokeColor="@color/primary"
+        app:chipStrokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.668"
+        app:layout_constraintStart_toEndOf="@id/save"
+        app:layout_constraintTop_toBottomOf="@id/type_text" />
+
     <ImageView
         android:id="@+id/picture"
         android:layout_width="match_parent"
@@ -152,5 +176,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/save"
         app:layout_constraintTop_toBottomOf="@id/type_text" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

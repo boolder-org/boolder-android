@@ -134,6 +134,12 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
             }
         }
 
+        binding.ticklist.setOnClickListener{
+            val intent = Intent(this, SearchActivity::class.java)
+            val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
+            searchRegister.launch(intent, option)
+        }
+
         mapViewModel.gradeStateFlow.launchAndCollectIn(owner = this) {
             binding.mapView.filterGrades(it.grades)
             binding.gradesFilterButton.text = it.gradeRangeButtonTitle
