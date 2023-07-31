@@ -1,21 +1,17 @@
 package com.boolder.boolder.view.detail
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -23,7 +19,6 @@ import androidx.core.view.setPadding
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.CircuitColor
-import com.boolder.boolder.domain.model.CircuitColor.WHITE
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
@@ -101,7 +96,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     //region Draw
     private fun drawCurves() {
         val points = selectedLine?.points()
-        if (points != null && points.isNotEmpty()) {
+        if (!points.isNullOrEmpty()) {
 
             val segment = curveAlgorithm.controlPointsFromPoints(points)
 
@@ -112,7 +107,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 points,
                 ctrl1,
                 ctrl2,
-                selectedProblem.drawColor(requireContext())
+                selectedProblem.getColor(requireContext())
             )
         } else {
             binding.lineVector.clearPath()
@@ -122,34 +117,31 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     private fun drawCircuitNumberCircle() {
         val pointD = selectedLine?.points()?.firstOrNull()
         if (pointD != null) {
-            val match = ViewGroup.LayoutParams.MATCH_PARENT
-            val cardSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, if (selectedProblem.circuitNumber.isNullOrBlank()) 16f else 28f, resources.displayMetrics)
-            val offset = cardSize / 2
-            val cardParams = RelativeLayout.LayoutParams(cardSize.toInt(), cardSize.toInt())
+            val viewSizeRes = if (selectedProblem.circuitNumber.isNullOrBlank()) {
+                R.dimen.size_problem_start_without_number
+            } else {
+                R.dimen.size_problem_start_with_number
+            }
 
-            val text = TextView(requireContext()).apply {
-                val textColor = if (selectedProblem.circuitColorSafe == WHITE) {
-                    ColorStateList.valueOf(Color.BLACK)
-                } else ColorStateList.valueOf(Color.WHITE)
+            val viewSize = resources.getDimensionPixelSize(viewSizeRes)
+            val marginProblemStart = resources.getDimensionPixelSize(R.dimen.margin_problem_start)
+            val viewWithMarginSize = viewSize + marginProblemStart * 2
+            val offset = viewWithMarginSize / 2
 
+            val textColor = when (selectedProblem.circuitColorSafe) {
+                CircuitColor.WHITE -> Color.BLACK
+                else -> Color.WHITE
+            }
+
+            val problemStartView = ProblemStartView(binding.root.context).apply {
+                setText(selectedProblem.circuitNumber)
                 setTextColor(textColor)
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                text = selectedProblem.circuitNumber
-                gravity = Gravity.CENTER
+                setProblemColor(selectedProblem.getColor(context))
+                translationX = (pointD.x * binding.picture.measuredWidth - offset).toFloat()
+                translationY = (pointD.y * binding.picture.measuredHeight - offset).toFloat()
             }
 
-            val card = CardView(requireContext())
-
-            card.apply {
-                backgroundTintList = ColorStateList.valueOf(selectedProblem.drawColor(requireContext()))
-                addView(text, RelativeLayout.LayoutParams(match, match))
-                radius = 40f
-
-                translationX = ((pointD.x * binding.picture.measuredWidth) - offset).toFloat()
-                translationY = ((pointD.y * binding.picture.measuredHeight) - offset).toFloat()
-            }
-
-            binding.root.addView(card, cardParams)
+            binding.root.addView(problemStartView, LayoutParams(WRAP_CONTENT, WRAP_CONTENT))
         }
     }
     //endregion

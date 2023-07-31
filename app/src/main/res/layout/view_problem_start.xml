@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <FrameLayout
+        android:id="@+id/background"
+        android:layout_width="@dimen/size_problem_start_with_number"
+        android:layout_height="@dimen/size_problem_start_with_number"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/margin_problem_start"
+        tools:background="@color/circuit_color_red">
+
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            tools:text="42" />
+
+    </FrameLayout>
+
+</merge>

@@ -1,16 +1,21 @@
 package com.boolder.boolder.view.detail
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
-import androidx.annotation.ColorRes
+import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
+import com.boolder.boolder.R
 
 
-class LineVectorView @JvmOverloads constructor(
-    context: Context?,
+class ProblemLineView @JvmOverloads constructor(
+    context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
@@ -27,34 +32,22 @@ class LineVectorView @JvmOverloads constructor(
         )
     }
 
-    private val paint = Paint()
-
-    private var viewCanvas: Canvas? = null
-    private var bitmap: Bitmap? = null
-    private val bitmapPaint = Paint(Paint.DITHER_FLAG)
-
-    override fun onSizeChanged(
-        w: Int,
-        h: Int,
-        oldw: Int,
-        oldh: Int
-    ) {
-        super.onSizeChanged(w, h, oldw, oldh)
-
-        bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        viewCanvas = Canvas(bitmap!!)
+    private val paint = Paint().apply {
+        setShadowLayer(
+            resources.getDimension(R.dimen.radius_problem_line),
+            0f,
+            0f,
+            ContextCompat.getColor(context, R.color.problem_line_shadow)
+        )
+        setLayerType(LAYER_TYPE_SOFTWARE, this)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        drawBezierCurve(canvas)
-        bitmap?.let {
-            canvas?.drawBitmap(it, 0f, 0f, bitmapPaint)
-        }
+        canvas.drawProblemPath()
     }
 
-    private fun drawBezierCurve(canvas: Canvas?) {
+    private fun Canvas.drawProblemPath() {
         try {
             if (points.isEmpty() && controlPoint1.isEmpty() && controlPoint2.isEmpty()) return
 
@@ -72,14 +65,19 @@ class LineVectorView @JvmOverloads constructor(
                 )
             }
 
-            canvas?.drawPath(path, paint)
+            drawPath(path, paint)
 
         } catch (e: Exception) {
             Log.e("TAG", e.message ?: "")
         }
     }
 
-    fun addDataPoints(data: List<PointD>, point1: List<PointD>, point2: List<PointD>, @ColorRes drawColor: Int) {
+    fun addDataPoints(
+        data: List<PointD>,
+        point1: List<PointD>,
+        point2: List<PointD>,
+        @ColorInt drawColor: Int
+    ) {
 
         paint.apply {
             isAntiAlias = true
