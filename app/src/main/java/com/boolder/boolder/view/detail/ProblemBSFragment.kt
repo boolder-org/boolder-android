@@ -16,10 +16,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
+import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.R
-import com.boolder.boolder.data.database.entity.Tick
+import com.boolder.boolder.data.database.entity.TickEntity
 import com.boolder.boolder.data.database.repository.TickRepository
-import com.boolder.boolder.data.database.tickDatabaseModule
 import com.boolder.boolder.databinding.BottomSheetBinding
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.CompleteProblem
@@ -32,6 +32,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.koin.android.ext.android.get
@@ -207,12 +208,12 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
 
         binding.tick.setOnClickListener{
             val tickRepository: TickRepository = get()
-            val idToWrite = 123
+            val idToWrite = selectedProblem.id
 
-            runBlocking {
+            lifecycleScope.launch {
                 val existingTick = tickRepository.loadById(idToWrite)
                 if (existingTick == null) {
-                    val tick = Tick(idToWrite)
+                    val tick = TickEntity(idToWrite)
                     tickRepository.insertTick(tick)
                 }
             }

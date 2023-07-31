@@ -33,6 +33,7 @@ import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchActivity
+import com.boolder.boolder.view.search.TickActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment.STYLE_NORMAL
 import com.mapbox.geojson.Geometry
@@ -135,7 +136,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         }
 
         binding.ticklist.setOnClickListener{
-            val intent = Intent(this, SearchActivity::class.java)
+            val intent = Intent(this, TickActivity::class.java)
             val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
             searchRegister.launch(intent, option)
         }

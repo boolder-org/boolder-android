@@ -16,6 +16,7 @@
         android:theme="@style/Theme.Boolder"
         tools:targetApi="31">
         <activity android:name=".view.search.SearchActivity" />
+        <activity android:name=".view.search.TickActivity" />
         <activity
             android:name=".view.map.MapActivity"
             android:screenOrientation="portrait"

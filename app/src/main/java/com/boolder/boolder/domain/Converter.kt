@@ -4,10 +4,12 @@ import com.boolder.boolder.data.database.entity.AreasEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.ProblemWithAreaName
+import com.boolder.boolder.data.database.entity.TickEntity
 import com.boolder.boolder.data.network.model.TopoRemote
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Tick
 import com.boolder.boolder.domain.model.Topo
 
 fun ProblemEntity.convert(areaName: String? = null): Problem {
@@ -60,4 +62,8 @@ fun LineEntity.convert(): Line {
 
 fun AreasEntity.convert(): Area {
     return Area(id, name, southWestLat, southWestLon, northEastLat, northEastLon)
+}
+
+fun TickEntity.convert(): Tick {
+    return Tick(id)
 }

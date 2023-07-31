@@ -30,7 +30,9 @@ val tickDatabaseModule = module {
             androidContext(),
             TickDatabase::class.java,
             "tick.db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     single { TickRepository(get<TickDatabase>().tickDao(), get<BoolderAppDatabase>().problemDao()) }

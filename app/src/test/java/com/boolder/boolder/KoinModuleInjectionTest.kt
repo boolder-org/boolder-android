@@ -2,6 +2,7 @@ package com.boolder.boolder
 
 import android.content.Context
 import com.boolder.boolder.data.database.databaseModule
+import com.boolder.boolder.data.database.tickDatabaseModule
 import com.boolder.boolder.data.network.networkModule
 import com.boolder.boolder.view.viewModelModule
 import org.junit.Rule
@@ -24,7 +25,7 @@ class KoinModuleInjectionTest : KoinTest {
     fun `test that all modules of koin can be injected at runtime`() {
 
         koinApplication {
-            modules(databaseModule, networkModule, viewModelModule)
+            modules(databaseModule, networkModule, viewModelModule, tickDatabaseModule)
             checkModules {
                 withInstance<Context>()
             }

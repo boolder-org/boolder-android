@@ -9,7 +9,7 @@ import com.boolder.boolder.data.database.dao.TickDao
 import com.boolder.boolder.data.database.entity.AreasEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
-import com.boolder.boolder.data.database.entity.Tick
+import com.boolder.boolder.data.database.entity.TickEntity
 
 @Database(
     entities = [
@@ -27,7 +27,7 @@ abstract class BoolderAppDatabase : RoomDatabase() {
 }
 
 
-@Database(entities = [Tick::class], version = 1, exportSchema = false)
+@Database(entities = [TickEntity::class], version = 3, exportSchema = true)
 abstract class TickDatabase : RoomDatabase() {
     abstract fun tickDao(): TickDao
 }
