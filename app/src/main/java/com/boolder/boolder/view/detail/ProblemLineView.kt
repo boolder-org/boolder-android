@@ -1,9 +1,12 @@
 package com.boolder.boolder.view.detail
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PathMeasure
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.Log
@@ -42,6 +45,8 @@ class ProblemLineView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_SOFTWARE, this)
     }
 
+    private var lineLengthRatio = 0f
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawProblemPath()
@@ -64,6 +69,17 @@ class ProblemLineView @JvmOverloads constructor(
                     points[i].y * height
                 )
             }
+
+            val pathMeasure = PathMeasure(path, false)
+            val length = pathMeasure.length
+
+            paint.pathEffect = DashPathEffect(
+                floatArrayOf(
+                    length * lineLengthRatio,
+                    length * (1f - lineLengthRatio)
+                ),
+                0f
+            )
 
             drawPath(path, paint)
 
@@ -109,5 +125,19 @@ class ProblemLineView @JvmOverloads constructor(
         controlPoint1.clear()
         controlPoint2.clear()
         postInvalidate()
+    }
+
+    fun animatePath() {
+        ValueAnimator.ofFloat(0f, 1f).apply {
+            startDelay = 300L
+            duration = 400L
+
+            addUpdateListener { valueAnimator ->
+                lineLengthRatio = valueAnimator.animatedFraction
+                postInvalidate()
+            }
+
+            start()
+        }
     }
 }
