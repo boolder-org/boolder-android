@@ -18,4 +18,7 @@ interface TickDao {
     suspend fun loadById(tickId: Int): TickEntity?
     @Insert
     suspend fun insertTick(tick: TickEntity)
+
+    @Query("DELETE FROM ticks WHERE id = :tickId")
+    suspend fun deleteById(tickId: Int)
 }

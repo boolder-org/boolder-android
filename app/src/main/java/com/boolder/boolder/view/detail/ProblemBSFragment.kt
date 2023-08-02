@@ -178,6 +178,15 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             text = listOfNotNull(steepnessText, sitStartText).joinToString(separator = " • ")
             isVisible = !text.isNullOrEmpty()
         }
+        val tickRepository: TickRepository = get()
+        val idToWrite = selectedProblem.id
+        lifecycleScope.launch {
+            val existingTick = tickRepository.loadById(idToWrite)
+            if (existingTick != null){
+                binding.tick.text = "Ticked"
+            }
+        }
+
     }
 
     private fun setupChipClick() {
@@ -215,6 +224,11 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 if (existingTick == null) {
                     val tick = TickEntity(idToWrite)
                     tickRepository.insertTick(tick)
+                    binding.tick.text = "Ticked"
+                }
+                else {
+                    tickRepository.deleteById(idToWrite)
+                    binding.tick.text = "Tick"
                 }
             }
         }

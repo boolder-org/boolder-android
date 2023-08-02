@@ -19,6 +19,10 @@ class TickRepository(
         return tickDao.loadById(tickId)
     }
 
+    suspend fun deleteById(tickId: Int){
+        return tickDao.deleteById(tickId)
+    }
+
     suspend fun deleteAll(){
         return tickDao.deleteAll()
     }

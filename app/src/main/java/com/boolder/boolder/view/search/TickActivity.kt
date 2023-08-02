@@ -94,18 +94,14 @@ class TickActivity : AppCompatActivity(), NetworkObserver {
                 refreshSuggestionsVisibility(true)
             } else {
                 binding.searchComponent.searchLastIcon.visibility = View.VISIBLE
-                tickViewModel.list()
             }
         }
+        tickViewModel.list()
 
         tickViewModel.searchResult.observe(this) {
             refreshNoResultVisibility(it.isEmpty())
             refreshSuggestionsVisibility(false)
-            if (isQueryEmpty) {
-                searchAdapter.submitList(emptyList())
-            } else {
-                searchAdapter.submitList(it)
-            }
+            searchAdapter.submitList(it)
         }
     }
 
