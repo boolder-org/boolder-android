@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
@@ -27,12 +28,11 @@ import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.viewBinding
-import com.boolder.boolder.view.detail.BottomSheetListener
-import com.boolder.boolder.view.detail.ProblemBSFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchActivity
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment.STYLE_NORMAL
 import com.mapbox.geojson.Geometry
@@ -42,20 +42,21 @@ import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.locationcomponent.location
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener, BottomSheetListener {
+class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
     private val mapViewModel by viewModel<MapViewModel>()
-    private val layerFactory: MapboxStyleFactory by inject()
+    private val layerFactory by inject<MapboxStyleFactory>()
 
     private lateinit var locationProvider: LocationProvider
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +83,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         }
 
         locationProvider = LocationProvider(this, this)
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet)
+            .also { it.state = BottomSheetBehavior.STATE_HIDDEN }
 
         setupMap()
 
@@ -168,11 +172,8 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
     override fun onProblemSelected(problemId: Int) {
         lifecycleScope.launch {
             mapViewModel.fetchProblemAndTopo(problemId).collect { completeProblem ->
-                with(Dispatchers.Main) {
-                    val bottomSheetFragment = ProblemBSFragment.newInstance(completeProblem, this@MapActivity)
-                    bottomSheetFragment.setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
-                    bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
-                }
+                binding.problemView.setProblem(completeProblem)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }
@@ -203,9 +204,5 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener,
         } catch (e: Exception) {
             Log.i("MAP", "No apps can handle this kind of intent")
         }
-    }
-
-    override fun onProblemSelected(problem: Problem) {
-        binding.mapView.selectProblemAndCenter(problem)
     }
 }

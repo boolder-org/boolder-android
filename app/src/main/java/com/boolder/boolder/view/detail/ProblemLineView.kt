@@ -110,9 +110,9 @@ class ProblemLineView @JvmOverloads constructor(
                 controlPoint1.clear()
                 controlPoint2.clear()
 
-                points.addAll(data.toF())
-                controlPoint1.addAll(point1.toF())
-                controlPoint2.addAll(point2.toF())
+                points.addAll(data.toPointFList())
+                controlPoint1.addAll(point1.toPointFList())
+                controlPoint2.addAll(point2.toPointFList())
 
                 postInvalidate()
 
@@ -121,6 +121,7 @@ class ProblemLineView @JvmOverloads constructor(
     }
 
     fun clearPath() {
+        lineLengthRatio = 0f
         points.clear()
         controlPoint1.clear()
         controlPoint2.clear()
@@ -141,3 +142,7 @@ class ProblemLineView @JvmOverloads constructor(
         }
     }
 }
+
+data class PointD(val x: Double, val y: Double)
+
+fun List<PointD>.toPointFList() = map { PointF(it.x.toFloat(), it.y.toFloat()) }
