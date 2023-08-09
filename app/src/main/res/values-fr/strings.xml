@@ -32,6 +32,7 @@
     <string name="query_examples">Exemples :</string>
     <string name="category_area">Secteurs</string>
     <string name="category_problem">Voies</string>
+    <string name="category_ticks">Ticks</string>
     <string name="sit_start">départ assis</string>
     <string name="pois_bs_open">Voir dans Google Maps</string>
     <string name="pois_bs_close">Fermer</string>

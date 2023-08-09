@@ -35,6 +35,6 @@ val tickDatabaseModule = module {
             .build()
     }
 
-    single { TickRepository(get<TickDatabase>().tickDao(), get<BoolderAppDatabase>().problemDao()) }
+    single { TickRepository(get<TickDatabase>().tickDao(), get<BoolderAppDatabase>().problemDao(), get<BoolderAppDatabase>().areaDao()) }
     single { ProblemRepository(get<BoolderAppDatabase>().problemDao()) }
 }

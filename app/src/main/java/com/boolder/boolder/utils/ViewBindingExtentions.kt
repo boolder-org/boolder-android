@@ -46,7 +46,7 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
     }
 }
 
-// Use this to injet view in fragment
+// Use this to inject view in fragment
 fun <T : ViewBinding> Fragment.viewBinding(viewBindingFactory: (View) -> T) =
     FragmentViewBindingDelegate(viewBindingFactory)
 
