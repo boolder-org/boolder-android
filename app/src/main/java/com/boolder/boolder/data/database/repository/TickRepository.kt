@@ -31,4 +31,10 @@ class TickRepository(
         val problemIds = tickEntities.map { it.id }
         return problemDao.getProblemsWithAreaNamesByIds(problemIds)
     }
+
+    suspend fun getProblemsWithAreaNamesByName(name: String): List<ProblemWithAreaName> {
+        val tickEntities = tickDao.getAllIds()
+        val problemIds = tickEntities.map { it.id }
+        return problemDao.getProblemsWithAreaNamesByIdsAndName(problemIds, name)
+    }
 }

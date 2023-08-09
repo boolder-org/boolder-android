@@ -26,4 +26,7 @@ interface ProblemDao {
 
     @Query("SELECT problems.*, areas.name AS 'areaName' FROM problems JOIN areas ON problems.area_id = areas.id WHERE problems.id IN (:problemIds) ORDER BY problems.popularity DESC")
     suspend fun getProblemsWithAreaNamesByIds(problemIds: List<Int>): List<ProblemWithAreaName>
+
+    @Query("SELECT problems.*, areas.name AS 'areaName' FROM problems JOIN areas ON problems.area_id = areas.id WHERE problems.id IN (:problemIds) AND problems.name_searchable LIKE :name  ORDER BY problems.popularity DESC")
+    suspend fun getProblemsWithAreaNamesByIdsAndName(problemIds: List<Int>, name: String): List<ProblemWithAreaName>
 }

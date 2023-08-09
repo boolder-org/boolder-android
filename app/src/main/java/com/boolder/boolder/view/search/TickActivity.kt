@@ -77,8 +77,7 @@ class TickActivity : AppCompatActivity(), NetworkObserver {
 
         binding.searchComponent.searchLastIcon.setOnClickListener {
             binding.searchComponent.searchBar.text.clear()
-            refreshNoResultVisibility(false)
-            searchAdapter.submitList(emptyList())
+            tickViewModel.list()
         }
 
         binding.recyclerView.apply {
@@ -90,14 +89,13 @@ class TickActivity : AppCompatActivity(), NetworkObserver {
         binding.searchComponent.searchBar.addTextChangedListener { query ->
             if (isQueryEmpty) {
                 binding.searchComponent.searchLastIcon.visibility = View.GONE
-                searchAdapter.submitList(emptyList())
-                refreshSuggestionsVisibility(true)
-            } else {
+                tickViewModel.list()
+            } else{
                 binding.searchComponent.searchLastIcon.visibility = View.VISIBLE
+                tickViewModel.search(query.toString())
             }
         }
         tickViewModel.list()
-
         tickViewModel.searchResult.observe(this) {
             refreshNoResultVisibility(it.isEmpty())
             refreshSuggestionsVisibility(false)
