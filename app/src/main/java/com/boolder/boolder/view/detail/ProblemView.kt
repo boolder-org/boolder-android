@@ -193,6 +193,8 @@ class ProblemView(
     }
 
     private fun loadBoolderImage() {
+        binding.progressCircular.isVisible = true
+
         if (completeProblem?.topo != null) {
             val okHttpClient = OkHttpClient.Builder()
                 .connectTimeout(10, SECONDS)
@@ -207,7 +209,7 @@ class ProblemView(
                     override fun onSuccess() {
                         context?.let {
                             binding.picture.setPadding(0)
-                            binding.progressCircular.visibility = View.GONE
+                            binding.progressCircular.isVisible = false
                             markParentAsSelected()
                         }
                     }
@@ -224,7 +226,7 @@ class ProblemView(
             ContextCompat.getDrawable(context, R.drawable.ic_placeholder)
         )
         binding.picture.setPadding(200)
-        binding.progressCircular.visibility = View.GONE
+        binding.progressCircular.isVisible = false
     }
     //endregion
 
