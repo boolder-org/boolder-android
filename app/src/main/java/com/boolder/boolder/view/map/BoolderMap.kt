@@ -48,6 +48,7 @@ class BoolderMap @JvmOverloads constructor(
 
     interface BoolderClickListener {
         fun onProblemSelected(problemId: Int)
+        fun onProblemUnselected()
         fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?)
     }
 
@@ -154,7 +155,13 @@ class BoolderMap @JvmOverloads constructor(
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
             if (features.isValue) {
 
-                val feature = features.value?.firstOrNull()?.feature ?: return@queryRenderedFeatures
+                val feature = features.value?.firstOrNull()?.feature
+                    ?: run {
+                        unselectProblem()
+                        listener?.onProblemUnselected()
+                        return@queryRenderedFeatures
+                    }
+
                 if (getMapboxMap().cameraState.zoom < 18) return@queryRenderedFeatures
                 if (feature.hasProperty("id") && feature.geometry() != null) {
                     selectProblem(feature.getNumberProperty("id").toString())

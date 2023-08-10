@@ -178,6 +178,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
         }
     }
 
+    override fun onProblemUnselected() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
     override fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?) {
 
         val view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_pois, binding.root, false)
