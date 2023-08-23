@@ -20,14 +20,14 @@ class TickViewModel(
     fun list(){
         viewModelScope.launch {
 //            tickRepository.deleteAll()
-            val areas_with_problems = tickRepository.getProblemsPerArea();
+            val areasWithProblems = tickRepository.getProblemsPerArea();
 
             _result.value = buildList {
-                if (areas_with_problems.isNotEmpty()) {
+                if (areasWithProblems.isNotEmpty()) {
                     add(CategoryHeader(R.string.category_ticks))
-                    areas_with_problems.forEach { area_with_problems ->
-                        add(area_with_problems.areaEntity.convert())
-                        addAll(area_with_problems.problems.map{ it.convert()})
+                    areasWithProblems.forEach { areaWithProblems ->
+                        add(areaWithProblems.areaEntity.convert())
+                        addAll(areaWithProblems.problems.map{ it.convert()})
                     }
                 }
             }
@@ -41,14 +41,14 @@ class TickViewModel(
                 ?.let { "%${it.normalized()}%" }
                 .orEmpty()
 
-            val areas_with_problems = tickRepository.getProblemsByNamePerArea(pattern)
+            val areasWithProblems = tickRepository.getProblemsByNamePerArea(pattern)
 
             _result.value = buildList {
-                if (areas_with_problems.isNotEmpty()) {
+                if (areasWithProblems.isNotEmpty()) {
                     add(CategoryHeader(R.string.category_ticks))
-                    areas_with_problems.forEach { area_with_problems ->
-                        add(area_with_problems.areaEntity.convert())
-                        addAll(area_with_problems.problems.map{ it.convert()})
+                    areasWithProblems.forEach { areaWithProblems ->
+                        add(areaWithProblems.areaEntity.convert())
+                        addAll(areaWithProblems.problems.map{ it.convert()})
                     }
                 }
             }

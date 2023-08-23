@@ -69,6 +69,8 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
     private val shareUrl
         get() = "https://www.boolder.com/${Locale.getDefault().language}/p/${selectedProblem.id}"
 
+    private val tickRepository: TickRepository = get()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.bottom_sheet, container, false)
     }
@@ -178,7 +180,6 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
             text = listOfNotNull(steepnessText, sitStartText).joinToString(separator = " • ")
             isVisible = !text.isNullOrEmpty()
         }
-        val tickRepository: TickRepository = get()
         val idToWrite = selectedProblem.id
         lifecycleScope.launch {
             val existingTick = tickRepository.loadById(idToWrite)
@@ -216,7 +217,6 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }
 
         binding.tick.setOnClickListener{
-            val tickRepository: TickRepository = get()
             val idToWrite = selectedProblem.id
 
             lifecycleScope.launch {
