@@ -27,7 +27,7 @@ abstract class BoolderAppDatabase : RoomDatabase() {
 }
 
 
-@Database(entities = [TickEntity::class], version = 3, exportSchema = true)
+@Database(entities = [TickEntity::class], version = 1, exportSchema = true)
 abstract class TickDatabase : RoomDatabase() {
     abstract fun tickDao(): TickDao
 }

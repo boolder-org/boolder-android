@@ -31,7 +31,6 @@ val tickDatabaseModule = module {
             TickDatabase::class.java,
             "tick.db"
         )
-            .fallbackToDestructiveMigration()
             .build()
     }
 
