@@ -86,6 +86,55 @@
         app:layout_constraintTop_toBottomOf="@+id/title"
         tools:text="Wall" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/save"
+        android:stateListAnimator="@null"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginVertical="8dp"
+        android:layout_marginEnd="8dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_outline_bookmark"
+        app:iconTint="@color/circuit_color_yellow"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="18dp"
+        app:strokeColor="@color/circuit_color_yellow"
+        app:strokeWidth="1dp"
+        app:backgroundTint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tick"
+        android:stateListAnimator="@null"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginVertical="8dp"
+        android:layout_marginEnd="8dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:elevation="0dp"
+        app:cornerRadius="12dp"
+        app:icon="@drawable/ic_checkmark"
+        app:iconTint="@color/primary"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="18dp"
+        app:strokeColor="@color/primary"
+        app:strokeWidth="1dp"
+        app:backgroundTint="@color/white"
+        app:elevation="0dp"
+        app:layout_constraintEnd_toStartOf="@id/save"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
+
     <com.google.android.material.chip.Chip
         android:id="@+id/bleau_info"
         style="@style/Widget.MaterialComponents.Chip.Action"
@@ -111,27 +160,6 @@
         app:layout_constraintTop_toBottomOf="@id/type_text" />
 
     <com.google.android.material.chip.Chip
-        android:id="@+id/save"
-        style="@style/Widget.MaterialComponents.Chip.Action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/save"
-        android:textColor="@color/primary"
-        android:visibility="gone"
-        app:chipBackgroundColor="@color/white"
-        app:chipEndPadding="8dp"
-        app:chipIcon="@drawable/ic_outline_bookmark"
-        app:chipIconTint="@color/primary"
-        app:chipStartPadding="8dp"
-        app:chipStrokeColor="@color/primary"
-        app:chipStrokeWidth="1dp"
-        app:layout_constraintEnd_toStartOf="@id/share"
-        app:layout_constraintStart_toEndOf="@id/bleau_info"
-        app:layout_constraintTop_toBottomOf="@id/type_text" />
-
-    <com.google.android.material.chip.Chip
         android:id="@+id/share"
         style="@style/Widget.MaterialComponents.Chip.Action"
         android:layout_width="wrap_content"
@@ -149,33 +177,10 @@
         app:chipStartPadding="8dp"
         app:chipStrokeColor="@color/primary"
         app:chipStrokeWidth="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/save"
+        app:layout_constraintStart_toEndOf="@id/bleau_info"
         app:layout_constraintTop_toBottomOf="@id/type_text" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/tick"
-        style="@style/Widget.MaterialComponents.Chip.Action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Tick"
-        android:textColor="@color/primary"
-        android:textSize="18sp"
-        app:chipBackgroundColor="@color/white"
-        app:chipEndPadding="8dp"
-        app:chipIcon="@drawable/ic_checkmark"
-        app:chipIconTint="@color/primary"
-        app:chipMinHeight="36dp"
-        app:chipStartPadding="8dp"
-        app:chipStrokeColor="@color/primary"
-        app:chipStrokeWidth="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
-        app:layout_constraintStart_toEndOf="@id/share"
-        app:layout_constraintTop_toBottomOf="@id/type_text" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

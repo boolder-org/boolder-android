@@ -1,6 +1,7 @@
 package com.boolder.boolder.view.detail
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PointF
 import android.net.Uri
@@ -224,11 +225,36 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                 if (existingTick == null) {
                     val tick = TickEntity(idToWrite)
                     tickRepository.insertTick(tick)
-                    binding.tick.text = "Ticked"
+                    binding.tick.iconTint = ColorStateList.valueOf(Color.WHITE)
+                    binding.tick.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
                 }
                 else {
+                    binding.tick.iconTint = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
+                    binding.tick.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
                     tickRepository.deleteById(idToWrite)
-                    binding.tick.text = "Tick"
+                }
+            }
+        }
+
+        binding.save.setOnClickListener{
+//            TODO: This needs to check for database not for the color of the button! This was done to test the ui.
+            lifecycleScope.launch {
+                if (binding.save.iconTint != ColorStateList.valueOf(Color.WHITE) ) {
+                    binding.save.iconTint = ColorStateList.valueOf(Color.WHITE)
+                    binding.save.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.circuit_color_yellow
+                        )
+                    )
+                }
+                else{
+
+                    binding.save.iconTint = ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.circuit_color_yellow))
+                    binding.save.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
                 }
             }
         }
