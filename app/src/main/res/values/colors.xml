@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="primary">#65C466</color>
+    <color name="yellow">#ffcc02</color>
     <color name="gray">#F2F2F2</color>
     <color name="gray_darker">#E5E5E5</color>
     <color name="dark_gray">@android:color/darker_gray</color>

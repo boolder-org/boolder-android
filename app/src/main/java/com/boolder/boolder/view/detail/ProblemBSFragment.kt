@@ -185,10 +185,10 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         lifecycleScope.launch {
             val existingTick = tickRepository.loadById(idToWrite)
             if (existingTick != null){
-                binding.tick.text = "Ticked"
+                binding.tick.iconTint = ColorStateList.valueOf(Color.WHITE)
+                binding.tick.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
             }
         }
-
     }
 
     private fun setupChipClick() {
@@ -244,7 +244,7 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
                     binding.save.backgroundTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(
                             binding.root.context,
-                            R.color.circuit_color_yellow
+                            R.color.yellow
                         )
                     )
                 }
