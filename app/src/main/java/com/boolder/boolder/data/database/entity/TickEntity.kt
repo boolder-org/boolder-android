@@ -6,4 +6,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "ticks")
 data class TickEntity(
     @PrimaryKey val id: Int,
+    val state: Int,
 )

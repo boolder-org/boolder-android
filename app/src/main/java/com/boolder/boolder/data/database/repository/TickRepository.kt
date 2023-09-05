@@ -21,8 +21,16 @@ class TickRepository(
         return tickDao.loadById(tickId)
     }
 
+    suspend fun loadByIdAndState(tickId: Int, state: Int): TickEntity? {
+        return tickDao.loadByIdAndState(tickId, state)
+    }
+
     suspend fun deleteById(tickId: Int){
         return tickDao.deleteById(tickId)
+    }
+
+    suspend fun update(tickId: Int, state: Int){
+        return tickDao.update(tickId, state)
     }
 
     suspend fun deleteAll(){

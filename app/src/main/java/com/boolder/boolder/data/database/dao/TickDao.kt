@@ -16,9 +16,16 @@ interface TickDao {
 
     @Query("SELECT * FROM ticks WHERE id == :tickId")
     suspend fun loadById(tickId: Int): TickEntity?
+
+    @Query("SELECT * FROM ticks WHERE id == :tickId AND state == :state")
+    suspend fun loadByIdAndState(tickId: Int, state: Int): TickEntity?
+
     @Insert
     suspend fun insertTick(tick: TickEntity)
 
     @Query("DELETE FROM ticks WHERE id = :tickId")
     suspend fun deleteById(tickId: Int)
+
+    @Query("UPDATE ticks SET state = :state WHERE id = :tickId")
+    suspend fun update(tickId: Int, state: Int)
 }

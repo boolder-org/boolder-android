@@ -101,6 +101,34 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }
     }
 
+    private fun setSaveButtonActive(){
+        binding.save.iconTint = ColorStateList.valueOf(Color.WHITE)
+        binding.save.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                binding.root.context,
+                R.color.yellow
+            )
+        )
+    }
+
+    private fun setSaveButtonInactive(){
+        binding.save.iconTint = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                binding.root.context,
+                R.color.circuit_color_yellow))
+        binding.save.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+    }
+
+    private fun setTickButtonActive(){
+        binding.tick.iconTint = ColorStateList.valueOf(Color.WHITE)
+        binding.tick.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
+    }
+    private fun setTickButtonInactive(){
+        binding.tick.iconTint = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
+        binding.tick.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+    }
+
+
     //region Draw
     private fun drawCurves() {
         val points = selectedLine?.points()
@@ -185,8 +213,19 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         lifecycleScope.launch {
             val existingTick = tickRepository.loadById(idToWrite)
             if (existingTick != null){
-                binding.tick.iconTint = ColorStateList.valueOf(Color.WHITE)
-                binding.tick.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
+                if (existingTick.state == 0) {
+                    binding.tick.iconTint = ColorStateList.valueOf(Color.WHITE)
+                    binding.tick.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
+                }
+                else if (existingTick.state == 1){
+                    binding.save.iconTint = ColorStateList.valueOf(Color.WHITE)
+                    binding.save.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            R.color.yellow
+                        )
+                    )
+                }
             }
         }
     }
@@ -218,43 +257,47 @@ class ProblemBSFragment(private val listener: BottomSheetListener) : BottomSheet
         }
 
         binding.tick.setOnClickListener{
-            val idToWrite = selectedProblem.id
-
             lifecycleScope.launch {
-                val existingTick = tickRepository.loadById(idToWrite)
-                if (existingTick == null) {
-                    val tick = TickEntity(idToWrite)
-                    tickRepository.insertTick(tick)
-                    binding.tick.iconTint = ColorStateList.valueOf(Color.WHITE)
-                    binding.tick.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
+                val idToWrite = selectedProblem.id
+                val existingSave = tickRepository.loadById(idToWrite)
+                if (existingSave != null){
+                    if (existingSave.state == 0){
+                        setTickButtonInactive()
+                        tickRepository.deleteById(idToWrite)
+                    }
+                    else if (existingSave.state == 1){
+                        setTickButtonActive()
+                        tickRepository.update(idToWrite, 0)
+                        setSaveButtonInactive()
+                    }
                 }
                 else {
-                    binding.tick.iconTint = ColorStateList.valueOf(ContextCompat.getColor(binding.root.context, R.color.primary))
-                    binding.tick.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
-                    tickRepository.deleteById(idToWrite)
+                    val tick = TickEntity(idToWrite,0)
+                    tickRepository.insertTick(tick)
+                    setTickButtonActive()
                 }
             }
         }
 
         binding.save.setOnClickListener{
-//            TODO: This needs to check for database not for the color of the button! This was done to test the ui.
             lifecycleScope.launch {
-                if (binding.save.iconTint != ColorStateList.valueOf(Color.WHITE) ) {
-                    binding.save.iconTint = ColorStateList.valueOf(Color.WHITE)
-                    binding.save.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            binding.root.context,
-                            R.color.yellow
-                        )
-                    )
+                val idToWrite = selectedProblem.id
+                val existingSave = tickRepository.loadById(idToWrite)
+                if (existingSave != null){
+                    if (existingSave.state == 1){
+                        setSaveButtonInactive()
+                        tickRepository.deleteById(idToWrite)
+                    }
+                    else if (existingSave.state == 0){
+                        setSaveButtonActive()
+                        tickRepository.update(idToWrite, 1)
+                        setTickButtonInactive()
+                    }
                 }
-                else{
-
-                    binding.save.iconTint = ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            binding.root.context,
-                            R.color.circuit_color_yellow))
-                    binding.save.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+                else {
+                    val save = TickEntity(idToWrite,1)
+                    tickRepository.insertTick(save)
+                    setSaveButtonActive()
                 }
             }
         }
