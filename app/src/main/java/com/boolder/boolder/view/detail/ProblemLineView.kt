@@ -76,7 +76,7 @@ class ProblemLineView @JvmOverloads constructor(
             paint.pathEffect = DashPathEffect(
                 floatArrayOf(
                     length * lineLengthRatio,
-                    length * (1f - lineLengthRatio)
+                    length * 1f
                 ),
                 0f
             )

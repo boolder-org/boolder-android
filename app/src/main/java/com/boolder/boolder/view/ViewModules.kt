@@ -1,7 +1,6 @@
 package com.boolder.boolder.view
 
 import android.content.res.Resources
-import com.boolder.boolder.utils.CubicCurveAlgorithm
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.view.map.MapViewModel
@@ -18,7 +17,6 @@ val viewModelModule = module {
     single { SearchViewModel(get(), get()) }
     single { NetworkObserverImpl() }
     factory { MapboxStyleFactory() }
-    factory { CubicCurveAlgorithm() }
 
     viewModelOf(::GradesFilterViewModel)
 }
