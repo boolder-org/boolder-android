@@ -45,6 +45,7 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.lang.Double.max
 
 
 class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener {
@@ -155,9 +156,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
 
     override fun onGPSLocation(location: Location) {
         val point = Point.fromLngLat(location.longitude, location.latitude)
+        val zoomLevel = max(binding.mapView.getMapboxMap().cameraState.zoom, 17.0)
 
         binding.mapView.getMapboxMap()
-            .setCamera(CameraOptions.Builder().center(point).zoom(16.0).bearing(location.bearing.toDouble()).build())
+            .setCamera(CameraOptions.Builder().center(point).zoom(zoomLevel).bearing(location.bearing.toDouble()).build())
         binding.mapView.location.updateSettings {
             enabled = true
             pulsingEnabled = true
