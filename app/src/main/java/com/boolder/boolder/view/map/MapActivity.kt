@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +29,8 @@ import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.viewBinding
-import com.boolder.boolder.view.map.BoolderMap.BoolderClickListener
+import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
+import com.boolder.boolder.view.map.composable.AreaName
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchActivity
@@ -48,7 +50,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Double.max
 
 
-class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener {
+class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -144,6 +146,12 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
             binding.gradesFilterButton.text = it.gradeRangeButtonTitle
         }
 
+        mapViewModel.areaStateFlow.launchAndCollectIn(owner = this) {
+            binding.areaNameComposeView.setContent {
+                AreaName(name = (it as? MapViewModel.AreaState.Area)?.name)
+            }
+        }
+
         supportFragmentManager.setFragmentResultListener(
             /* requestKey = */ GradesFilterBottomSheetDialogFragment.REQUEST_KEY,
             /* lifecycleOwner = */ this
@@ -198,7 +206,14 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderClickListener 
         }
         bottomSheet.setContentView(view)
         bottomSheet.show()
+    }
 
+    override fun onAreaVisited(areaId: Int) {
+        mapViewModel.onAreaVisited(areaId)
+    }
+
+    override fun onAreaLeft() {
+        mapViewModel.onAreaLeft()
     }
 
     private fun openGoogleMaps(url: String) {

@@ -9,4 +9,7 @@ interface AreaDao {
 
     @Query("SELECT * FROM areas WHERE name_searchable LIKE :name ORDER BY priority ASC LIMIT 10")
     suspend fun areasByName(name: String): List<AreasEntity>
+
+    @Query("SELECT * FROM areas WHERE id = :id")
+    suspend fun getAreaById(id: Int): AreasEntity
 }
