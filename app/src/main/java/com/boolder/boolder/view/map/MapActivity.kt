@@ -130,6 +130,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             }
         }
 
+        binding.problemView.onProblemFromSameTopoSelected = { problemId ->
+            binding.mapView.selectProblem(problemId)
+        }
+
         mapViewModel.gradeStateFlow.launchAndCollectIn(owner = this) {
             binding.mapView.filterGrades(it.grades)
             binding.gradesFilterButton.text = it.gradeRangeButtonTitle
@@ -152,6 +156,11 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
             mapViewModel.onGradeRangeSelected(gradeRange)
         }
+    }
+
+    override fun onDestroy() {
+        binding.problemView.onProblemFromSameTopoSelected = null
+        super.onDestroy()
     }
 
     override fun onGPSLocation(location: Location) {

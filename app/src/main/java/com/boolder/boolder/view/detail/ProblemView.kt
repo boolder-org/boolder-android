@@ -33,6 +33,8 @@ class ProblemView(
 
     private val binding = ViewProblemBinding.inflate(LayoutInflater.from(context), this)
 
+    var onProblemFromSameTopoSelected: ((problemId: String) -> Unit)? = null
+
     init {
         setBackgroundColor(Color.WHITE)
         isClickable = true
@@ -59,6 +61,7 @@ class ProblemView(
         updateLabels(completeProblem.problem)
         setupChipClick(completeProblem.problem)
         drawCurves(completeProblem)
+        onProblemFromSameTopoSelected?.invoke(completeProblem.problem.id.toString())
     }
 
     //region Draw
