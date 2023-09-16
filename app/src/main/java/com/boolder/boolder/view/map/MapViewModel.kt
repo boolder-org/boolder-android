@@ -2,6 +2,7 @@ package com.boolder.boolder.view.map
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
@@ -16,9 +17,10 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class MapViewModel(
     private val areaRepository: AreaRepository,
@@ -40,7 +42,10 @@ class MapViewModel(
             grades = ALL_GRADES
         )
     )
-    val gradeStateFlow: StateFlow<GradeState> = _gradeStateFlow
+    val gradeStateFlow = _gradeStateFlow.asStateFlow()
+
+    private val _areaStateFlow = MutableStateFlow<AreaState>(AreaState.Undefined)
+    val areaStateFlow = _areaStateFlow.asStateFlow()
 
     fun fetchProblemAndTopo(problemId: Int): Flow<CompleteProblem> {
         return flow {
@@ -103,8 +108,35 @@ class MapViewModel(
         }
     }
 
+    fun onAreaVisited(areaId: Int) {
+        viewModelScope.launch {
+            val currentState = _areaStateFlow.value
+
+            if (currentState is AreaState.Area && currentState.id == areaId) return@launch
+
+            val area = areaRepository.getAreaById(areaId)
+
+            _areaStateFlow.update { AreaState.Area(id = areaId, name = area.name) }
+        }
+    }
+
+    fun onAreaLeft() {
+        if (_areaStateFlow.value is AreaState.Undefined) return
+
+        _areaStateFlow.update { AreaState.Undefined }
+    }
+
     data class GradeState(
         val gradeRangeButtonTitle: String,
         val grades: List<String>
     )
+
+    sealed interface AreaState {
+        object Undefined : AreaState
+
+        data class Area(
+            val id: Int,
+            val name: String
+        ) : AreaState
+    }
 }

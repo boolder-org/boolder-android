@@ -48,6 +48,16 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:text="Grades" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/area_name_compose_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="80dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_component" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout

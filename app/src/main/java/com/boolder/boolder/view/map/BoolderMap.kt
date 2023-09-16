@@ -21,6 +21,7 @@ import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenBox
 import com.mapbox.maps.ScreenCoordinate
+import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.dsl.generated.match
 import com.mapbox.maps.extension.style.expressions.generated.Expression
@@ -44,36 +45,32 @@ class BoolderMap @JvmOverloads constructor(
 
     companion object {
         private const val TAG = "Boolder Map"
+
+        private const val CAMERA_CHECK_THROTTLE_DELAY = 100L
     }
 
-    interface BoolderClickListener {
+    interface BoolderMapListener {
         fun onProblemSelected(problemId: Int)
         fun onProblemUnselected()
         fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?)
+
+        fun onAreaVisited(areaId: Int)
+        fun onAreaLeft()
     }
 
-    private var listener: BoolderClickListener? = null
+    private var listener: BoolderMapListener? = null
 
     private var previousSelectedFeatureId: String? = null
 
+    private var lastCameraCheckTimestamp = 0L
+
     init {
-        init()
-    }
-
-    fun setup(listener: BoolderClickListener, buildStyle: StyleExtension) {
-        this.listener = listener
-        getMapboxMap().loadStyle(buildStyle)
-    }
-
-    private fun init() {
         val cameraOptions = CameraOptions.Builder()
             .center(Point.fromLngLat(2.5968216, 48.3925623))
             .zoom(10.2)
             .build()
 
-        getMapboxMap().apply {
-            setCamera(cameraOptions)
-        }
+        getMapboxMap().setCamera(cameraOptions)
 
         gestures.pitchEnabled = false
         scalebar.enabled = false
@@ -81,6 +78,13 @@ class BoolderMap @JvmOverloads constructor(
         compass.marginTop = resources.getDimension(R.dimen.margin_compass_top)
         compass.marginRight = resources.getDimension(R.dimen.margin_compass_end)
         addClickEvent()
+
+        getMapboxMap().addOnCameraChangeListener { onCameraChanged() }
+    }
+
+    fun setup(listener: BoolderMapListener, buildStyle: StyleExtension) {
+        this.listener = listener
+        getMapboxMap().loadStyle(buildStyle)
     }
 
     private fun addClickEvent() {
@@ -331,5 +335,42 @@ class BoolderMap @JvmOverloads constructor(
 
         problemsLayer?.filter(query)
         problemsTextLayer?.filter(query)
+    }
+
+    private fun onCameraChanged() {
+        val now = System.currentTimeMillis()
+
+        if (now - lastCameraCheckTimestamp < CAMERA_CHECK_THROTTLE_DELAY) return
+
+        lastCameraCheckTimestamp = now
+
+        val halfSquareSize = width / 8
+
+        val left = (width / 2 - halfSquareSize).toDouble()
+        val right = (width / 2 + halfSquareSize).toDouble()
+        val top = (height / 2 - halfSquareSize).toDouble()
+        val bottom = (height / 2 + halfSquareSize).toDouble()
+
+        getMapboxMap().queryRenderedFeatures(
+            geometry = RenderedQueryGeometry(
+                listOf(
+                    ScreenCoordinate(left, top),
+                    ScreenCoordinate(right, top),
+                    ScreenCoordinate(right, bottom),
+                    ScreenCoordinate(left, bottom)
+                )
+            ),
+            options = RenderedQueryOptions(
+                listOf("areas-hulls"),
+                Expression.gt {
+                    zoom()
+                    literal(14.5)
+                }
+            )
+        ) { queriedFeature ->
+            queriedFeature.value?.firstOrNull()?.feature?.properties()?.get("areaId")
+                ?.let { areaId -> listener?.onAreaVisited(areaId.asInt) }
+                ?: listener?.onAreaLeft()
+        }
     }
 }
