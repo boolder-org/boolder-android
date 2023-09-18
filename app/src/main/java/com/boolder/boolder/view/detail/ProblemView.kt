@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
+import coil.load
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ViewProblemBinding
 import com.boolder.boolder.domain.model.CircuitColor
@@ -19,12 +20,7 @@ import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.utils.CubicCurveAlgorithm
-import com.squareup.picasso.Callback
-import com.squareup.picasso.OkHttp3Downloader
-import com.squareup.picasso.Picasso
-import okhttp3.OkHttpClient
 import java.util.Locale
-import java.util.concurrent.TimeUnit.SECONDS
 
 class ProblemView(
     context: Context,
@@ -185,28 +181,21 @@ class ProblemView(
         binding.progressCircular.isVisible = true
 
         if (completeProblem.topo != null) {
-            val okHttpClient = OkHttpClient.Builder()
-                .connectTimeout(10, SECONDS)
-                .build()
+            binding.picture.load(completeProblem.topo.url) {
+                crossfade(true)
+                error(R.drawable.ic_placeholder)
 
-            Picasso.Builder(context)
-                .downloader(OkHttp3Downloader(okHttpClient))
-                .build()
-                .load(completeProblem.topo.url)
-                .error(R.drawable.ic_placeholder)
-                .into(binding.picture, object : Callback {
-                    override fun onSuccess() {
+                listener(
+                    onSuccess = { _, _ ->
                         context?.let {
                             binding.picture.setPadding(0)
                             binding.progressCircular.isVisible = false
                             onProblemPictureLoaded(completeProblem)
                         }
-                    }
-
-                    override fun onError(e: java.lang.Exception?) {
-                        loadErrorPicture()
-                    }
-                })
+                    },
+                    onError = { _, _ -> loadErrorPicture() }
+                )
+            }
         } else loadErrorPicture()
     }
 

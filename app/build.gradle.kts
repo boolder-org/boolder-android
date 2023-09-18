@@ -76,8 +76,8 @@ dependencies {
     // DI
     implementation("io.insert-koin:koin-android:3.3.3")
 
-    // Picasso
-    implementation("com.squareup.picasso:picasso:2.8")
+    // Coil
+    implementation("io.coil-kt:coil:2.4.0")
 
     // Jetpack compose
     val composeBom = platform("androidx.compose:compose-bom:2023.09.00")
