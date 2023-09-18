@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import androidx.lifecycle.lifecycleScope
@@ -148,7 +147,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
         mapViewModel.areaStateFlow.launchAndCollectIn(owner = this) {
             binding.areaNameComposeView.setContent {
-                AreaName(name = (it as? MapViewModel.AreaState.Area)?.name)
+                AreaName(
+                    name = (it as? MapViewModel.AreaState.Area)?.name,
+                    onHideAreaName = ::onAreaLeft
+                )
             }
         }
 
