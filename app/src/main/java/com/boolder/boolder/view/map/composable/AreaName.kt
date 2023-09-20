@@ -24,8 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.boolder.boolder.R
 import com.boolder.boolder.view.compose.BoolderTheme
 
@@ -47,7 +49,7 @@ internal fun AreaName(
             .fillMaxWidth()
             .heightIn(min = 48.dp)
             .background(color = Color.White, shape = RoundedCornerShape(8.dp))
-            .clickable(enabled = alpha == 1f) {},
+            .then(if (alpha == 1f) Modifier.clickable(enabled = false) {} else Modifier),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -66,7 +68,10 @@ internal fun AreaName(
                 .weight(1f)
                 .padding(8.dp),
             text = name.orEmpty(),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.width(48.dp))
