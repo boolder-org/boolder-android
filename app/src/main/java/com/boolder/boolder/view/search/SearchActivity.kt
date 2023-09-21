@@ -27,7 +27,7 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
     private val binding by viewBinding(ActivitySearchBinding::inflate)
 
-    private val searchViewModel: SearchViewModel = SearchViewModel(get(), get())
+    private val searchViewModel: SearchViewModel = SearchViewModel(get(), get(), get())
     private val networkObserverImpl: NetworkObserverImpl by inject()
 
     private val searchAdapter = SearchAdapter(

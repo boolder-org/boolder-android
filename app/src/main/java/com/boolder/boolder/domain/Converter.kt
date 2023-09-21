@@ -12,7 +12,7 @@ import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Tick
 import com.boolder.boolder.domain.model.Topo
 
-fun ProblemEntity.convert(areaName: String? = null): Problem {
+fun ProblemEntity.convert(areaName: String? = null, state: Int? = null): Problem {
     return Problem(
         id,
         name,
@@ -29,11 +29,12 @@ fun ProblemEntity.convert(areaName: String? = null): Problem {
         bleauInfoId,
         featured,
         parentId,
-        areaName
+        areaName,
+        state
     )
 }
 
-fun ProblemWithAreaName.convert() = Problem(
+fun ProblemWithAreaName.convert(state: Int? = null) = Problem(
     problemEntity.id,
     problemEntity.name,
     problemEntity.nameEn,
@@ -49,7 +50,8 @@ fun ProblemWithAreaName.convert() = Problem(
     problemEntity.bleauInfoId,
     problemEntity.featured,
     problemEntity.parentId,
-    areaName
+    areaName,
+    state
 )
 
 fun TopoRemote.convert(): Topo {

@@ -15,7 +15,7 @@ val viewModelModule = module {
     single<Resources> { androidApplication().resources }
 
     viewModelOf(::MapViewModel)
-    single { SearchViewModel(get(), get()) }
+    single { SearchViewModel(get(), get(), get()) }
     single { NetworkObserverImpl() }
     factory { MapboxStyleFactory() }
     factory { CubicCurveAlgorithm() }

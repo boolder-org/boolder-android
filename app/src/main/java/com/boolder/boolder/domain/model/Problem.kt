@@ -24,7 +24,8 @@ data class Problem(
     val bleauInfoId: String?,
     val featured: Boolean,
     val parentId: Int?,
-    val areaName: String?
+    val areaName: String?,
+    var state: Int?
 ) : Parcelable, BaseObject {
 
     val circuitColorSafe

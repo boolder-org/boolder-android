@@ -7,13 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.data.database.repository.TickRepository
 import com.boolder.boolder.domain.convert
 import kotlinx.coroutines.launch
 import java.text.Normalizer
 
 class SearchViewModel(
     private val problemRepository: ProblemRepository,
-    private val areaRepository: AreaRepository
+    private val areaRepository: AreaRepository,
+    private val tickRepository: TickRepository
 ) : ViewModel() {
 
     private val _result = MutableLiveData<List<BaseObject>>()
@@ -29,8 +31,15 @@ class SearchViewModel(
             val areas = areaRepository.areasByName(pattern)
                 .map { it.convert() }
 
-            val problems = problemRepository.problemsByName(pattern)
+            var problems = problemRepository.problemsByName(pattern)
                 .map { it.convert() }
+
+            for (problem in problems){
+                val state = tickRepository.loadById(problem.id)
+                if (state != null) {
+                    problem.state = state.state
+                }
+            }
 
             _result.value = buildList {
                 if (areas.isNotEmpty()) {

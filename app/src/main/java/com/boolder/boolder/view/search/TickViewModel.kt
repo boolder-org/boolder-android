@@ -27,7 +27,15 @@ class TickViewModel(
                     add(CategoryHeader(R.string.category_ticks))
                     areasWithProblems.forEach { areaWithProblems ->
                         add(areaWithProblems.areaEntity.convert())
-                        addAll(areaWithProblems.problems.map{ it.convert()})
+                        for (problem in areaWithProblems.problems){
+                            val state_entity = tickRepository.loadById(problem.id)
+                            if (state_entity != null) {
+                                add(problem.convert(state=state_entity.state))
+                            }
+                            else{
+                                add(problem.convert())
+                            }
+                        }
                     }
                 }
             }
@@ -48,7 +56,15 @@ class TickViewModel(
                     add(CategoryHeader(R.string.category_ticks))
                     areasWithProblems.forEach { areaWithProblems ->
                         add(areaWithProblems.areaEntity.convert())
-                        addAll(areaWithProblems.problems.map{ it.convert()})
+                        for (problem in areaWithProblems.problems){
+                            val state_entity = tickRepository.loadById(problem.id)
+                            if (state_entity != null) {
+                                add(problem.convert(state=state_entity.state))
+                            }
+                            else{
+                                add(problem.convert())
+                            }
+                        }
                     }
                 }
             }
