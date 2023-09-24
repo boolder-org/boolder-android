@@ -8,6 +8,7 @@ import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.MapboxStyleFactory
+import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Geometry
@@ -21,7 +22,6 @@ import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenBox
 import com.mapbox.maps.ScreenCoordinate
-import com.mapbox.maps.extension.observable.eventdata.CameraChangedEventData
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.dsl.generated.match
 import com.mapbox.maps.extension.style.expressions.generated.Expression
@@ -291,7 +291,14 @@ class BoolderMap @JvmOverloads constructor(
                         it.getStringProperty("northEastLat").toDouble()
                     )
                     val coordinateBound = CoordinateBounds(southWest, northEst)
-                    moveCamera(coordinateBound)
+
+                    val areaId = if (it.hasProperty("areaId")) {
+                        it.getStringProperty("areaId").toInt()
+                    } else {
+                        null
+                    }
+
+                    moveCamera(coordinates = coordinateBound, areaId = areaId)
                 }
             } ?: unselectProblem()
         } else {
@@ -300,7 +307,7 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     // Triggered when user click on a Area or Cluster on Map
-    private fun moveCamera(coordinates: CoordinateBounds) {
+    private fun moveCamera(coordinates: CoordinateBounds, areaId: Int?) {
         val cameraOption = getMapboxMap().cameraForCoordinateBounds(
             coordinates,
             EdgeInsets(60.0, 8.0, 8.0, 8.0),
@@ -308,9 +315,13 @@ class BoolderMap @JvmOverloads constructor(
             0.0
         )
 
-        val mapAnimationOption = MapAnimationOptions.Builder()
-            .duration(500L)
-            .build()
+        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions {
+            duration(500L)
+
+            areaId ?: return@mapAnimationOptions
+
+            animatorListener(animationEndListener { listener?.onAreaVisited(areaId) })
+        }
 
         getMapboxMap().flyTo(cameraOption, mapAnimationOption)
     }

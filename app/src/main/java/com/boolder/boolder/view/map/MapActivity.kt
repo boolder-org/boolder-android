@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -15,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +30,7 @@ import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.viewBinding
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
+import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.AreaName
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
@@ -42,6 +43,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.locationcomponent.location
 import kotlinx.coroutines.launch
@@ -97,31 +99,18 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
         }
 
         val searchRegister = registerForActivityResult(StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                result.data?.let {
-                    val cameraOptions = if (it.hasExtra("AREA")) {
-                        val area = it.getParcelableExtra<Area>("AREA")
-                        val southWest = Point.fromLngLat(area!!.southWestLon.toDouble(), area.southWestLat.toDouble())
-                        val northEst = Point.fromLngLat(area.northEastLon.toDouble(), area.northEastLat.toDouble())
-                        val coordinates = CoordinateBounds(southWest, northEst)
-                        binding.mapView.getMapboxMap().cameraForCoordinateBounds(
-                            coordinates,
-                            EdgeInsets(60.0, 8.0, 8.0, 8.0),
-                            0.0,
-                            0.0
-                        )
-                    } else if (it.hasExtra("PROBLEM")) {
-                        val problem = it.getParcelableExtra<Problem>("PROBLEM")
-                        onProblemSelected(problem!!.id)
-                        binding.mapView.selectProblem(problem.id.toString())
-                        val point = Point.fromLngLat(problem.longitude.toDouble(), problem.latitude.toDouble())
-                        CameraOptions.Builder().center(point).zoom(20.0).build()
-                    } else null
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
 
-                    cameraOptions?.let { option ->
-                        binding.mapView.camera.flyTo(option)
-                    }
-                }
+            val resultData = result.data ?: return@registerForActivityResult
+
+            when {
+                resultData.hasExtra("AREA") -> flyToArea(
+                    requireNotNull(resultData.getParcelableExtra("AREA"))
+                )
+
+                resultData.hasExtra("PROBLEM") -> flyToProblem(
+                    requireNotNull(resultData.getParcelableExtra("PROBLEM"))
+                )
             }
         }
 
@@ -148,7 +137,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
         mapViewModel.areaStateFlow.launchAndCollectIn(owner = this) {
             binding.areaNameComposeView.setContent {
-                AreaName(name = (it as? MapViewModel.AreaState.Area)?.name)
+                AreaName(
+                    name = (it as? MapViewModel.AreaState.Area)?.name,
+                    onHideAreaName = ::onAreaLeft
+                )
             }
         }
 
@@ -226,4 +218,55 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             Log.i("MAP", "No apps can handle this kind of intent")
         }
     }
+
+    private fun flyToArea(area: Area) {
+        val southWest = Point.fromLngLat(
+            area.southWestLon.toDouble(),
+            area.southWestLat.toDouble()
+        )
+        val northEst = Point.fromLngLat(
+            area.northEastLon.toDouble(),
+            area.northEastLat.toDouble()
+        )
+        val coordinates = CoordinateBounds(southWest, northEst)
+
+        val cameraOptions = binding.mapView.getMapboxMap().cameraForCoordinateBounds(
+            coordinates,
+            EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            0.0,
+            0.0
+        )
+
+        binding.mapView.camera.flyTo(
+            cameraOptions = cameraOptions,
+            animationOptions = defaultMapAnimationOptions {
+                animatorListener(animationEndListener { onAreaVisited(area.id) })
+            }
+        )
+    }
+
+    private fun flyToProblem(problem: Problem) {
+        onProblemSelected(problem.id)
+        binding.mapView.selectProblem(problem.id.toString())
+        val point = Point.fromLngLat(
+            problem.longitude.toDouble(),
+            problem.latitude.toDouble()
+        )
+
+        val cameraOptions = CameraOptions.Builder().center(point).zoom(20.0).build()
+
+        binding.mapView.camera.flyTo(
+            cameraOptions = cameraOptions,
+            animationOptions = defaultMapAnimationOptions {
+                animatorListener(animationEndListener { onAreaVisited(problem.areaId) })
+            }
+        )
+    }
+
+    private fun defaultMapAnimationOptions(block: MapAnimationOptions.Builder.() -> Unit) =
+        MapAnimationOptions.mapAnimationOptions {
+            duration(300L)
+            interpolator(AccelerateDecelerateInterpolator())
+            block()
+        }
 }
