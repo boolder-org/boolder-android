@@ -4,7 +4,6 @@ import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
-import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.LineRepository
@@ -49,16 +48,22 @@ class MapViewModel(
 
     fun fetchProblemAndTopo(problemId: Int): Flow<CompleteProblem> {
         return flow {
-            val problem: ProblemEntity = problemRepository.loadById(problemId) ?: return@flow
+            val mainProblem: ProblemEntity = problemRepository.loadById(problemId) ?: return@flow
+
             val line = lineRepository.loadByProblemId(problemId)
             val result = if (line != null) {
                 val topo = topoRepository.getTopoById(line.topoId).getOrNull()?.convert()
-                val otherLines: List<LineEntity> = lineRepository.loadAllByTopoIds(line.topoId)
+                val otherLines = lineRepository.loadAllByTopoIds(line.topoId)
                     .filter { it.id != line.id }
-                val otherProblems: List<ProblemEntity> = problemRepository.loadAllByIds(otherLines.map { it.problemId })
-                    .filter { it.id != problemId }
 
-                val others = otherProblems.map { other ->
+                val problemsOnSameTopo = problemRepository.loadAllByIds(otherLines.map { it.problemId })
+                    .filter {
+                        it.id != mainProblem.id
+                            && it.parentId == null
+                            && it.id != mainProblem.parentId
+                    }
+
+                val others = problemsOnSameTopo.map { other ->
                     CompleteProblem(
                         other.convert(),
                         topo,
@@ -68,12 +73,12 @@ class MapViewModel(
                 }
 
                 CompleteProblem(
-                    problem.convert(),
+                    mainProblem.convert(),
                     topo,
                     line.convert(),
                     others
                 )
-            } else CompleteProblem(problem.convert(), null, null, emptyList())
+            } else CompleteProblem(mainProblem.convert(), null, null, emptyList())
 
             emit(result)
 

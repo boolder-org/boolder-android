@@ -32,7 +32,7 @@ The app is written in Kotlin, and uses several libraries:
 - Room 
 - Mapbox SDK 
 - Koin 
-- Picasso
+- Coil
 
 Here is a 15-min video describing the architecture of the app : https://youtu.be/Qk7gX1CaMk4
 
