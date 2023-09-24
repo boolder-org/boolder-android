@@ -237,15 +237,11 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             0.0
         )
 
-        val animationOptions = MapAnimationOptions.mapAnimationOptions {
-            duration(300L)
-            interpolator(AccelerateDecelerateInterpolator())
-            animatorListener(animationEndListener { onAreaVisited(area.id) })
-        }
-
         binding.mapView.camera.flyTo(
             cameraOptions = cameraOptions,
-            animationOptions = animationOptions
+            animationOptions = defaultMapAnimationOptions {
+                animatorListener(animationEndListener { onAreaVisited(area.id) })
+            }
         )
     }
 
@@ -259,6 +255,18 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
         val cameraOptions = CameraOptions.Builder().center(point).zoom(20.0).build()
 
-        binding.mapView.camera.flyTo(cameraOptions = cameraOptions)
+        binding.mapView.camera.flyTo(
+            cameraOptions = cameraOptions,
+            animationOptions = defaultMapAnimationOptions {
+                animatorListener(animationEndListener { onAreaVisited(problem.areaId) })
+            }
+        )
     }
+
+    private fun defaultMapAnimationOptions(block: MapAnimationOptions.Builder.() -> Unit) =
+        MapAnimationOptions.mapAnimationOptions {
+            duration(300L)
+            interpolator(AccelerateDecelerateInterpolator())
+            block()
+        }
 }
