@@ -23,4 +23,10 @@ interface ProblemDao {
         """
     )
     suspend fun problemsByName(name: String): List<ProblemWithAreaName>
+
+    @Query("SELECT * FROM problems WHERE id = :id")
+    suspend fun problemById(id: Int): ProblemEntity?
+
+    @Query("SELECT * FROM problems WHERE parent_id = :parentProblemId")
+    suspend fun problemVariantsByParentId(parentProblemId: Int): List<ProblemEntity>
 }

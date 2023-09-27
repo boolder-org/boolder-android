@@ -7,7 +7,6 @@ class TopoRepository(
     private val client: KtorClient
 ) {
 
-    suspend fun getTopoById(topoId: Int): Result<TopoRemote> {
-        return client.loadTopoPicture(topoId)
-    }
+    suspend fun getTopoPictureById(topoId: Int): String? =
+        client.loadTopoPicture(topoId).getOrNull()?.url
 }

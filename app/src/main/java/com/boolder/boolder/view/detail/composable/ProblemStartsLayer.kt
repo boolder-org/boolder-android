@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.CompleteProblem
+import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.utils.extension.composeColor
 import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.utils.previewgenerator.dummyProblemStart
@@ -38,6 +39,7 @@ internal fun ProblemStartsLayer(
     problemStarts: List<ProblemStart>,
     selectedProblem: CompleteProblem?,
     onProblemStartClicked: (CompleteProblem) -> Unit,
+    onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -49,7 +51,7 @@ internal fun ProblemStartsLayer(
                 shadowRadius = shadowRadius
             )
 
-            if (problemStart.completeProblem.problem.id != selectedProblem?.problem?.id) {
+            if (problemStart.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id) {
                 ProblemStartMarker(
                     problemStart = problemStart,
                     modifier = Modifier.clickable {
@@ -61,18 +63,24 @@ internal fun ProblemStartsLayer(
 
         if (selectedProblem != null) {
             ProblemLine(
-                line = selectedProblem.line,
-                color = selectedProblem.problem.circuitColorSafe.composeColor()
+                line = selectedProblem.problemWithLine.line,
+                color = selectedProblem.problemWithLine.problem.circuitColorSafe.composeColor()
             )
 
             problemStarts
-                .find { it.completeProblem.problem.id == selectedProblem.problem.id }
+                .find { it.completeProblem.problemWithLine.problem.id == selectedProblem.problemWithLine.problem.id }
                 ?.let {
                     ProblemStartMarker(
                         problemStart = it,
                         modifier = Modifier
                     )
                 }
+
+            ProblemVariantsButton(
+                modifier = Modifier.align(Alignment.TopEnd),
+                variants = listOf(selectedProblem.problemWithLine) + selectedProblem.variants,
+                onVariantSelected = onVariantSelected
+            )
         }
     }
 }
@@ -104,7 +112,7 @@ private fun ProblemStartMarker(
     ) {
         Text(
             modifier = Modifier.align(Alignment.Center),
-            text = problemStart.completeProblem.problem.circuitNumber.orEmpty(),
+            text = problemStart.completeProblem.problemWithLine.problem.circuitNumber.orEmpty(),
             color = colorResource(id = problemStart.textColorRes),
             fontSize = 18.sp
         )
@@ -166,7 +174,8 @@ internal fun ProblemStartsLayerPreview() {
                     )
                 ),
                 selectedProblem = completeProblem,
-                onProblemStartClicked = {}
+                onProblemStartClicked = {},
+                onVariantSelected = {}
             )
         }
     }

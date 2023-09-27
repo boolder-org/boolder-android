@@ -67,7 +67,7 @@
         app:behavior_hideable="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <com.boolder.boolder.view.detail.ProblemView
+        <com.boolder.boolder.view.detail.TopoView
             android:id="@+id/problem_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

@@ -18,7 +18,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
-import androidx.lifecycle.lifecycleScope
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
 import com.boolder.boolder.domain.model.Area
@@ -36,6 +35,8 @@ import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment.STYLE_NORMAL
 import com.mapbox.geojson.Geometry
@@ -46,7 +47,6 @@ import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.locationcomponent.location
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Double.max
@@ -90,7 +90,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
         locationProvider = LocationProvider(this, this)
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet)
-            .also { it.state = BottomSheetBehavior.STATE_HIDDEN }
+            .also { it.state = STATE_HIDDEN }
 
         setupMap()
 
@@ -130,8 +130,13 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             }
         }
 
-        binding.problemView.onProblemFromSameTopoSelected = { problemId ->
+        binding.problemView.onSelectProblemOnMap = { problemId ->
             binding.mapView.selectProblem(problemId)
+        }
+
+        mapViewModel.topoStateFlow.launchAndCollectIn(owner = this) { topo ->
+            topo?.let(binding.problemView::setTopo)
+            bottomSheetBehavior.state = if (topo == null) STATE_HIDDEN else STATE_EXPANDED
         }
 
         mapViewModel.gradeStateFlow.launchAndCollectIn(owner = this) {
@@ -159,7 +164,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
     }
 
     override fun onDestroy() {
-        binding.problemView.onProblemFromSameTopoSelected = null
+        binding.problemView.onSelectProblemOnMap = null
         super.onDestroy()
     }
 
@@ -181,16 +186,11 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
     // Triggered when user click on a Problem on Map
     override fun onProblemSelected(problemId: Int) {
-        lifecycleScope.launch {
-            mapViewModel.fetchProblemAndTopo(problemId).collect { completeProblem ->
-                binding.problemView.setProblem(completeProblem)
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            }
-        }
+        mapViewModel.fetchTopo(problemId)
     }
 
     override fun onProblemUnselected() {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.state = STATE_HIDDEN
     }
 
     override fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?) {
