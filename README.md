@@ -13,14 +13,12 @@ Want to help us improve the app for thousands of climbers? Great!
 Here are a few ways you can contribute:
 - Open an issue if you find a bug
 - Open an issue if you want to suggest an improvement
-
-If you want to contribute more significantly: **we are looking for an official maintainer**.
+- Open a Pull Request (please get in touch with us beforehand, though)
 
 We already have a lot of features waiting to be built, and lots of new ideas to try out!
 We'd be happy to share the fun with you :)
 
 As the project is still young, the best way to get started is to drop us a line at hello@boolder.com
-
 
 ## Build the app
 
