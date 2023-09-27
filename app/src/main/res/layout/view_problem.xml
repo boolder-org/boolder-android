@@ -28,15 +28,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.boolder.boolder.view.detail.ProblemLineView
-        android:id="@+id/line_vector"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="4:3"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/problem_starts_container"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/problem_starts_compose_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="4:3"

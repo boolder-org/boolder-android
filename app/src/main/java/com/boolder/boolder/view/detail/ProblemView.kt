@@ -7,7 +7,9 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.Modifier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -15,11 +17,13 @@ import androidx.core.view.setPadding
 import coil.load
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ViewProblemBinding
-import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Steepness
-import com.boolder.boolder.utils.CubicCurveAlgorithm
+import com.boolder.boolder.domain.model.toProblemStart
+import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
+import com.boolder.boolder.view.detail.uimodel.ProblemStart
 import java.util.Locale
 
 class ProblemView(
@@ -28,6 +32,8 @@ class ProblemView(
 ) : ConstraintLayout(context, attrs) {
 
     private val binding = ViewProblemBinding.inflate(LayoutInflater.from(context), this)
+
+    private var problemStarts: List<ProblemStart> = emptyList()
 
     var onProblemFromSameTopoSelected: ((problemId: String) -> Unit)? = null
 
@@ -38,8 +44,10 @@ class ProblemView(
     }
 
     fun setProblem(completeProblem: CompleteProblem) {
-        binding.problemStartsContainer.removeAllViews()
-        binding.lineVector.clearPath()
+        setProblemStarts(
+            problemStarts = emptyList(),
+            selectedProblem = null
+        )
 
         loadBoolderImage(completeProblem)
         updateLabels(completeProblem.problem)
@@ -47,78 +55,41 @@ class ProblemView(
     }
 
     private fun onProblemPictureLoaded(completeProblem: CompleteProblem) {
-        completeProblem.otherCompleteProblem.forEach(::drawCircuitNumberCircle)
+        val containerWidth = binding.picture.measuredWidth
+        val containerHeight = binding.picture.measuredHeight
 
-        drawCircuitNumberCircle(completeProblem)
-        drawCurves(completeProblem)
+        val initialProblemStart = completeProblem.toProblemStart(
+            containerWidthPx = containerWidth,
+            containerHeightPx = containerHeight
+        )
+
+        val otherProblemStarts = completeProblem.otherCompleteProblem
+            .mapNotNull {
+                it.toProblemStart(
+                    containerWidthPx = containerWidth,
+                    containerHeightPx = containerHeight
+                )
+            }
+
+        this.problemStarts = initialProblemStart
+            ?.let { otherProblemStarts + it }
+            ?: otherProblemStarts
+
+        setProblemStarts(
+            problemStarts = problemStarts,
+            selectedProblem = completeProblem
+        )
     }
 
     private fun onProblemStartClicked(completeProblem: CompleteProblem) {
         updateLabels(completeProblem.problem)
         setupChipClick(completeProblem.problem)
-        drawCurves(completeProblem)
+        setProblemStarts(
+            problemStarts = problemStarts,
+            selectedProblem = completeProblem
+        )
         onProblemFromSameTopoSelected?.invoke(completeProblem.problem.id.toString())
     }
-
-    //region Draw
-    private fun drawCurves(completeProblem: CompleteProblem) {
-        binding.lineVector.clearPath()
-
-        val points = completeProblem.line?.points()
-
-        if (points.isNullOrEmpty()) return
-
-        val problemColor = completeProblem.problem.getColor(context)
-
-        val segment = CubicCurveAlgorithm().controlPointsFromPoints(points)
-
-        val ctrl1 = segment.map { PointD(it.controlPoint1.x, it.controlPoint1.y) }
-        val ctrl2 = segment.map { PointD(it.controlPoint2.x, it.controlPoint2.y) }
-
-        binding.lineVector.apply {
-            addDataPoints(
-                data = points,
-                point1 = ctrl1,
-                point2 = ctrl2,
-                drawColor = problemColor
-            )
-            animatePath()
-        }
-    }
-
-    private fun drawCircuitNumberCircle(completeProblem: CompleteProblem) {
-        val pointD = completeProblem.line?.points()?.firstOrNull()
-        if (pointD != null) {
-            val viewSizeRes = if (completeProblem.problem.circuitNumber.isNullOrBlank()) {
-                R.dimen.size_problem_start_without_number
-            } else {
-                R.dimen.size_problem_start_with_number
-            }
-
-            val viewSize = resources.getDimensionPixelSize(viewSizeRes)
-            val marginProblemStart = resources.getDimensionPixelSize(R.dimen.margin_problem_start)
-            val viewWithMarginSize = viewSize + marginProblemStart * 2
-            val offset = viewWithMarginSize / 2
-
-            val textColor = when (completeProblem.problem.circuitColorSafe) {
-                CircuitColor.WHITE -> Color.BLACK
-                else -> Color.WHITE
-            }
-
-            val problemStartView = ProblemStartView(binding.root.context).apply {
-                setText(completeProblem.problem.circuitNumber)
-                setTextColor(textColor)
-                setProblemColor(completeProblem.problem.getColor(context))
-                translationX = (pointD.x * binding.picture.measuredWidth - offset).toFloat()
-                translationY = (pointD.y * binding.picture.measuredHeight - offset).toFloat()
-
-                setOnClickListener { onProblemStartClicked(completeProblem) }
-            }
-
-            binding.problemStartsContainer.addView(problemStartView, LayoutParams(WRAP_CONTENT, WRAP_CONTENT))
-        }
-    }
-    //endregion
 
     private fun updateLabels(problem: Problem) {
         binding.title.text = problem.nameSafe()
@@ -206,9 +177,24 @@ class ProblemView(
         binding.picture.setPadding(200)
         binding.progressCircular.isVisible = false
     }
-    //endregion
 
-    //region Extensions
+    private fun setProblemStarts(
+        problemStarts: List<ProblemStart>,
+        selectedProblem: CompleteProblem?
+    ) {
+        binding.problemStartsComposeView.setContent {
+            BoolderTheme {
+                ProblemStartsLayer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(4f / 3f),
+                    problemStarts = problemStarts,
+                    selectedProblem = selectedProblem,
+                    onProblemStartClicked = ::onProblemStartClicked
+                )
+            }
+        }
+    }
 
     private fun Problem.nameSafe(): String =
         if (Locale.getDefault().language == "fr") {
@@ -216,6 +202,4 @@ class ProblemView(
         } else {
             nameEn.orEmpty()
         }
-
-    //endregion
 }
