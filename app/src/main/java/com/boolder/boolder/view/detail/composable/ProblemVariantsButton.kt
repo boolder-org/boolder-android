@@ -1,6 +1,7 @@
 package com.boolder.boolder.view.detail.composable
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,20 +68,41 @@ internal fun ProblemVariantsButton(
                 }
             )
         } else {
-            Text(
-                modifier = Modifier
-                    .clip(shape = CircleShape)
-                    .background(color = Color.Gray.copy(alpha = .8f), shape = CircleShape)
-                    .clickable { showSelector = true }
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                text = pluralStringResource(
-                    id = R.plurals.variant,
-                    count = displayedSize,
-                    displayedSize
-                ),
-                color = Color.White
+            ProblemVariantsPillButton(
+                variantsCount = displayedSize,
+                onClick = { showSelector = true }
             )
         }
+    }
+}
+
+@Composable
+private fun ProblemVariantsPillButton(
+    variantsCount: Int,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .clip(shape = CircleShape)
+            .background(color = Color.Gray.copy(alpha = .8f), shape = CircleShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 2.dp),
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            text = pluralStringResource(
+                id = R.plurals.variant,
+                count = variantsCount,
+                variantsCount
+            ),
+            color = Color.White
+        )
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_keyboard_arrow_down),
+            contentDescription = null,
+            tint = Color.White
+        )
     }
 }
 
@@ -89,16 +113,17 @@ private fun ProblemVariantItem(problem: Problem) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
+            modifier = Modifier.weight(1f),
             text = problem.name.orEmpty(),
             color = Color.Black
         )
 
         Text(
             modifier = Modifier
-                .background(color = Color.Black, shape = CircleShape)
+                .border(width = 1.dp, color = Color.Black, shape = CircleShape)
                 .padding(horizontal = 8.dp, vertical = 2.dp),
             text = problem.grade.orEmpty(),
-            color = Color.White
+            color = Color.Black
         )
     }
 }
