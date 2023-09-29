@@ -53,7 +53,7 @@ internal fun ProblemLine(
         val width = constraints.maxWidth
         val height = constraints.maxHeight
 
-        LaunchedEffect(key1 = points) {
+        LaunchedEffect(key1 = points, key2 = color) {
             internalColor = Color.Transparent
             path.reset()
 
