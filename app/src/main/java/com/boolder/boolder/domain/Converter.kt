@@ -50,10 +50,6 @@ fun ProblemWithAreaName.convert() = Problem(
     areaName
 )
 
-fun TopoRemote.convert(): Topo {
-    return Topo(url)
-}
-
 fun LineEntity.convert(): Line {
     return Line(id, problemId, topoId, coordinates)
 }

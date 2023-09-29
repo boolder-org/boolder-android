@@ -16,26 +16,28 @@ import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import coil.load
 import com.boolder.boolder.R
-import com.boolder.boolder.databinding.ViewProblemBinding
+import com.boolder.boolder.databinding.ViewTopoBinding
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Steepness
+import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.toProblemStart
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
 import com.boolder.boolder.view.detail.uimodel.ProblemStart
 import java.util.Locale
 
-class ProblemView(
+class TopoView(
     context: Context,
     attrs: AttributeSet?
 ) : ConstraintLayout(context, attrs) {
 
-    private val binding = ViewProblemBinding.inflate(LayoutInflater.from(context), this)
+    private val binding = ViewTopoBinding.inflate(LayoutInflater.from(context), this)
 
     private var problemStarts: List<ProblemStart> = emptyList()
 
-    var onProblemFromSameTopoSelected: ((problemId: String) -> Unit)? = null
+    var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
 
     init {
         setBackgroundColor(Color.WHITE)
@@ -43,33 +45,37 @@ class ProblemView(
         isFocusable = true
     }
 
-    fun setProblem(completeProblem: CompleteProblem) {
+    fun setTopo(topo: Topo) {
         setProblemStarts(
             problemStarts = emptyList(),
             selectedProblem = null
         )
 
-        loadBoolderImage(completeProblem)
-        updateLabels(completeProblem.problem)
-        setupChipClick(completeProblem.problem)
+        loadTopoImage(topo)
+
+        topo.selectedCompleteProblem?.let {
+            updateLabels(it.problemWithLine.problem)
+            setupChipClick(it.problemWithLine.problem)
+        }
     }
 
-    private fun onProblemPictureLoaded(completeProblem: CompleteProblem) {
+    private fun onProblemPictureLoaded(topo: Topo) {
+        val selectedProblem = topo.selectedCompleteProblem ?: return
+
         val containerWidth = binding.picture.measuredWidth
         val containerHeight = binding.picture.measuredHeight
 
-        val initialProblemStart = completeProblem.toProblemStart(
+        val initialProblemStart = selectedProblem.toProblemStart(
             containerWidthPx = containerWidth,
             containerHeightPx = containerHeight
         )
 
-        val otherProblemStarts = completeProblem.otherCompleteProblem
-            .mapNotNull {
-                it.toProblemStart(
-                    containerWidthPx = containerWidth,
-                    containerHeightPx = containerHeight
-                )
-            }
+        val otherProblemStarts = topo.otherCompleteProblems.mapNotNull {
+            it.toProblemStart(
+                containerWidthPx = containerWidth,
+                containerHeightPx = containerHeight
+            )
+        }
 
         this.problemStarts = initialProblemStart
             ?.let { otherProblemStarts + it }
@@ -77,18 +83,45 @@ class ProblemView(
 
         setProblemStarts(
             problemStarts = problemStarts,
-            selectedProblem = completeProblem
+            selectedProblem = selectedProblem
         )
     }
 
     private fun onProblemStartClicked(completeProblem: CompleteProblem) {
-        updateLabels(completeProblem.problem)
-        setupChipClick(completeProblem.problem)
+        val problem = completeProblem.problemWithLine.problem
+
+        updateLabels(problem)
+        setupChipClick(problem)
         setProblemStarts(
             problemStarts = problemStarts,
             selectedProblem = completeProblem
         )
-        onProblemFromSameTopoSelected?.invoke(completeProblem.problem.id.toString())
+        onSelectProblemOnMap?.invoke(problem.id.toString())
+    }
+
+    private fun onVariantSelected(variant: ProblemWithLine) {
+        val (selectedProblem, newProblemStarts) = VariantSelector.selectVariantInProblemStarts(
+            selectedVariant = variant,
+            problemStarts = problemStarts,
+            containerWidth = binding.picture.measuredWidth,
+            containerHeight = binding.picture.measuredHeight
+        )
+
+        problemStarts = newProblemStarts
+
+        selectedProblem?.let {
+            updateLabels(it.problemWithLine.problem)
+            setupChipClick(it.problemWithLine.problem)
+        }
+
+        setProblemStarts(
+            problemStarts = problemStarts,
+            selectedProblem = selectedProblem
+        )
+
+        selectedProblem?.problemWithLine?.problem?.id?.toString()?.let { selectedProblemId ->
+            onSelectProblemOnMap?.invoke(selectedProblemId)
+        }
     }
 
     private fun updateLabels(problem: Problem) {
@@ -148,26 +181,29 @@ class ProblemView(
         }
     }
 
-    private fun loadBoolderImage(completeProblem: CompleteProblem) {
+    private fun loadTopoImage(topo: Topo) {
         binding.progressCircular.isVisible = true
 
-        if (completeProblem.topo != null) {
-            binding.picture.load(completeProblem.topo.url) {
-                crossfade(true)
-                error(R.drawable.ic_placeholder)
+        if (topo.pictureUrl == null) {
+            loadErrorPicture()
+            return
+        }
 
-                listener(
-                    onSuccess = { _, _ ->
-                        context?.let {
-                            binding.picture.setPadding(0)
-                            binding.progressCircular.isVisible = false
-                            onProblemPictureLoaded(completeProblem)
-                        }
-                    },
-                    onError = { _, _ -> loadErrorPicture() }
-                )
-            }
-        } else loadErrorPicture()
+        binding.picture.load(topo.pictureUrl) {
+            crossfade(true)
+            error(R.drawable.ic_placeholder)
+
+            listener(
+                onSuccess = { _, _ ->
+                    context?.let {
+                        binding.picture.setPadding(0)
+                        binding.progressCircular.isVisible = false
+                        onProblemPictureLoaded(topo)
+                    }
+                },
+                onError = { _, _ -> loadErrorPicture() }
+            )
+        }
     }
 
     private fun loadErrorPicture() {
@@ -190,7 +226,8 @@ class ProblemView(
                         .aspectRatio(4f / 3f),
                     problemStarts = problemStarts,
                     selectedProblem = selectedProblem,
-                    onProblemStartClicked = ::onProblemStartClicked
+                    onProblemStartClicked = ::onProblemStartClicked,
+                    onVariantSelected = ::onVariantSelected
                 )
             }
         }

@@ -37,6 +37,7 @@
     <string name="pois_bs_close">Fermer</string>
     <plurals name="variant">
         <item quantity="one">%d variante</item>
+        <item quantity="many">%d variantes</item>
         <item quantity="other">%d variantes</item>
     </plurals>
 

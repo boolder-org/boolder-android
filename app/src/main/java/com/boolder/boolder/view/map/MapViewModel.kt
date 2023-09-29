@@ -4,30 +4,24 @@ import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
-import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.repository.AreaRepository
-import com.boolder.boolder.data.database.repository.LineRepository
-import com.boolder.boolder.data.database.repository.ProblemRepository
-import com.boolder.boolder.data.network.repository.TopoRepository
-import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.ALL_GRADES
-import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.GradeRange
+import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MapViewModel(
     private val areaRepository: AreaRepository,
-    private val lineRepository: LineRepository,
-    private val problemRepository: ProblemRepository,
-    private val topoRepository: TopoRepository,
+    private val topoDataAggregator: TopoDataAggregator,
     private val resources: Resources
 ) : ViewModel() {
+
+    private val _topoStateFlow = MutableStateFlow<Topo?>(null)
+    val topoStateFlow = _topoStateFlow.asStateFlow()
 
     private var currentGradeRange = GradeRange(
         min = ALL_GRADES.first(),
@@ -46,42 +40,9 @@ class MapViewModel(
     private val _areaStateFlow = MutableStateFlow<AreaState>(AreaState.Undefined)
     val areaStateFlow = _areaStateFlow.asStateFlow()
 
-    fun fetchProblemAndTopo(problemId: Int): Flow<CompleteProblem> {
-        return flow {
-            val mainProblem: ProblemEntity = problemRepository.loadById(problemId) ?: return@flow
-
-            val line = lineRepository.loadByProblemId(problemId)
-            val result = if (line != null) {
-                val topo = topoRepository.getTopoById(line.topoId).getOrNull()?.convert()
-                val otherLines = lineRepository.loadAllByTopoIds(line.topoId)
-                    .filter { it.id != line.id }
-
-                val problemsOnSameTopo = problemRepository.loadAllByIds(otherLines.map { it.problemId })
-                    .filter {
-                        it.id != mainProblem.id
-                            && it.parentId == null
-                            && it.id != mainProblem.parentId
-                    }
-
-                val others = problemsOnSameTopo.map { other ->
-                    CompleteProblem(
-                        other.convert(),
-                        topo,
-                        otherLines.first { it.problemId == other.id }.convert(),
-                        emptyList()
-                    )
-                }
-
-                CompleteProblem(
-                    mainProblem.convert(),
-                    topo,
-                    line.convert(),
-                    others
-                )
-            } else CompleteProblem(mainProblem.convert(), null, null, emptyList())
-
-            emit(result)
-
+    fun fetchTopo(problemId: Int) {
+        viewModelScope.launch {
+            _topoStateFlow.value = topoDataAggregator.aggregate(problemId)
         }
     }
 

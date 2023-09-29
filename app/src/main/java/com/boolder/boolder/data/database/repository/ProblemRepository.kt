@@ -18,4 +18,10 @@ class ProblemRepository(
 
     suspend fun problemsByName(name: String): List<ProblemWithAreaName> =
         problemDao.problemsByName(name)
+
+    suspend fun problemById(id: Int): ProblemEntity? =
+        problemDao.problemById(id)
+
+    suspend fun problemVariantsByParentId(parentProblemId: Int): List<ProblemEntity> =
+        problemDao.problemVariantsByParentId(parentProblemId)
 }

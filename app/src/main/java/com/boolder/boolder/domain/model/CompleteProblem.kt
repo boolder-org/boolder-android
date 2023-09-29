@@ -1,24 +1,24 @@
 package com.boolder.boolder.domain.model
 
-import android.os.Parcelable
 import androidx.annotation.Px
 import com.boolder.boolder.view.detail.uimodel.ProblemStart
-import kotlinx.parcelize.Parcelize
 import kotlin.math.roundToInt
 
-@Parcelize
+/**
+ * Wrapper for a boulder problem, along with its variants
+ */
 data class CompleteProblem(
-    val problem: Problem,
-    val topo: Topo?,
-    val line: Line?,
-    val otherCompleteProblem: List<CompleteProblem>
-) : Parcelable
+    val problemWithLine: ProblemWithLine,
+    val variants: List<ProblemWithLine>
+)
 
 fun CompleteProblem.toProblemStart(
     @Px containerWidthPx: Int,
     @Px containerHeightPx: Int
 ): ProblemStart? {
-    val startPoint = line?.points()?.firstOrNull() ?: return null
+    val startPoint = problemWithLine.line?.points()?.firstOrNull() ?: return null
+
+    val problem = problemWithLine.problem
 
     return ProblemStart(
         x = (startPoint.x * containerWidthPx).roundToInt(),
