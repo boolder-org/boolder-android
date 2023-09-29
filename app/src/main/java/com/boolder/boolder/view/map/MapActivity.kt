@@ -257,14 +257,19 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
     private fun flyToProblem(problem: Problem) {
         onProblemSelected(problem.id)
         binding.mapView.selectProblem(problem.id.toString())
+
         val point = Point.fromLngLat(
             problem.longitude.toDouble(),
             problem.latitude.toDouble()
         )
 
-        val cameraOptions = CameraOptions.Builder().center(point).zoom(20.0).build()
+        val cameraOptions = CameraOptions.Builder()
+            .center(point)
+            .padding(EdgeInsets(40.0, 0.0, (binding.mapView.height / 2).toDouble(), 0.0))
+            .zoom(20.0)
+            .build()
 
-        binding.mapView.camera.flyTo(
+        binding.mapView.camera.easeTo(
             cameraOptions = cameraOptions,
             animationOptions = defaultMapAnimationOptions {
                 animatorListener(animationEndListener { onAreaVisited(problem.areaId) })
