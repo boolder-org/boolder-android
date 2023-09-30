@@ -10,6 +10,7 @@ import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
+import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -165,25 +166,19 @@ class BoolderMap @JvmOverloads constructor(
                         return@queryRenderedFeatures
                     }
 
-                if (getMapboxMap().cameraState.zoom < 18) return@queryRenderedFeatures
+                if (getMapboxMap().cameraState.zoom < 19.0) {
+                    zoomToBoulderProblemLevel(feature)
+                    return@queryRenderedFeatures
+                }
+
                 if (feature.hasProperty("id") && feature.geometry() != null) {
                     selectProblem(feature.getNumberProperty("id").toString())
                     listener?.onProblemSelected(feature.getNumberProperty("id").toInt())
 
                     // Move camera if problem is hidden by bottomSheet
                     if (geometry.screenCoordinate.y >= (height / 2) - 100) {
-
-                        val cameraOption = CameraOptions.Builder()
-                            .center(feature.geometry() as Point)
-                            .padding(EdgeInsets(40.0, 8.8, (height / 2).toDouble(), 8.8))
-                            .build()
-                        val mapAnimationOption = MapAnimationOptions.Builder()
-                            .duration(500L)
-                            .build()
-
-                        getMapboxMap().easeTo(cameraOption, mapAnimationOption)
+                        focusOnBoulderProblem(feature)
                     }
-
                 } else {
                     unselectProblem()
                 }
@@ -273,7 +268,7 @@ class BoolderMap @JvmOverloads constructor(
                         null
                     }
 
-                    moveCamera(coordinates = coordinateBound, areaId = areaId)
+                    zoomToCoordinateBounds(coordinates = coordinateBound, areaId = areaId)
                 }
             } ?: unselectProblem()
         } else {
@@ -282,7 +277,7 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     // Triggered when user click on a Area or Cluster on Map
-    private fun moveCamera(coordinates: CoordinateBounds, areaId: Int?) {
+    private fun zoomToCoordinateBounds(coordinates: CoordinateBounds, areaId: Int?) {
         val cameraOption = getMapboxMap().cameraForCoordinateBounds(
             coordinates,
             EdgeInsets(60.0, 8.0, 8.0, 8.0),
@@ -299,6 +294,29 @@ class BoolderMap @JvmOverloads constructor(
         }
 
         getMapboxMap().flyTo(cameraOption, mapAnimationOption)
+    }
+
+    private fun zoomToBoulderProblemLevel(feature: Feature) {
+        val cameraOption = CameraOptions.Builder()
+            .center(feature.geometry() as Point)
+            .padding(EdgeInsets(0.0, 0.0,0.0, 0.0))
+            .zoom(19.0)
+            .build()
+
+        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
+
+        getMapboxMap().easeTo(cameraOption, mapAnimationOption)
+    }
+
+    private fun focusOnBoulderProblem(feature: Feature) {
+        val cameraOption = CameraOptions.Builder()
+            .center(feature.geometry() as Point)
+            .padding(EdgeInsets(40.0, 8.8, (height / 2).toDouble(), 8.8))
+            .build()
+
+        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
+
+        getMapboxMap().easeTo(cameraOption, mapAnimationOption)
     }
 
     fun applyCompassTopInset(topInset: Float) {
