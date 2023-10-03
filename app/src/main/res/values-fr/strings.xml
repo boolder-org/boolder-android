@@ -58,4 +58,7 @@
     <string name="apply">Appliquer</string>
     <string name="custom">Personnalisé</string>
 
+    <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
+    <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>
+
 </resources>

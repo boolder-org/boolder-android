@@ -2,7 +2,6 @@ package com.boolder.boolder.view.detail
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
@@ -24,6 +23,7 @@ import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.toProblemStart
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.detail.composable.CircuitControls
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
 import com.boolder.boolder.view.detail.uimodel.ProblemStart
 import java.util.Locale
@@ -38,12 +38,7 @@ class TopoView(
     private var problemStarts: List<ProblemStart> = emptyList()
 
     var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
-
-    init {
-        setBackgroundColor(Color.WHITE)
-        isClickable = true
-        isFocusable = true
-    }
+    var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
 
     fun setTopo(topo: Topo) {
         setProblemStarts(
@@ -52,6 +47,11 @@ class TopoView(
         )
 
         loadTopoImage(topo)
+
+        updateCircuitControls(
+            circuitPreviousProblemId = topo.circuitPreviousProblemId,
+            circuitNextProblemId = topo.circuitNextProblemId
+        )
 
         topo.selectedCompleteProblem?.let {
             updateLabels(it.problemWithLine.problem)
@@ -121,6 +121,26 @@ class TopoView(
 
         selectedProblem?.problemWithLine?.problem?.id?.toString()?.let { selectedProblemId ->
             onSelectProblemOnMap?.invoke(selectedProblemId)
+        }
+    }
+
+    private fun updateCircuitControls(
+        circuitPreviousProblemId: Int?,
+        circuitNextProblemId: Int?
+    ) {
+        binding.circuitControlsComposeView.setContent {
+            BoolderTheme {
+                CircuitControls(
+                    circuitPreviousProblemId = circuitPreviousProblemId,
+                    circuitNextProblemId = circuitNextProblemId,
+                    onPreviousProblemClicked = {
+                        circuitPreviousProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                    },
+                    onNextProblemClicked = {
+                        circuitNextProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                    }
+                )
+            }
         }
     }
 

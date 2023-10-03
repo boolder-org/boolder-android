@@ -7,6 +7,7 @@ import android.util.TypedValue
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.utils.MapboxStyleFactory
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -27,8 +28,10 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.match
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.Layer
 import com.mapbox.maps.extension.style.layers.generated.CircleLayer
+import com.mapbox.maps.extension.style.layers.generated.LineLayer
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
-import com.mapbox.maps.extension.style.layers.getLayer
+import com.mapbox.maps.extension.style.layers.getLayerAs
+import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
@@ -158,9 +161,9 @@ class BoolderMap @JvmOverloads constructor(
             problemsOption
         ) { features: Expected<String, MutableList<QueriedFeature>> ->
             if (features.isValue) {
-
                 val feature = features.value?.firstOrNull()?.feature
                     ?: run {
+                        hideCircuit()
                         unselectProblem()
                         listener?.onProblemUnselected()
                         return@queryRenderedFeatures
@@ -183,6 +186,11 @@ class BoolderMap @JvmOverloads constructor(
                     unselectProblem()
                 }
 
+                if (feature.hasProperty("circuitId")) {
+                    showCircuit(feature.getNumberProperty("circuitId").toLong())
+                } else {
+                    hideCircuit()
+                }
             } else {
                 Log.w(TAG, features.error ?: "No message")
             }
@@ -239,6 +247,28 @@ class BoolderMap @JvmOverloads constructor(
                 Value.fromJson("""{"selected": false}""").value!!
             )
         }
+    }
+
+    private fun showCircuit(circuitId: Long) {
+        val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
+
+        circuitsLayer.apply {
+            filter(
+                match {
+                    get("id")
+                    literal(circuitId)
+                    literal(true)
+                    literal(false)
+                }
+            )
+            visibility(Visibility.VISIBLE)
+        }
+    }
+
+    private fun hideCircuit() {
+        val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
+
+        circuitsLayer.visibility(Visibility.NONE)
     }
 
     // 3A. Build bounds around coordinate
@@ -323,15 +353,15 @@ class BoolderMap @JvmOverloads constructor(
         compass.marginTop = resources.getDimension(R.dimen.margin_compass_top) + topInset
     }
 
-    private fun getLayer(layerId: String): Layer? =
-        getMapboxMap().getStyle()?.getLayer(layerId)
+    private inline fun <reified T : Layer> getLayerAs(layerId: String): T? =
+        getMapboxMap().getStyle()?.getLayerAs(layerId)
 
     fun filterGrades(grades: List<String>) {
-        val problemsLayer = getLayer(MapboxStyleFactory.LAYER_PROBLEMS) as? CircleLayer
-        val problemsTextLayer = getLayer(MapboxStyleFactory.LAYER_PROBLEMS_TEXT) as? SymbolLayer
+        val problemsLayer = getLayerAs<CircleLayer>(MapboxStyleFactory.LAYER_PROBLEMS)
+        val problemsTextLayer = getLayerAs<SymbolLayer>(MapboxStyleFactory.LAYER_PROBLEMS_TEXT)
 
         val query = match {
-            get { literal("grade") }
+            get("grade")
             literal(grades)
             literal(true)
             literal(false)

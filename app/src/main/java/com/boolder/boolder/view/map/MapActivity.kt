@@ -130,13 +130,17 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             }
         }
 
-        binding.topoView.onSelectProblemOnMap = { problemId ->
-            binding.mapView.selectProblem(problemId)
+        binding.topoView.apply {
+            onSelectProblemOnMap = binding.mapView::selectProblem
+            onCircuitProblemSelected = mapViewModel::fetchTopo
         }
 
-        mapViewModel.topoStateFlow.launchAndCollectIn(owner = this) { topo ->
-            topo?.let(binding.topoView::setTopo)
-            bottomSheetBehavior.state = if (topo == null) STATE_HIDDEN else STATE_EXPANDED
+        mapViewModel.topoStateFlow.launchAndCollectIn(owner = this) { nullableTopo ->
+            nullableTopo?.let { topo ->
+                binding.topoView.setTopo(topo)
+                topo.selectedCompleteProblem?.problemWithLine?.problem?.let(::flyToProblem)
+            }
+            bottomSheetBehavior.state = if (nullableTopo == null) STATE_HIDDEN else STATE_EXPANDED
         }
 
         mapViewModel.gradeStateFlow.launchAndCollectIn(owner = this) {
@@ -164,7 +168,10 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
     }
 
     override fun onDestroy() {
-        binding.topoView.onSelectProblemOnMap = null
+        binding.topoView.apply {
+            onSelectProblemOnMap = null
+            onCircuitProblemSelected = null
+        }
         super.onDestroy()
     }
 
@@ -257,7 +264,6 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
     }
 
     private fun flyToProblem(problem: Problem) {
-        onProblemSelected(problem.id)
         binding.mapView.selectProblem(problem.id.toString())
 
         val point = Point.fromLngLat(

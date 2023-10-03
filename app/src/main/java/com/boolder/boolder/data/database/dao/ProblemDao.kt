@@ -29,4 +29,15 @@ interface ProblemDao {
 
     @Query("SELECT * FROM problems WHERE parent_id = :parentProblemId")
     suspend fun problemVariantsByParentId(parentProblemId: Int): List<ProblemEntity>
+
+    @Query(
+        """
+        SELECT id FROM problems 
+        WHERE circuit_id = :circuitId AND circuit_number = :circuitProblemNumber
+        """
+    )
+    suspend fun problemIdByCircuitAndNumber(
+        circuitId: Int,
+        circuitProblemNumber: Int
+    ): Int?
 }

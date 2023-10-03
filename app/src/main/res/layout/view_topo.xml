@@ -8,6 +8,23 @@
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/circuit_controls_compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/picture" />
+
+    <View
+        android:id="@+id/clicks_interceptor"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/picture" />
+
     <ImageView
         android:id="@+id/picture"
         android:layout_width="match_parent"
@@ -16,24 +33,26 @@
         android:background="@color/gray"
         android:contentDescription="@string/cd_boolder_picture"
         app:layout_constraintDimensionRatio="4:3"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/circuit_controls_compose_view" />
 
     <ProgressBar
         android:id="@+id/progress_circular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        app:layout_constraintBottom_toBottomOf="@id/picture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/picture"
+        app:layout_constraintEnd_toEndOf="@+id/picture"
+        app:layout_constraintStart_toStartOf="@+id/picture"
+        app:layout_constraintTop_toTopOf="@+id/picture" />
 
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/problem_starts_compose_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="4:3"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/picture"
+        app:layout_constraintEnd_toEndOf="@+id/picture"
+        app:layout_constraintStart_toStartOf="@+id/picture"
+        app:layout_constraintTop_toTopOf="@+id/picture" />
 
     <TextView
         android:id="@+id/title"

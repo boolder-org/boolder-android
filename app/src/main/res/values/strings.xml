@@ -62,4 +62,7 @@
     <string name="apply">Apply</string>
     <string name="custom">Custom</string>
 
+    <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
+    <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>
+
 </resources>

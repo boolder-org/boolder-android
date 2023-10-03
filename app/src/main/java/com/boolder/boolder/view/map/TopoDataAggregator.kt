@@ -35,10 +35,14 @@ class TopoDataAggregator(
             mainProblemWithLine = mainProblemAndLine
         )
 
+        val (circuitPreviousProblemId, circuitNextProblemId) = getCircuitPreviousAndNextProblemIds(mainProblem)
+
         return Topo(
             pictureUrl = topoPictureUrl,
             selectedCompleteProblem = mainCompleteProblem,
-            otherCompleteProblems = otherCompleteProblems
+            otherCompleteProblems = otherCompleteProblems,
+            circuitPreviousProblemId = circuitPreviousProblemId,
+            circuitNextProblemId = circuitNextProblemId
         )
     }
 
@@ -94,6 +98,30 @@ class TopoDataAggregator(
         return otherProblemsWithLines.map { getCompleteProblem(it) }
     }
 
+    private suspend fun getCircuitPreviousAndNextProblemIds(
+        currentProblem: ProblemEntity
+    ): Pair<Int?, Int?> {
+        val circuitId = currentProblem.circuitId ?: return null to null
+
+        val currentCircuitNumber = try {
+            currentProblem.circuitNumber?.toInt()
+        } catch (e: Exception) {
+            null
+        } ?: return null to null
+
+        val previousProblemId = problemRepository.problemIdByCircuitAndNumber(
+            circuitId = circuitId,
+            circuitProblemNumber = currentCircuitNumber - 1
+        )
+
+        val nextProblemId = problemRepository.problemIdByCircuitAndNumber(
+            circuitId = circuitId,
+            circuitProblemNumber = currentCircuitNumber + 1
+        )
+
+        return previousProblemId to nextProblemId
+    }
+
     private suspend fun ProblemEntity.toProblemWithLine(): ProblemWithLine {
         val problem = this.convert()
 
@@ -107,7 +135,9 @@ class TopoDataAggregator(
         private val EMPTY_TOPO = Topo(
             pictureUrl = null,
             selectedCompleteProblem = null,
-            otherCompleteProblems = emptyList()
+            otherCompleteProblems = emptyList(),
+            circuitPreviousProblemId = null,
+            circuitNextProblemId = null
         )
     }
 }

@@ -24,4 +24,10 @@ class ProblemRepository(
 
     suspend fun problemVariantsByParentId(parentProblemId: Int): List<ProblemEntity> =
         problemDao.problemVariantsByParentId(parentProblemId)
+
+    suspend fun problemIdByCircuitAndNumber(
+        circuitId: Int,
+        circuitProblemNumber: Int
+    ): Int? =
+        problemDao.problemIdByCircuitAndNumber(circuitId, circuitProblemNumber)
 }
