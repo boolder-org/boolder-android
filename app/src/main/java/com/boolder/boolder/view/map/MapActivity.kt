@@ -23,6 +23,7 @@ import com.boolder.boolder.databinding.ActivityMainBinding
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
@@ -131,17 +132,14 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
         }
 
         binding.topoView.apply {
-            onSelectProblemOnMap = binding.mapView::selectProblem
+            onSelectProblemOnMap = { problemId ->
+                binding.mapView.selectProblem(problemId)
+                mapViewModel.updateCircuitControlsForProblem(problemId)
+            }
             onCircuitProblemSelected = mapViewModel::fetchTopo
         }
 
-        mapViewModel.topoStateFlow.launchAndCollectIn(owner = this) { nullableTopo ->
-            nullableTopo?.let { topo ->
-                binding.topoView.setTopo(topo)
-                topo.selectedCompleteProblem?.problemWithLine?.problem?.let(::flyToProblem)
-            }
-            bottomSheetBehavior.state = if (nullableTopo == null) STATE_HIDDEN else STATE_EXPANDED
-        }
+        mapViewModel.topoStateFlow.launchAndCollectIn(owner = this, collector = ::onNewTopo)
 
         mapViewModel.gradeStateFlow.launchAndCollectIn(owner = this) {
             binding.mapView.filterGrades(it.grades)
@@ -222,6 +220,18 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
     override fun onAreaLeft() {
         mapViewModel.onAreaLeft()
+    }
+
+    private fun onNewTopo(nullableTopo: Topo?) {
+        nullableTopo?.let { topo ->
+            binding.topoView.setTopo(topo)
+
+            val selectedProblem = topo.selectedCompleteProblem?.problemWithLine?.problem
+
+            binding.mapView.updateCircuit(selectedProblem?.circuitId?.toLong())
+            selectedProblem?.let(::flyToProblem)
+        }
+        bottomSheetBehavior.state = if (nullableTopo == null) STATE_HIDDEN else STATE_EXPANDED
     }
 
     private fun openGoogleMaps(url: String) {

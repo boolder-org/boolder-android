@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.lang.NumberFormatException
 
 class MapViewModel(
     private val areaRepository: AreaRepository,
@@ -43,6 +44,39 @@ class MapViewModel(
     fun fetchTopo(problemId: Int) {
         viewModelScope.launch {
             _topoStateFlow.value = topoDataAggregator.aggregate(problemId)
+        }
+    }
+
+    fun updateCircuitControlsForProblem(problemId: String) {
+        val currentTopoState = _topoStateFlow.value ?: return
+
+        val intProblemId = try {
+            problemId.toInt()
+        } catch (e: NumberFormatException) {
+            return
+        }
+
+        viewModelScope.launch {
+            val selectedProblem = currentTopoState.otherCompleteProblems
+                .find { it.problemWithLine.problem.id == intProblemId }
+                ?: return@launch
+
+            val otherProblems = buildList {
+                currentTopoState.selectedCompleteProblem?.let(::add)
+                currentTopoState.otherCompleteProblems.forEach { completeProblem ->
+                    if (completeProblem != selectedProblem) add(completeProblem)
+                }
+            }
+
+            val circuitInfo = topoDataAggregator.updateCircuitControlsForProblem(intProblemId)
+
+            _topoStateFlow.update {
+                currentTopoState.copy(
+                    selectedCompleteProblem = selectedProblem,
+                    otherCompleteProblems = otherProblems,
+                    circuitInfo = circuitInfo
+                )
+            }
         }
     }
 

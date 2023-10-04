@@ -1,6 +1,7 @@
 package com.boolder.boolder.view.map
 
 import com.boolder.boolder.data.database.entity.ProblemEntity
+import com.boolder.boolder.data.database.entity.circuitColorSafe
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.network.repository.TopoRepository
@@ -124,6 +125,18 @@ class TopoDataAggregator(
         )
 
         return previousProblemId to nextProblemId
+    }
+
+    suspend fun updateCircuitControlsForProblem(problemId: Int): CircuitInfo? {
+        val problem = problemRepository.problemById(problemId) ?: return null
+
+        val (previousProblemId, nextProblemId) = getCircuitPreviousAndNextProblemIds(problem)
+
+        return CircuitInfo(
+            color = problem.circuitColorSafe,
+            previousProblemId = previousProblemId,
+            nextProblemId = nextProblemId
+        )
     }
 
     private suspend fun ProblemEntity.toProblemWithLine(): ProblemWithLine {

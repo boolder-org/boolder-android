@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.Index.Order.ASC
 import androidx.room.PrimaryKey
+import com.boolder.boolder.domain.model.CircuitColor
 
 @Entity(
     tableName = "problems",
@@ -58,3 +59,7 @@ data class ProblemEntity(
     @ColumnInfo(name = "parent_id")
     val parentId: Int?
 )
+
+val ProblemEntity.circuitColorSafe
+    get() = circuitColor?.let { CircuitColor.valueOf(it.uppercase()) }
+        ?: CircuitColor.OFF_CIRCUIT

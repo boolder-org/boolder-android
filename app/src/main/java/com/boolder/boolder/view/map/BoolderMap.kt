@@ -185,12 +185,6 @@ class BoolderMap @JvmOverloads constructor(
                 } else {
                     unselectProblem()
                 }
-
-                if (feature.hasProperty("circuitId")) {
-                    showCircuit(feature.getNumberProperty("circuitId").toLong())
-                } else {
-                    hideCircuit()
-                }
             } else {
                 Log.w(TAG, features.error ?: "No message")
             }
@@ -249,7 +243,12 @@ class BoolderMap @JvmOverloads constructor(
         }
     }
 
-    private fun showCircuit(circuitId: Long) {
+    fun updateCircuit(circuitId: Long?) {
+        circuitId ?: run {
+            hideCircuit()
+            return
+        }
+
         val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
 
         circuitsLayer.apply {
