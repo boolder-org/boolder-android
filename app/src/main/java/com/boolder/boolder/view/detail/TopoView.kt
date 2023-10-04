@@ -16,6 +16,7 @@ import androidx.core.view.setPadding
 import coil.load
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ViewTopoBinding
+import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.ProblemWithLine
@@ -48,10 +49,7 @@ class TopoView(
 
         loadTopoImage(topo)
 
-        updateCircuitControls(
-            circuitPreviousProblemId = topo.circuitPreviousProblemId,
-            circuitNextProblemId = topo.circuitNextProblemId
-        )
+        updateCircuitControls(circuitInfo = topo.circuitInfo)
 
         topo.selectedCompleteProblem?.let {
             updateLabels(it.problemWithLine.problem)
@@ -124,20 +122,18 @@ class TopoView(
         }
     }
 
-    private fun updateCircuitControls(
-        circuitPreviousProblemId: Int?,
-        circuitNextProblemId: Int?
-    ) {
+    private fun updateCircuitControls(circuitInfo: CircuitInfo?) {
         binding.circuitControlsComposeView.setContent {
+            circuitInfo ?: return@setContent
+
             BoolderTheme {
                 CircuitControls(
-                    circuitPreviousProblemId = circuitPreviousProblemId,
-                    circuitNextProblemId = circuitNextProblemId,
+                    circuitInfo = circuitInfo,
                     onPreviousProblemClicked = {
-                        circuitPreviousProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                        circuitInfo.previousProblemId?.let { onCircuitProblemSelected?.invoke(it) }
                     },
                     onNextProblemClicked = {
-                        circuitNextProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                        circuitInfo.nextProblemId?.let { onCircuitProblemSelected?.invoke(it) }
                     }
                 )
             }

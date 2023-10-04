@@ -10,15 +10,27 @@ package com.boolder.boolder.domain.model
  * the detail information. Its line should also be shown.
  * @param otherCompleteProblems The problems that are on the same picture, but
  * which are not shown in the detail information.
- * @param circuitPreviousProblemId The ID of the previous boulder problem in
- * the same circuit as the selected boulder problem.
- * @param circuitNextProblemId The ID of the next boulder problem in the same
- * circuit as the selected boulder problem.
+ * @param circuitInfo Data related to the circuit that the selected boulder
+ * problem belongs to.
  */
 data class Topo(
     val pictureUrl: String?,
     val selectedCompleteProblem: CompleteProblem?,
     val otherCompleteProblems: List<CompleteProblem>,
-    val circuitPreviousProblemId: Int?,
-    val circuitNextProblemId: Int?
+    val circuitInfo: CircuitInfo?
+)
+
+/**
+ * Groups all the data that is related to a circuit.
+ *
+ * @param color The color of the circuit.
+ * @param previousProblemId The ID of the previous boulder problem in the same
+ * circuit as the selected boulder problem.
+ * @param nextProblemId The ID of the next boulder problem in the same circuit
+ * as the selected boulder problem.
+ */
+data class CircuitInfo(
+    val color: CircuitColor,
+    val previousProblemId: Int?,
+    val nextProblemId: Int?
 )

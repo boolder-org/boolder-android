@@ -5,6 +5,7 @@ import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.network.repository.TopoRepository
 import com.boolder.boolder.domain.convert
+import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
@@ -41,8 +42,11 @@ class TopoDataAggregator(
             pictureUrl = topoPictureUrl,
             selectedCompleteProblem = mainCompleteProblem,
             otherCompleteProblems = otherCompleteProblems,
-            circuitPreviousProblemId = circuitPreviousProblemId,
-            circuitNextProblemId = circuitNextProblemId
+            circuitInfo = CircuitInfo(
+                color = mainCompleteProblem.problemWithLine.problem.circuitColorSafe,
+                previousProblemId = circuitPreviousProblemId,
+                nextProblemId = circuitNextProblemId
+            )
         )
     }
 
@@ -136,8 +140,7 @@ class TopoDataAggregator(
             pictureUrl = null,
             selectedCompleteProblem = null,
             otherCompleteProblems = emptyList(),
-            circuitPreviousProblemId = null,
-            circuitNextProblemId = null
+            circuitInfo = null
         )
     }
 }
