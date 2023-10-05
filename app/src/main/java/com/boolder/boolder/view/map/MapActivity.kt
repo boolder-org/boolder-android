@@ -130,12 +130,12 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             }
         }
 
-        binding.problemView.onSelectProblemOnMap = { problemId ->
+        binding.topoView.onSelectProblemOnMap = { problemId ->
             binding.mapView.selectProblem(problemId)
         }
 
         mapViewModel.topoStateFlow.launchAndCollectIn(owner = this) { topo ->
-            topo?.let(binding.problemView::setTopo)
+            topo?.let(binding.topoView::setTopo)
             bottomSheetBehavior.state = if (topo == null) STATE_HIDDEN else STATE_EXPANDED
         }
 
@@ -164,7 +164,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
     }
 
     override fun onDestroy() {
-        binding.problemView.onSelectProblemOnMap = null
+        binding.topoView.onSelectProblemOnMap = null
         super.onDestroy()
     }
 
@@ -252,6 +252,8 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
                 animatorListener(animationEndListener { onAreaVisited(area.id) })
             }
         )
+
+        bottomSheetBehavior.state = STATE_HIDDEN
     }
 
     private fun flyToProblem(problem: Problem) {
