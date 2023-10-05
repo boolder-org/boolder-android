@@ -281,10 +281,12 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             problem.latitude.toDouble()
         )
 
+        val zoomLevel = binding.mapView.getMapboxMap().cameraState.zoom
+
         val cameraOptions = CameraOptions.Builder()
             .center(point)
             .padding(EdgeInsets(40.0, 0.0, (binding.mapView.height / 2).toDouble(), 0.0))
-            .zoom(20.0)
+            .zoom(if (zoomLevel <= 19.0) 20.0 else zoomLevel)
             .build()
 
         binding.mapView.camera.easeTo(
