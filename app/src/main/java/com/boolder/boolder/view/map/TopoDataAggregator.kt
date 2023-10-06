@@ -1,13 +1,16 @@
 package com.boolder.boolder.view.map
 
 import com.boolder.boolder.data.database.entity.ProblemEntity
+import com.boolder.boolder.data.database.entity.circuitColorSafe
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.network.repository.TopoRepository
 import com.boolder.boolder.domain.convert
+import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.TopoOrigin
 
 class TopoDataAggregator(
     private val topoRepository: TopoRepository,
@@ -15,7 +18,7 @@ class TopoDataAggregator(
     private val lineRepository: LineRepository
 ) {
 
-    suspend fun aggregate(problemId: Int): Topo {
+    suspend fun aggregate(problemId: Int, origin: TopoOrigin): Topo {
         val mainProblem: ProblemEntity = problemRepository.loadById(problemId) ?: return EMPTY_TOPO
 
         val mainLine = lineRepository.loadByProblemId(problemId) ?: return EMPTY_TOPO
@@ -35,10 +38,18 @@ class TopoDataAggregator(
             mainProblemWithLine = mainProblemAndLine
         )
 
+        val (circuitPreviousProblemId, circuitNextProblemId) = getCircuitPreviousAndNextProblemIds(mainProblem)
+
         return Topo(
             pictureUrl = topoPictureUrl,
             selectedCompleteProblem = mainCompleteProblem,
-            otherCompleteProblems = otherCompleteProblems
+            otherCompleteProblems = otherCompleteProblems,
+            circuitInfo = CircuitInfo(
+                color = mainCompleteProblem.problemWithLine.problem.circuitColorSafe,
+                previousProblemId = circuitPreviousProblemId,
+                nextProblemId = circuitNextProblemId
+            ),
+            origin = origin
         )
     }
 
@@ -94,6 +105,42 @@ class TopoDataAggregator(
         return otherProblemsWithLines.map { getCompleteProblem(it) }
     }
 
+    private suspend fun getCircuitPreviousAndNextProblemIds(
+        currentProblem: ProblemEntity
+    ): Pair<Int?, Int?> {
+        val circuitId = currentProblem.circuitId ?: return null to null
+
+        val currentCircuitNumber = try {
+            currentProblem.circuitNumber?.toInt()
+        } catch (e: Exception) {
+            null
+        } ?: return null to null
+
+        val previousProblemId = problemRepository.problemIdByCircuitAndNumber(
+            circuitId = circuitId,
+            circuitProblemNumber = currentCircuitNumber - 1
+        )
+
+        val nextProblemId = problemRepository.problemIdByCircuitAndNumber(
+            circuitId = circuitId,
+            circuitProblemNumber = currentCircuitNumber + 1
+        )
+
+        return previousProblemId to nextProblemId
+    }
+
+    suspend fun updateCircuitControlsForProblem(problemId: Int): CircuitInfo? {
+        val problem = problemRepository.problemById(problemId) ?: return null
+
+        val (previousProblemId, nextProblemId) = getCircuitPreviousAndNextProblemIds(problem)
+
+        return CircuitInfo(
+            color = problem.circuitColorSafe,
+            previousProblemId = previousProblemId,
+            nextProblemId = nextProblemId
+        )
+    }
+
     private suspend fun ProblemEntity.toProblemWithLine(): ProblemWithLine {
         val problem = this.convert()
 
@@ -107,7 +154,9 @@ class TopoDataAggregator(
         private val EMPTY_TOPO = Topo(
             pictureUrl = null,
             selectedCompleteProblem = null,
-            otherCompleteProblems = emptyList()
+            otherCompleteProblems = emptyList(),
+            circuitInfo = null,
+            origin = TopoOrigin.MAP
         )
     }
 }

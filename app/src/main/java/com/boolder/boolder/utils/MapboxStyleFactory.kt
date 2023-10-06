@@ -6,7 +6,9 @@ import com.mapbox.maps.extension.style.StyleContract.StyleExtension
 import com.mapbox.maps.extension.style.expressions.dsl.generated.*
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.generated.circleLayer
+import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
+import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.extension.style.types.PromoteId
@@ -15,8 +17,20 @@ class MapboxStyleFactory {
 
     fun buildStyle(): StyleExtension {
         return style(BoolderMapConfig.styleUri) {
+            +vectorSource(LAYER_CIRCUITS) {
+                url(BoolderMapConfig.circuitsVectorSourceUrl)
+            }
+            +lineLayer(LAYER_CIRCUITS, "circuits") {
+                sourceLayer(BoolderMapConfig.circuitSourceLayerId)
+                minZoom(15.0)
+                lineWidth(2.0)
+                lineDasharray(listOf(4.0, 1.0))
+                lineColor(colorFromProperty("color"))
+                visibility(Visibility.NONE)
+            }
+
             +vectorSource(LAYER_PROBLEMS) {
-                url(BoolderMapConfig.vectorSourceUrl)
+                url(BoolderMapConfig.problemsVectorSourceUrl)
                 promoteId(PromoteId("id"))
             }
             +circleLayer(LAYER_PROBLEMS, "problems") {
@@ -49,32 +63,7 @@ class MapboxStyleFactory {
                     }
                 )
 
-                circleColor(
-                    match {
-                        get { literal("circuitColor") }
-                        literal("yellow")
-                        CircuitColor.YELLOW.rgb(this)
-                        literal("purple")
-                        CircuitColor.PURPLE.rgb(this)
-                        literal("orange")
-                        CircuitColor.ORANGE.rgb(this)
-                        literal("green")
-                        CircuitColor.GREEN.rgb(this)
-                        literal("blue")
-                        CircuitColor.BLUE.rgb(this)
-                        literal("skyblue")
-                        CircuitColor.SKYBLUE.rgb(this)
-                        literal("salmon")
-                        CircuitColor.SALMON.rgb(this)
-                        literal("red")
-                        CircuitColor.RED.rgb(this)
-                        literal("black")
-                        CircuitColor.BLACK.rgb(this)
-                        literal("white")
-                        CircuitColor.WHITE.rgb(this)
-                        CircuitColor.OFF_CIRCUIT.rgb(this)
-                    }
-                )
+                circleColor(colorFromProperty("circuitColor"))
 
                 circleStrokeWidth(
                     Expression.switchCase {
@@ -135,7 +124,34 @@ class MapboxStyleFactory {
         }
     }
 
+    private fun colorFromProperty(propertyName: String): Expression =
+        match {
+            get { literal(propertyName) }
+            literal("yellow")
+            CircuitColor.YELLOW.rgb(this)
+            literal("purple")
+            CircuitColor.PURPLE.rgb(this)
+            literal("orange")
+            CircuitColor.ORANGE.rgb(this)
+            literal("green")
+            CircuitColor.GREEN.rgb(this)
+            literal("blue")
+            CircuitColor.BLUE.rgb(this)
+            literal("skyblue")
+            CircuitColor.SKYBLUE.rgb(this)
+            literal("salmon")
+            CircuitColor.SALMON.rgb(this)
+            literal("red")
+            CircuitColor.RED.rgb(this)
+            literal("black")
+            CircuitColor.BLACK.rgb(this)
+            literal("white")
+            CircuitColor.WHITE.rgb(this)
+            CircuitColor.OFF_CIRCUIT.rgb(this)
+        }
+
     companion object {
+        const val LAYER_CIRCUITS = "circuits"
         const val LAYER_PROBLEMS = "problems"
         const val LAYER_PROBLEMS_TEXT = "problems-text"
     }

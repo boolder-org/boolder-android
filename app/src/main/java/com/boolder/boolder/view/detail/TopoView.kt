@@ -2,7 +2,6 @@ package com.boolder.boolder.view.detail
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
@@ -17,6 +16,7 @@ import androidx.core.view.setPadding
 import coil.load
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ViewTopoBinding
+import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.ProblemWithLine
@@ -24,6 +24,7 @@ import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.toProblemStart
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.detail.composable.CircuitControls
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
 import com.boolder.boolder.view.detail.uimodel.ProblemStart
 import java.util.Locale
@@ -38,12 +39,7 @@ class TopoView(
     private var problemStarts: List<ProblemStart> = emptyList()
 
     var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
-
-    init {
-        setBackgroundColor(Color.WHITE)
-        isClickable = true
-        isFocusable = true
-    }
+    var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
 
     fun setTopo(topo: Topo) {
         setProblemStarts(
@@ -52,6 +48,8 @@ class TopoView(
         )
 
         loadTopoImage(topo)
+
+        updateCircuitControls(circuitInfo = topo.circuitInfo)
 
         topo.selectedCompleteProblem?.let {
             updateLabels(it.problemWithLine.problem)
@@ -121,6 +119,24 @@ class TopoView(
 
         selectedProblem?.problemWithLine?.problem?.id?.toString()?.let { selectedProblemId ->
             onSelectProblemOnMap?.invoke(selectedProblemId)
+        }
+    }
+
+    private fun updateCircuitControls(circuitInfo: CircuitInfo?) {
+        binding.circuitControlsComposeView.setContent {
+            circuitInfo ?: return@setContent
+
+            BoolderTheme {
+                CircuitControls(
+                    circuitInfo = circuitInfo,
+                    onPreviousProblemClicked = {
+                        circuitInfo.previousProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                    },
+                    onNextProblemClicked = {
+                        circuitInfo.nextProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                    }
+                )
+            }
         }
     }
 

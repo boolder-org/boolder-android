@@ -8,11 +8,13 @@ import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.lang.NumberFormatException
 
 class MapViewModel(
     private val areaRepository: AreaRepository,
@@ -40,9 +42,46 @@ class MapViewModel(
     private val _areaStateFlow = MutableStateFlow<AreaState>(AreaState.Undefined)
     val areaStateFlow = _areaStateFlow.asStateFlow()
 
-    fun fetchTopo(problemId: Int) {
+    fun fetchTopo(problemId: Int, origin: TopoOrigin) {
         viewModelScope.launch {
-            _topoStateFlow.value = topoDataAggregator.aggregate(problemId)
+            _topoStateFlow.value = topoDataAggregator.aggregate(
+                problemId = problemId,
+                origin = origin
+            )
+        }
+    }
+
+    fun updateCircuitControlsForProblem(problemId: String) {
+        val currentTopoState = _topoStateFlow.value ?: return
+
+        val intProblemId = try {
+            problemId.toInt()
+        } catch (e: NumberFormatException) {
+            return
+        }
+
+        viewModelScope.launch {
+            val selectedProblem = currentTopoState.otherCompleteProblems
+                .find { it.problemWithLine.problem.id == intProblemId }
+                ?: return@launch
+
+            val otherProblems = buildList {
+                currentTopoState.selectedCompleteProblem?.let(::add)
+                currentTopoState.otherCompleteProblems.forEach { completeProblem ->
+                    if (completeProblem != selectedProblem) add(completeProblem)
+                }
+            }
+
+            val circuitInfo = topoDataAggregator.updateCircuitControlsForProblem(intProblemId)
+
+            _topoStateFlow.update {
+                currentTopoState.copy(
+                    selectedCompleteProblem = selectedProblem,
+                    otherCompleteProblems = otherProblems,
+                    circuitInfo = circuitInfo,
+                    origin = TopoOrigin.TOPO
+                )
+            }
         }
     }
 
