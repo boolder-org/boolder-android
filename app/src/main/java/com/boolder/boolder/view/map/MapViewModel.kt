@@ -8,6 +8,7 @@ import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,9 +42,12 @@ class MapViewModel(
     private val _areaStateFlow = MutableStateFlow<AreaState>(AreaState.Undefined)
     val areaStateFlow = _areaStateFlow.asStateFlow()
 
-    fun fetchTopo(problemId: Int) {
+    fun fetchTopo(problemId: Int, origin: TopoOrigin) {
         viewModelScope.launch {
-            _topoStateFlow.value = topoDataAggregator.aggregate(problemId)
+            _topoStateFlow.value = topoDataAggregator.aggregate(
+                problemId = problemId,
+                origin = origin
+            )
         }
     }
 
@@ -74,7 +78,8 @@ class MapViewModel(
                 currentTopoState.copy(
                     selectedCompleteProblem = selectedProblem,
                     otherCompleteProblems = otherProblems,
-                    circuitInfo = circuitInfo
+                    circuitInfo = circuitInfo,
+                    origin = TopoOrigin.TOPO
                 )
             }
         }

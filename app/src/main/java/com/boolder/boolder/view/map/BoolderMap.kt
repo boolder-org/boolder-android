@@ -6,6 +6,7 @@ import android.util.Log
 import android.util.TypedValue
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
+import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
 import com.boolder.boolder.view.map.animator.animationEndListener
@@ -53,7 +54,7 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     interface BoolderMapListener {
-        fun onProblemSelected(problemId: Int)
+        fun onProblemSelected(problemId: Int, origin: TopoOrigin)
         fun onProblemUnselected()
         fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?)
 
@@ -176,7 +177,10 @@ class BoolderMap @JvmOverloads constructor(
 
                 if (feature.hasProperty("id") && feature.geometry() != null) {
                     selectProblem(feature.getNumberProperty("id").toString())
-                    listener?.onProblemSelected(feature.getNumberProperty("id").toInt())
+                    listener?.onProblemSelected(
+                        problemId = feature.getNumberProperty("id").toInt(),
+                        origin = TopoOrigin.MAP
+                    )
 
                     // Move camera if problem is hidden by bottomSheet
                     if (geometry.screenCoordinate.y >= (height / 2) - 100) {

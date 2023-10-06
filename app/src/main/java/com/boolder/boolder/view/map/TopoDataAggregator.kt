@@ -10,6 +10,7 @@ import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.TopoOrigin
 
 class TopoDataAggregator(
     private val topoRepository: TopoRepository,
@@ -17,7 +18,7 @@ class TopoDataAggregator(
     private val lineRepository: LineRepository
 ) {
 
-    suspend fun aggregate(problemId: Int): Topo {
+    suspend fun aggregate(problemId: Int, origin: TopoOrigin): Topo {
         val mainProblem: ProblemEntity = problemRepository.loadById(problemId) ?: return EMPTY_TOPO
 
         val mainLine = lineRepository.loadByProblemId(problemId) ?: return EMPTY_TOPO
@@ -47,7 +48,8 @@ class TopoDataAggregator(
                 color = mainCompleteProblem.problemWithLine.problem.circuitColorSafe,
                 previousProblemId = circuitPreviousProblemId,
                 nextProblemId = circuitNextProblemId
-            )
+            ),
+            origin = origin
         )
     }
 
@@ -153,7 +155,8 @@ class TopoDataAggregator(
             pictureUrl = null,
             selectedCompleteProblem = null,
             otherCompleteProblems = emptyList(),
-            circuitInfo = null
+            circuitInfo = null,
+            origin = TopoOrigin.MAP
         )
     }
 }

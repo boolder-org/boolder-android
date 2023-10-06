@@ -24,6 +24,7 @@ import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
@@ -109,8 +110,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
                     requireNotNull(resultData.getParcelableExtra("AREA"))
                 )
 
-                resultData.hasExtra("PROBLEM") -> flyToProblem(
-                    requireNotNull(resultData.getParcelableExtra("PROBLEM"))
+                resultData.hasExtra("PROBLEM") -> onProblemSelected(
+                    problemId = requireNotNull(resultData.getParcelableExtra<Problem>("PROBLEM")).id,
+                    origin = TopoOrigin.SEARCH
                 )
             }
         }
@@ -136,7 +138,9 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
                 binding.mapView.selectProblem(problemId)
                 mapViewModel.updateCircuitControlsForProblem(problemId)
             }
-            onCircuitProblemSelected = mapViewModel::fetchTopo
+            onCircuitProblemSelected = {
+                mapViewModel.fetchTopo(problemId = it, origin = TopoOrigin.CIRCUIT)
+            }
         }
 
         mapViewModel.topoStateFlow.launchAndCollectIn(owner = this, collector = ::onNewTopo)
@@ -190,8 +194,8 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
     }
 
     // Triggered when user click on a Problem on Map
-    override fun onProblemSelected(problemId: Int) {
-        mapViewModel.fetchTopo(problemId)
+    override fun onProblemSelected(problemId: Int, origin: TopoOrigin) {
+        mapViewModel.fetchTopo(problemId = problemId, origin = origin)
     }
 
     override fun onProblemUnselected() {
@@ -229,7 +233,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             val selectedProblem = topo.selectedCompleteProblem?.problemWithLine?.problem
 
             binding.mapView.updateCircuit(selectedProblem?.circuitId?.toLong())
-            selectedProblem?.let(::flyToProblem)
+            selectedProblem?.let { flyToProblem(problem = it, origin = topo.origin) }
         }
         bottomSheetBehavior.state = if (nullableTopo == null) STATE_HIDDEN else STATE_EXPANDED
     }
@@ -273,7 +277,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
         bottomSheetBehavior.state = STATE_HIDDEN
     }
 
-    private fun flyToProblem(problem: Problem) {
+    private fun flyToProblem(problem: Problem, origin: TopoOrigin) {
         binding.mapView.selectProblem(problem.id.toString())
 
         val point = Point.fromLngLat(
@@ -283,11 +287,13 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
         val zoomLevel = binding.mapView.getMapboxMap().cameraState.zoom
 
-        val cameraOptions = CameraOptions.Builder()
-            .center(point)
-            .padding(EdgeInsets(40.0, 0.0, (binding.mapView.height / 2).toDouble(), 0.0))
-            .zoom(if (zoomLevel <= 19.0) 20.0 else zoomLevel)
-            .build()
+        val cameraOptions = CameraOptions.Builder().run {
+            if (origin in arrayOf(TopoOrigin.SEARCH, TopoOrigin.CIRCUIT)) center(point)
+
+            padding(EdgeInsets(40.0, 0.0, (binding.mapView.height / 2).toDouble(), 0.0))
+            zoom(if (zoomLevel <= 19.0) 20.0 else zoomLevel)
+            build()
+        }
 
         binding.mapView.camera.easeTo(
             cameraOptions = cameraOptions,

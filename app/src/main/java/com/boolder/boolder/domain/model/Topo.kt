@@ -17,7 +17,8 @@ data class Topo(
     val pictureUrl: String?,
     val selectedCompleteProblem: CompleteProblem?,
     val otherCompleteProblems: List<CompleteProblem>,
-    val circuitInfo: CircuitInfo?
+    val circuitInfo: CircuitInfo?,
+    val origin: TopoOrigin
 )
 
 /**
@@ -34,3 +35,17 @@ data class CircuitInfo(
     val previousProblemId: Int?,
     val nextProblemId: Int?
 )
+
+/**
+ * The origin of the event that triggered a new topo generation:
+ * - MAP corresponds to a click on the map
+ * - SEARCH corresponds to a validated search result
+ * - TOPO corresponds to a click on the topo's picture
+ * - CIRCUIT corresponds to a navigation on the current circuit
+ */
+enum class TopoOrigin {
+    MAP,
+    SEARCH,
+    TOPO,
+    CIRCUIT
+}
