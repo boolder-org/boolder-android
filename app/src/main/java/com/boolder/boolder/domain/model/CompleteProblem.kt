@@ -2,6 +2,7 @@ package com.boolder.boolder.domain.model
 
 import androidx.annotation.Px
 import com.boolder.boolder.view.detail.uimodel.ProblemStart
+import com.boolder.boolder.view.detail.uimodel.UiProblem
 import kotlin.math.roundToInt
 
 /**
@@ -12,7 +13,18 @@ data class CompleteProblem(
     val variants: List<ProblemWithLine>
 )
 
-fun CompleteProblem.toProblemStart(
+fun CompleteProblem.toUiProblem(
+    @Px containerWidthPx: Int,
+    @Px containerHeightPx: Int
+) = UiProblem(
+    completeProblem = this,
+    problemStart = toProblemStart(
+        containerWidthPx = containerWidthPx,
+        containerHeightPx = containerHeightPx
+    )
+)
+
+private fun CompleteProblem.toProblemStart(
     @Px containerWidthPx: Int,
     @Px containerHeightPx: Int
 ): ProblemStart? {
@@ -29,7 +41,6 @@ fun CompleteProblem.toProblemStart(
             android.R.color.black
         } else {
             android.R.color.white
-        },
-        completeProblem = this
+        }
     )
 }

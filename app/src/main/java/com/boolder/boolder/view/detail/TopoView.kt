@@ -22,11 +22,11 @@ import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.Topo
-import com.boolder.boolder.domain.model.toProblemStart
+import com.boolder.boolder.domain.model.toUiProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.detail.composable.CircuitControls
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
-import com.boolder.boolder.view.detail.uimodel.ProblemStart
+import com.boolder.boolder.view.detail.uimodel.UiProblem
 import java.util.Locale
 
 class TopoView(
@@ -36,14 +36,14 @@ class TopoView(
 
     private val binding = ViewTopoBinding.inflate(LayoutInflater.from(context), this)
 
-    private var problemStarts: List<ProblemStart> = emptyList()
+    private var uiProblems: List<UiProblem> = emptyList()
 
     var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
     var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
 
     fun setTopo(topo: Topo) {
-        setProblemStarts(
-            problemStarts = emptyList(),
+        setUiProblems(
+            uiProblems = emptyList(),
             selectedProblem = null
         )
 
@@ -63,24 +63,22 @@ class TopoView(
         val containerWidth = binding.picture.measuredWidth
         val containerHeight = binding.picture.measuredHeight
 
-        val initialProblemStart = selectedProblem.toProblemStart(
+        val initialUiProblem = selectedProblem.toUiProblem(
             containerWidthPx = containerWidth,
             containerHeightPx = containerHeight
         )
 
-        val otherProblemStarts = topo.otherCompleteProblems.mapNotNull {
-            it.toProblemStart(
+        val otherUiProblems = topo.otherCompleteProblems.map {
+            it.toUiProblem(
                 containerWidthPx = containerWidth,
                 containerHeightPx = containerHeight
             )
         }
 
-        this.problemStarts = initialProblemStart
-            ?.let { otherProblemStarts + it }
-            ?: otherProblemStarts
+        this.uiProblems = otherUiProblems + initialUiProblem
 
-        setProblemStarts(
-            problemStarts = problemStarts,
+        setUiProblems(
+            uiProblems = uiProblems,
             selectedProblem = selectedProblem
         )
     }
@@ -90,30 +88,30 @@ class TopoView(
 
         updateLabels(problem)
         setupChipClick(problem)
-        setProblemStarts(
-            problemStarts = problemStarts,
+        setUiProblems(
+            uiProblems = uiProblems,
             selectedProblem = completeProblem
         )
         onSelectProblemOnMap?.invoke(problem.id.toString())
     }
 
     private fun onVariantSelected(variant: ProblemWithLine) {
-        val (selectedProblem, newProblemStarts) = VariantSelector.selectVariantInProblemStarts(
+        val (selectedProblem, newUiProblems) = VariantSelector.selectVariantInProblemStarts(
             selectedVariant = variant,
-            problemStarts = problemStarts,
+            uiProblems = uiProblems,
             containerWidth = binding.picture.measuredWidth,
             containerHeight = binding.picture.measuredHeight
         )
 
-        problemStarts = newProblemStarts
+        uiProblems = newUiProblems
 
         selectedProblem?.let {
             updateLabels(it.problemWithLine.problem)
             setupChipClick(it.problemWithLine.problem)
         }
 
-        setProblemStarts(
-            problemStarts = problemStarts,
+        setUiProblems(
+            uiProblems = uiProblems,
             selectedProblem = selectedProblem
         )
 
@@ -230,8 +228,8 @@ class TopoView(
         binding.progressCircular.isVisible = false
     }
 
-    private fun setProblemStarts(
-        problemStarts: List<ProblemStart>,
+    private fun setUiProblems(
+        uiProblems: List<UiProblem>,
         selectedProblem: CompleteProblem?
     ) {
         binding.problemStartsComposeView.setContent {
@@ -240,7 +238,7 @@ class TopoView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(4f / 3f),
-                    problemStarts = problemStarts,
+                    uiProblems = uiProblems,
                     selectedProblem = selectedProblem,
                     onProblemStartClicked = ::onProblemStartClicked,
                     onVariantSelected = ::onVariantSelected
