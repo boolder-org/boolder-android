@@ -21,22 +21,27 @@ class TopoDataAggregator(
     suspend fun aggregate(problemId: Int, origin: TopoOrigin): Topo {
         val mainProblem: ProblemEntity = problemRepository.loadById(problemId) ?: return EMPTY_TOPO
 
-        val mainLine = lineRepository.loadByProblemId(problemId) ?: return EMPTY_TOPO
+        val mainLine = lineRepository.loadByProblemId(problemId)
 
-        val topoId = mainLine.topoId
-        val topoPictureUrl = topoRepository.getTopoPictureById(topoId)
+        val topoId = mainLine?.topoId
+
+        val topoPictureUrl = topoId?.let { topoRepository.getTopoPictureById(it) }
 
         val mainProblemAndLine = ProblemWithLine(
             problem = mainProblem.convert(),
-            line = mainLine.convert()
+            line = mainLine?.convert()
         )
 
         val mainCompleteProblem = getCompleteProblem(mainProblemAndLine)
 
-        val otherCompleteProblems = getOtherCompleteProblemsFromTopo(
-            topoId = topoId,
-            mainProblemWithLine = mainProblemAndLine
-        )
+        val otherCompleteProblems = topoId
+            ?.let {
+                getOtherCompleteProblemsFromTopo(
+                    topoId = topoId,
+                    mainProblemWithLine = mainProblemAndLine
+                )
+            }
+            ?: emptyList()
 
         val (circuitPreviousProblemId, circuitNextProblemId) = getCircuitPreviousAndNextProblemIds(mainProblem)
 
