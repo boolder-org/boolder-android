@@ -17,6 +17,8 @@ fun BoolderTheme(
         onSurface = Color.Black,
         onSurfaceVariant = Color(0xFFA5A5A5),
         outline = Color(0xFFE5E5E5),
+        secondaryContainer = Color(0xFF65C466),
+        onSecondaryContainer = Color.White
     )
 
     MaterialTheme(

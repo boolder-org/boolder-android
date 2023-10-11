@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,35 +27,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <include
-            android:id="@+id/search_component"
-            layout="@layout/search_component"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="@dimen/margin_search_component"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/grades_filter_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_map_controls"
-            app:icon="@drawable/ic_tune_24"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/controls_overlay_compose_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="Grades" />
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/area_name_compose_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:elevation="10dp"
-            app:layout_constraintBottom_toBottomOf="@id/search_component"
-            app:layout_constraintEnd_toEndOf="@id/search_component"
-            app:layout_constraintStart_toStartOf="@id/search_component"
-            app:layout_constraintTop_toTopOf="@+id/search_component" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

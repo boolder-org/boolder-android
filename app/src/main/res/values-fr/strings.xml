@@ -49,6 +49,10 @@
 
     <string name="no_name">Sans nom</string>
 
+    <string name="circuit">Circuit %s</string>
+    <string name="circuits">Circuits</string>
+    <string name="circuit_start">Départ circuit</string>
+
     <string name="grade">Niveau</string>
     <string name="grades">Niveaux</string>
     <string name="beginner">Débutant</string>

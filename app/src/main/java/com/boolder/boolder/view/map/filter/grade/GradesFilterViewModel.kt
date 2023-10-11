@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.map.filter
+package com.boolder.boolder.view.map.filter.grade
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
