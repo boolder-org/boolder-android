@@ -3,20 +3,20 @@ package com.boolder.boolder.view.detail
 import androidx.annotation.Px
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
-import com.boolder.boolder.domain.model.toProblemStart
-import com.boolder.boolder.view.detail.uimodel.ProblemStart
+import com.boolder.boolder.domain.model.toUiProblem
+import com.boolder.boolder.view.detail.uimodel.UiProblem
 
 object VariantSelector {
 
     fun selectVariantInProblemStarts(
         selectedVariant: ProblemWithLine,
-        problemStarts: List<ProblemStart>,
+        uiProblems: List<UiProblem>,
         @Px containerWidth: Int,
         @Px containerHeight: Int
-    ): Pair<CompleteProblem?, List<ProblemStart>> {
+    ): Pair<CompleteProblem?, List<UiProblem>> {
         var selectedProblem: CompleteProblem? = null
 
-        val newProblemStarts = problemStarts.mapNotNull { problemStart ->
+        val newProblemStarts = uiProblems.mapNotNull { problemStart ->
             val completeProblem = problemStart.completeProblem
 
             if (completeProblem.problemWithLine == selectedVariant) {
@@ -25,7 +25,7 @@ object VariantSelector {
                     selectedVariant = selectedVariant
                 )
                     .also { selectedProblem = it }
-                    .toProblemStart(
+                    .toUiProblem(
                         containerWidthPx = containerWidth,
                         containerHeightPx = containerHeight
                     )
@@ -37,7 +37,7 @@ object VariantSelector {
                     selectedVariant = selectedVariant
                 )
                     .also { selectedProblem = it }
-                    .toProblemStart(
+                    .toUiProblem(
                         containerWidthPx = containerWidth,
                         containerHeightPx = containerHeight
                     )

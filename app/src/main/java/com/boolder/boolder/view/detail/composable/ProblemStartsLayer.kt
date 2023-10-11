@@ -32,32 +32,35 @@ import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.utils.previewgenerator.dummyProblemStart
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.detail.uimodel.ProblemStart
+import com.boolder.boolder.view.detail.uimodel.UiProblem
 import kotlin.math.roundToInt
 
 @Composable
 internal fun ProblemStartsLayer(
-    problemStarts: List<ProblemStart>,
+    uiProblems: List<UiProblem>,
     selectedProblem: CompleteProblem?,
     onProblemStartClicked: (CompleteProblem) -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        problemStarts.forEach { problemStart ->
-            val shadowRadius = 2.dp
+        uiProblems.forEach { uiProblem ->
+            uiProblem.problemStart?.let { problemStart ->
+                val shadowRadius = 2.dp
 
-            MarkerShadow(
-                problemStart = problemStart,
-                shadowRadius = shadowRadius
-            )
-
-            if (problemStart.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id) {
-                ProblemStartMarker(
+                MarkerShadow(
                     problemStart = problemStart,
-                    modifier = Modifier.clickable {
-                        onProblemStartClicked(problemStart.completeProblem)
-                    }
+                    shadowRadius = shadowRadius
                 )
+
+                if (uiProblem.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id) {
+                    ProblemStartMarker(
+                        uiProblem = uiProblem,
+                        modifier = Modifier.clickable {
+                            onProblemStartClicked(uiProblem.completeProblem)
+                        }
+                    )
+                }
             }
         }
 
@@ -67,11 +70,11 @@ internal fun ProblemStartsLayer(
                 color = selectedProblem.problemWithLine.problem.circuitColorSafe.composeColor()
             )
 
-            problemStarts
+            uiProblems
                 .find { it.completeProblem.problemWithLine.problem.id == selectedProblem.problemWithLine.problem.id }
                 ?.let {
                     ProblemStartMarker(
-                        problemStart = it,
+                        uiProblem = it,
                         modifier = Modifier
                     )
                 }
@@ -87,9 +90,11 @@ internal fun ProblemStartsLayer(
 
 @Composable
 private fun ProblemStartMarker(
-    problemStart: ProblemStart,
+    uiProblem: UiProblem,
     modifier: Modifier
 ) {
+    val problemStart = uiProblem.problemStart ?: return
+
     val markerHalfSizePx = with(LocalDensity.current) {
         (problemStart.dpSize.dp / 2).toPx().roundToInt()
     }
@@ -112,7 +117,7 @@ private fun ProblemStartMarker(
     ) {
         Text(
             modifier = Modifier.align(Alignment.Center),
-            text = problemStart.completeProblem.problemWithLine.problem.circuitNumber.orEmpty(),
+            text = uiProblem.completeProblem.problemWithLine.problem.circuitNumber.orEmpty(),
             color = colorResource(id = problemStart.textColorRes),
             fontSize = 18.sp
         )
@@ -167,10 +172,13 @@ internal fun ProblemStartsLayerPreview() {
                     .fillMaxWidth()
                     .aspectRatio(4f / 3f)
                     .background(color = Color.White),
-                problemStarts = listOf(
-                    dummyProblemStart(
-                        x = (0.76 * constraints.maxWidth).roundToInt(),
-                        y = (0.7533 * constraints.maxHeight).roundToInt()
+                uiProblems = listOf(
+                    UiProblem(
+                        completeProblem,
+                        dummyProblemStart(
+                            x = (0.76 * constraints.maxWidth).roundToInt(),
+                            y = (0.7533 * constraints.maxHeight).roundToInt()
+                        )
                     )
                 ),
                 selectedProblem = completeProblem,
