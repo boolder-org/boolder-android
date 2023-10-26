@@ -98,9 +98,7 @@ class MapboxStyleFactory {
                     literal(false)
                 })
                 textAllowOverlap(true)
-                textField(
-                    get("circuitNumber")
-                )
+                textField(get("circuitNumber"))
                 textSize(interpolate {
                     linear()
                     zoom()
@@ -109,17 +107,62 @@ class MapboxStyleFactory {
                     literal(22)
                     literal(20)
                 })
-                textColor(switchCase {
-                    match {
-                        get("circuitColor")
-                        literal("white")
-                        literal(true)
-                        literal(false)
-                    }
-                    rgb(0.0, 0.0, 0.0)
-                    rgb(255.0, 255.0, 255.0)
+                textColor(problemTextColor())
+            }
 
+            +circleLayer(LAYER_CIRCUIT_PROBLEMS, "problems") {
+                sourceLayer(BoolderMapConfig.problemsSourceLayerId)
+                minZoom(15.0)
+                visibility(Visibility.NONE)
+
+                circleRadius(
+                    interpolate {
+                        linear()
+                        zoom()
+                        literal(15.0)
+                        literal(2.0)
+                        literal(18.0)
+                        literal(10.0)
+                        literal(22.0)
+                        literal(16.0)
+                    }
+                )
+
+                circleColor(colorFromProperty("circuitColor"))
+
+                circleStrokeWidth(
+                    Expression.switchCase {
+                        boolean {
+                            featureState { literal("selected") }
+                            literal(false)
+                        }
+                        literal(3.0)
+                        literal(0.0)
+                    }
+                )
+
+                circleStrokeColor(rgb(101.0, 196.0, 102.0))
+            }
+            +symbolLayer(LAYER_CIRCUIT_PROBLEMS_TEXT, "problems") {
+                sourceLayer(BoolderMapConfig.problemsSourceLayerId)
+                minZoom(16.0)
+                visibility(Visibility.NONE)
+
+                textAllowOverlap(true)
+                textField(get("circuitNumber"))
+                textSize(interpolate {
+                    linear()
+                    zoom()
+                    literal(16)
+                    literal(8)
+                    literal(17)
+                    literal(10)
+                    literal(19)
+                    literal(16)
+                    literal(22)
+                    literal(20)
                 })
+                textColor(problemTextColor())
             }
         }
     }
@@ -150,8 +193,23 @@ class MapboxStyleFactory {
             CircuitColor.OFF_CIRCUIT.rgb(this)
         }
 
+    private fun problemTextColor(): Expression =
+        switchCase {
+            match {
+                get("circuitColor")
+                literal("white")
+                literal(true)
+                literal(false)
+            }
+            rgb(0.0, 0.0, 0.0)
+            rgb(255.0, 255.0, 255.0)
+
+        }
+
     companion object {
         const val LAYER_CIRCUITS = "circuits"
+        const val LAYER_CIRCUIT_PROBLEMS = "circuit-problems"
+        const val LAYER_CIRCUIT_PROBLEMS_TEXT = "circuit-problems-text"
         const val LAYER_PROBLEMS = "problems"
         const val LAYER_PROBLEMS_TEXT = "problems-text"
     }

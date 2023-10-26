@@ -11,6 +11,8 @@ import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS_TEXT
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -259,9 +261,7 @@ class BoolderMap @JvmOverloads constructor(
             return
         }
 
-        val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
-
-        circuitsLayer.apply {
+        getLayerAs<LineLayer>(LAYER_CIRCUITS)?.apply {
             filter(
                 match {
                     get("id")
@@ -272,12 +272,40 @@ class BoolderMap @JvmOverloads constructor(
             )
             visibility(Visibility.VISIBLE)
         }
+
+        getLayerAs<CircleLayer>(LAYER_CIRCUIT_PROBLEMS)?.apply {
+            filter(
+                match {
+                    get("circuitId")
+                    literal(circuitId)
+                    literal(true)
+                    literal(false)
+                }
+            )
+            visibility(Visibility.VISIBLE)
+        }
+
+        getLayerAs<SymbolLayer>(LAYER_CIRCUIT_PROBLEMS_TEXT)?.apply {
+            filter(
+                match {
+                    get("circuitId")
+                    literal(circuitId)
+                    literal(true)
+                    literal(false)
+                }
+            )
+            visibility(Visibility.VISIBLE)
+        }
     }
 
     private fun hideCircuit() {
-        val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
+        val layersToHide = listOfNotNull(
+            getLayerAs<LineLayer>(LAYER_CIRCUITS),
+            getLayerAs<CircleLayer>(LAYER_CIRCUIT_PROBLEMS),
+            getLayerAs<SymbolLayer>(LAYER_CIRCUIT_PROBLEMS_TEXT)
+        )
 
-        circuitsLayer.visibility(Visibility.NONE)
+        layersToHide.forEach { it.visibility(Visibility.NONE) }
     }
 
     // 3A. Build bounds around coordinate
