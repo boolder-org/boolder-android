@@ -5,8 +5,8 @@ import androidx.annotation.StringRes
 import com.boolder.boolder.R
 
 enum class Steepness(
-    @StringRes val textRes: Int?,
-    @DrawableRes val iconRes: Int?
+    @StringRes val textRes: Int,
+    @DrawableRes val iconRes: Int
 ) {
     SLAB(
         textRes = R.string.stepness_slab,
@@ -27,20 +27,16 @@ enum class Steepness(
     TRAVERSE(
         textRes = R.string.stepness_traverse,
         iconRes = R.drawable.ic_steepness_traverse_left_right
-    ),
-    OTHER(
-        textRes = null,
-        iconRes = null
     );
 
     companion object {
-        fun fromTextValue(value: String): Steepness = when (value.lowercase()) {
+        fun fromTextValue(value: String): Steepness? = when (value.lowercase()) {
             "slab" -> SLAB
             "overhang" -> OVERHANG
             "roof" -> ROOF
             "wall" -> WALL
             "traverse" -> TRAVERSE
-            else -> OTHER
+            else -> null
         }
     }
 }
