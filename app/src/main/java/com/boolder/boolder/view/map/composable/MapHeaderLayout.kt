@@ -7,9 +7,14 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
@@ -24,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
+import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.MapViewModel
 
@@ -37,6 +43,7 @@ fun MapHeaderLayout(
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
+    onResetFiltersClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -59,7 +66,8 @@ fun MapHeaderLayout(
                 gradeState = gradeState,
                 showCircuitFilterChip = areaName != null,
                 onCircuitFilterChipClicked = onCircuitFilterChipClicked,
-                onGradeFilterChipClicked = onGradeFilterChipClicked
+                onGradeFilterChipClicked = onGradeFilterChipClicked,
+                onResetFiltersClicked = onResetFiltersClicked
             )
         }
     }
@@ -72,17 +80,32 @@ private fun FiltersRow(
     gradeState: MapViewModel.GradeState,
     showCircuitFilterChip: Boolean,
     onCircuitFilterChipClicked: () -> Unit,
-    onGradeFilterChipClicked: () -> Unit
+    onGradeFilterChipClicked: () -> Unit,
+    onResetFiltersClicked: () -> Unit
 ) {
+    val isCircuitFilterActive = circuitState != null
+    val isGradeFilterActive = gradeState.grades != ALL_GRADES
+
+    val showResetButton = isCircuitFilterActive || isGradeFilterActive
+
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = spacedBy(8.dp)
     ) {
+        if (showResetButton) {
+            item(key = "reset_button") {
+                MapFilterResetChip(
+                    modifier = Modifier.animateItemPlacement(),
+                    onClick = onResetFiltersClicked
+                )
+            }
+        }
+
         if (showCircuitFilterChip) {
             item(key = circuitState?.circuitId) {
                 MapFilterChip(
                     modifier = Modifier.animateItemPlacement(),
-                    selected = circuitState != null,
+                    selected = isCircuitFilterActive,
                     label = circuitState?.color?.localizedName()
                         ?: stringResource(id = R.string.circuits),
                     iconRes = R.drawable.ic_route,
@@ -94,13 +117,36 @@ private fun FiltersRow(
         item(key = gradeState.gradeRangeButtonTitle) {
             MapFilterChip(
                 modifier = Modifier.animateItemPlacement(),
-                selected = gradeState.grades != ALL_GRADES,
+                selected = isGradeFilterActive,
                 label = gradeState.gradeRangeButtonTitle,
                 iconRes = R.drawable.ic_signal_cellular_alt,
                 onClick = onGradeFilterChipClicked
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MapFilterResetChip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ElevatedButton(
+        modifier = modifier
+            .padding(vertical = 8.dp)
+            .size(FilterChipDefaults.Height),
+        shape = CircleShape,
+        contentPadding = PaddingValues(),
+        colors = ButtonDefaults.elevatedButtonColors(contentColor = Color.Black),
+        onClick = onClick,
+        content = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_settings_backup_restore),
+                contentDescription = null
+            )
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,7 +183,10 @@ private fun MapHeaderLayoutPreview() {
     BoolderTheme {
         MapHeaderLayout(
             areaName = "Apremont",
-            circuitState = null,
+            circuitState = MapViewModel.CircuitState(
+                circuitId = 42,
+                color = CircuitColor.BLUE
+            ),
             gradeState = MapViewModel.GradeState(
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),
                 grades = ALL_GRADES
@@ -146,7 +195,8 @@ private fun MapHeaderLayoutPreview() {
             onHideAreaName = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},
-            onGradeFilterChipClicked = {}
+            onGradeFilterChipClicked = {},
+            onResetFiltersClicked = {}
         )
     }
 }

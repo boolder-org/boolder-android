@@ -37,6 +37,7 @@ fun MapControlsOverlay(
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
     onCircuitStartClicked: () -> Unit,
+    onResetFiltersClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -52,7 +53,8 @@ fun MapControlsOverlay(
             onHideAreaName = onHideAreaName,
             onSearchBarClicked = onSearchBarClicked,
             onCircuitFilterChipClicked = onCircuitFilterChipClicked,
-            onGradeFilterChipClicked = onGradeFilterChipClicked
+            onGradeFilterChipClicked = onGradeFilterChipClicked,
+            onResetFiltersClicked = onResetFiltersClicked
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -102,7 +104,8 @@ private fun MapControlsOverlayPreview() {
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},
             onGradeFilterChipClicked = {},
-            onCircuitStartClicked = {}
+            onCircuitStartClicked = {},
+            onResetFiltersClicked = {}
         )
     }
 }

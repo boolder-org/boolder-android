@@ -206,6 +206,18 @@ class MapViewModel(
         _screenStateFlow.update { it.copy(shouldShowFiltersBar = shouldShowFiltersBar) }
     }
 
+    fun onResetFiltersButtonClicked() {
+        _screenStateFlow.update {
+            it.copy(
+                circuitState = null,
+                gradeState = GradeState(
+                    gradeRangeButtonTitle = resources.getString(R.string.grades),
+                    grades = ALL_GRADES
+                )
+            )
+        }
+    }
+
     fun onCircuitFilterChipClicked() {
         viewModelScope.launch {
             val areaState = _screenStateFlow.value.areaState ?: return@launch

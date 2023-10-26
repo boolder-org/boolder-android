@@ -151,7 +151,8 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
                         onSearchBarClicked = ::navigateToSearchScreen,
                         onCircuitFilterChipClicked = mapViewModel::onCircuitFilterChipClicked,
                         onGradeFilterChipClicked = mapViewModel::onGradeFilterChipClicked,
-                        onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked
+                        onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked,
+                        onResetFiltersClicked = mapViewModel::onResetFiltersButtonClicked
                     )
                 }
             }
