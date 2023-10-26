@@ -3,9 +3,6 @@
     <dimen name="margin_search_component">16dp</dimen>
     <dimen name="margin_map_controls">20dp</dimen>
 
-    <dimen name="margin_compass_top">80dp</dimen>
-    <dimen name="margin_compass_end">16dp</dimen>
-
     <dimen name="margin_problem_start">4dp</dimen>
     <dimen name="radius_problem_line">2dp</dimen>
 

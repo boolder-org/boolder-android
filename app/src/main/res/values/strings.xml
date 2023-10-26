@@ -56,6 +56,7 @@
     <string name="circuit">Circuit %s</string>
     <string name="circuits">Circuits</string>
     <string name="circuit_start">Circuit start</string>
+    <string name="no_circuit_available">No circuit available for this area</string>
 
     <string name="grade">Grade</string>
     <string name="grades">Grades</string>

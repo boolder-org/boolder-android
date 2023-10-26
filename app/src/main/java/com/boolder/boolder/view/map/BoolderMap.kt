@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
 import androidx.core.graphics.Insets
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
@@ -86,9 +87,12 @@ class BoolderMap @JvmOverloads constructor(
 
         gestures.pitchEnabled = false
         scalebar.enabled = false
-        compass.visibility = true
-        compass.marginTop = resources.getDimension(R.dimen.margin_compass_top)
-        compass.marginRight = resources.getDimension(R.dimen.margin_compass_end)
+        compass.updateSettings {
+            visibility = true
+            position = Gravity.BOTTOM or Gravity.START
+            marginLeft = resources.getDimension(R.dimen.margin_map_controls)
+            marginRight = resources.getDimension(R.dimen.margin_map_controls)
+        }
         addClickEvent()
 
         getMapboxMap().addOnCameraChangeListener { onCameraChanged() }
@@ -414,7 +418,7 @@ class BoolderMap @JvmOverloads constructor(
     fun applyInsets(insets: Insets) {
         this.insets = insets
 
-        compass.marginTop = resources.getDimension(R.dimen.margin_compass_top) + insets.top
+        compass.marginBottom = resources.getDimension(R.dimen.margin_map_controls) + insets.bottom
     }
 
     fun onCircuitSelected(circuit: Circuit) {

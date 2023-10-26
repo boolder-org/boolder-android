@@ -28,12 +28,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.utils.extension.composeColor
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.mapbox.geojson.Point
 import com.mapbox.maps.CoordinateBounds
 
 @Composable
@@ -60,6 +63,46 @@ fun CircuitFilterLayout(
             textAlign = TextAlign.Center
         )
 
+        if (availableCircuits.isEmpty()) {
+            CircuitsEmptyContent()
+        } else {
+            CircuitsContent(
+                availableCircuits = availableCircuits,
+                onCircuitSelected = onCircuitSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun CircuitsEmptyContent() {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = spacedBy(8.dp)
+    ) {
+        Icon(
+            modifier = Modifier.size(32.dp),
+            painter = painterResource(id = R.drawable.ic_outline_wrong_location),
+            contentDescription = null,
+            tint = Color(red = 1f, .5f, 0f)
+        )
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.no_circuit_available),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun CircuitsContent(
+    availableCircuits: List<Circuit>,
+    onCircuitSelected: (Circuit?) -> Unit
+) {
+    Column {
         CircuitsList(
             availableCircuits = availableCircuits,
             onCircuitSelected = onCircuitSelected
@@ -177,8 +220,20 @@ private fun BottomButtons(
 
 @Preview
 @Composable
-private fun CircuitFilterLayoutPreview() {
-    val availableCircuits = CircuitColor.entries
+private fun CircuitFilterLayoutPreview(
+    @PreviewParameter(CircuitFilterLayoutPreviewParameterProvider::class)
+    circuits: List<Circuit>
+) {
+    BoolderTheme {
+        CircuitFilterLayout(
+            availableCircuits = circuits,
+            onCircuitSelected = {}
+        )
+    }
+}
+
+private class CircuitFilterLayoutPreviewParameterProvider : PreviewParameterProvider<List<Circuit>> {
+    val circuits = CircuitColor.entries
         .take(9)
         .mapIndexed { index, circuitColor ->
             Circuit(
@@ -187,14 +242,12 @@ private fun CircuitFilterLayoutPreview() {
                 averageGrade = "${index + 1}a",
                 isBeginnerFriendly = index == 0,
                 isDangerous = index == 8,
-                coordinateBounds = CoordinateBounds.world()
+                coordinateBounds = CoordinateBounds(
+                    Point.fromLngLat(0.0, 0.0),
+                    Point.fromLngLat(0.0, 0.0)
+                )
             )
         }
 
-    BoolderTheme {
-        CircuitFilterLayout(
-            availableCircuits = availableCircuits,
-            onCircuitSelected = {}
-        )
-    }
+    override val values = sequenceOf(emptyList(), circuits)
 }
