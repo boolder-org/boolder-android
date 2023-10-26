@@ -54,6 +54,9 @@ class MapViewModel(
         isCustom = false
     )
 
+    private var lastZoomValue = 0.0
+    private var isProblemTopoShown = false
+
     fun fetchTopo(problemId: Int, origin: TopoOrigin) {
         viewModelScope.launch {
             _topoStateFlow.value = topoDataAggregator.aggregate(
@@ -186,7 +189,21 @@ class MapViewModel(
     }
 
     fun onZoomLevelChanged(zoomLevel: Double) {
-        _screenStateFlow.update { it.copy(shouldShowFiltersBar = zoomLevel >= 15.0) }
+        lastZoomValue = zoomLevel
+        updateFilterBarVisibility()
+    }
+
+    fun onProblemTopoVisibilityChanged(isVisible: Boolean) {
+        isProblemTopoShown = isVisible
+        updateFilterBarVisibility()
+    }
+
+    private fun updateFilterBarVisibility() {
+        val shouldShowFiltersBar = lastZoomValue >= 15.0 && !isProblemTopoShown
+
+        if (_screenStateFlow.value.shouldShowFiltersBar == shouldShowFiltersBar) return
+
+        _screenStateFlow.update { it.copy(shouldShowFiltersBar = shouldShowFiltersBar) }
     }
 
     fun onCircuitFilterChipClicked() {

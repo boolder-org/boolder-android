@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
@@ -41,6 +42,7 @@ import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFr
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -104,8 +106,20 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
 
         locationProvider = LocationProvider(this, this)
 
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet)
-            .also { it.state = STATE_HIDDEN }
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet).also {
+            it.state = STATE_HIDDEN
+            it.addBottomSheetCallback(object : BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        STATE_EXPANDED -> mapViewModel.onProblemTopoVisibilityChanged(isVisible = true)
+                        STATE_HIDDEN -> mapViewModel.onProblemTopoVisibilityChanged(isVisible = false)
+                        else -> Unit
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            })
+        }
 
         setupMap()
 
