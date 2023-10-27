@@ -64,7 +64,15 @@ class MapViewModel(
                 origin = origin
             )
 
-            if (origin != TopoOrigin.CIRCUIT) return@launch
+            if (origin != TopoOrigin.CIRCUIT) {
+                _screenStateFlow.update {
+                    it.copy(
+                        circuitState = it.circuitState?.copy(showCircuitStartButton = false)
+                    )
+                }
+
+                return@launch
+            }
 
             val circuit = circuitRepository.getCircuitFromProblemId(problemId) ?: return@launch
 
@@ -72,7 +80,8 @@ class MapViewModel(
                 it.copy(
                     circuitState = CircuitState(
                         circuitId = circuit.id,
-                        color = circuit.color
+                        color = circuit.color,
+                        showCircuitStartButton = false
                     )
                 )
             }
@@ -118,7 +127,8 @@ class MapViewModel(
         val newCircuitState = circuit?.let {
             CircuitState(
                 circuitId = it.id,
-                color = it.color
+                color = it.color,
+                showCircuitStartButton = true
             )
         }
 
@@ -261,7 +271,8 @@ class MapViewModel(
 
     data class CircuitState(
         val circuitId: Int,
-        val color: CircuitColor
+        val color: CircuitColor,
+        val showCircuitStartButton: Boolean
     )
 
     data class GradeState(

@@ -9,10 +9,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,18 +55,11 @@ fun MapControlsOverlay(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        circuitState?.let {
-            var showButton by remember(circuitState) { mutableStateOf(true) }
-
-            if (!showButton) return@let
-
+        if (circuitState?.showCircuitStartButton == true) {
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 colors = ButtonDefaults.elevatedButtonColors(),
-                onClick = {
-                    onCircuitStartClicked()
-                    showButton = false
-                }
+                onClick = onCircuitStartClicked
             ) {
                 Text(
                     text = stringResource(id = R.string.circuit_start),
@@ -93,7 +82,8 @@ private fun MapControlsOverlayPreview() {
             areaName = "Apremont",
             circuitState = MapViewModel.CircuitState(
                 circuitId = 0,
-                color = CircuitColor.ORANGE
+                color = CircuitColor.ORANGE,
+                showCircuitStartButton = true
             ),
             gradeState = MapViewModel.GradeState(
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),

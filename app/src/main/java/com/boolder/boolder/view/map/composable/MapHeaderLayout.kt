@@ -142,7 +142,7 @@ private fun MapFilterResetChip(
         onClick = onClick,
         content = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_settings_backup_restore),
+                painter = painterResource(id = R.drawable.ic_cancel),
                 contentDescription = null
             )
         }
@@ -185,7 +185,8 @@ private fun MapHeaderLayoutPreview() {
             areaName = "Apremont",
             circuitState = MapViewModel.CircuitState(
                 circuitId = 42,
-                color = CircuitColor.BLUE
+                color = CircuitColor.BLUE,
+                showCircuitStartButton = true
             ),
             gradeState = MapViewModel.GradeState(
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),

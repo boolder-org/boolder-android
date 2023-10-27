@@ -14,6 +14,7 @@ import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS_TEXT
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -168,7 +169,10 @@ class BoolderMap @JvmOverloads constructor(
             )
         )
 
-        val problemsOption = RenderedQueryOptions(listOf("problems"), null)
+        val problemsOption = RenderedQueryOptions(
+            listOf(LAYER_PROBLEMS, LAYER_CIRCUIT_PROBLEMS),
+            null
+        )
 
         getMapboxMap().queryRenderedFeatures(
             problemGeometry,
