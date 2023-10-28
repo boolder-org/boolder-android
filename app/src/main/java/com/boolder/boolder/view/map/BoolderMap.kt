@@ -4,11 +4,17 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
+import androidx.core.graphics.Insets
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
+import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS_TEXT
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -34,6 +40,7 @@ import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.getLayerAs
 import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.compass.compass
@@ -60,6 +67,7 @@ class BoolderMap @JvmOverloads constructor(
 
         fun onAreaVisited(areaId: Int)
         fun onAreaLeft()
+        fun onZoomLevelChanged(zoomLevel: Double)
     }
 
     private var listener: BoolderMapListener? = null
@@ -67,6 +75,8 @@ class BoolderMap @JvmOverloads constructor(
     private var previousSelectedFeatureId: String? = null
 
     private var lastCameraCheckTimestamp = 0L
+
+    private var insets = Insets.NONE
 
     init {
         val cameraOptions = CameraOptions.Builder()
@@ -78,12 +88,16 @@ class BoolderMap @JvmOverloads constructor(
 
         gestures.pitchEnabled = false
         scalebar.enabled = false
-        compass.visibility = true
-        compass.marginTop = resources.getDimension(R.dimen.margin_compass_top)
-        compass.marginRight = resources.getDimension(R.dimen.margin_compass_end)
+        compass.updateSettings {
+            visibility = true
+            position = Gravity.BOTTOM or Gravity.START
+            marginLeft = resources.getDimension(R.dimen.margin_map_controls)
+            marginRight = resources.getDimension(R.dimen.margin_map_controls)
+        }
         addClickEvent()
 
         getMapboxMap().addOnCameraChangeListener { onCameraChanged() }
+        camera.addCameraZoomChangeListener { listener?.onZoomLevelChanged(it) }
     }
 
     fun setup(listener: BoolderMapListener, buildStyle: StyleExtension) {
@@ -155,7 +169,10 @@ class BoolderMap @JvmOverloads constructor(
             )
         )
 
-        val problemsOption = RenderedQueryOptions(listOf("problems"), null)
+        val problemsOption = RenderedQueryOptions(
+            listOf(LAYER_PROBLEMS, LAYER_CIRCUIT_PROBLEMS),
+            null
+        )
 
         getMapboxMap().queryRenderedFeatures(
             problemGeometry,
@@ -164,7 +181,6 @@ class BoolderMap @JvmOverloads constructor(
             if (features.isValue) {
                 val feature = features.value?.firstOrNull()?.feature
                     ?: run {
-                        hideCircuit()
                         unselectProblem()
                         listener?.onProblemUnselected()
                         return@queryRenderedFeatures
@@ -253,9 +269,7 @@ class BoolderMap @JvmOverloads constructor(
             return
         }
 
-        val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
-
-        circuitsLayer.apply {
+        getLayerAs<LineLayer>(LAYER_CIRCUITS)?.apply {
             filter(
                 match {
                     get("id")
@@ -266,12 +280,40 @@ class BoolderMap @JvmOverloads constructor(
             )
             visibility(Visibility.VISIBLE)
         }
+
+        getLayerAs<CircleLayer>(LAYER_CIRCUIT_PROBLEMS)?.apply {
+            filter(
+                match {
+                    get("circuitId")
+                    literal(circuitId)
+                    literal(true)
+                    literal(false)
+                }
+            )
+            visibility(Visibility.VISIBLE)
+        }
+
+        getLayerAs<SymbolLayer>(LAYER_CIRCUIT_PROBLEMS_TEXT)?.apply {
+            filter(
+                match {
+                    get("circuitId")
+                    literal(circuitId)
+                    literal(true)
+                    literal(false)
+                }
+            )
+            visibility(Visibility.VISIBLE)
+        }
     }
 
     private fun hideCircuit() {
-        val circuitsLayer = getLayerAs<LineLayer>(LAYER_CIRCUITS) ?: return
+        val layersToHide = listOfNotNull(
+            getLayerAs<LineLayer>(LAYER_CIRCUITS),
+            getLayerAs<CircleLayer>(LAYER_CIRCUIT_PROBLEMS),
+            getLayerAs<SymbolLayer>(LAYER_CIRCUIT_PROBLEMS_TEXT)
+        )
 
-        circuitsLayer.visibility(Visibility.NONE)
+        layersToHide.forEach { it.visibility(Visibility.NONE) }
     }
 
     // 3A. Build bounds around coordinate
@@ -301,7 +343,7 @@ class BoolderMap @JvmOverloads constructor(
                         null
                     }
 
-                    zoomToCoordinateBounds(coordinates = coordinateBound, areaId = areaId)
+                    zoomToAreaBounds(coordinates = coordinateBound, areaId = areaId)
                 }
             } ?: unselectProblem()
         } else {
@@ -310,7 +352,10 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     // Triggered when user click on a Area or Cluster on Map
-    private fun zoomToCoordinateBounds(coordinates: CoordinateBounds, areaId: Int?) {
+    private fun zoomToAreaBounds(
+        coordinates: CoordinateBounds,
+        areaId: Int?
+    ) {
         val cameraOption = getMapboxMap().cameraForCoordinateBounds(
             coordinates,
             EdgeInsets(60.0, 8.0, 8.0, 8.0),
@@ -328,6 +373,28 @@ class BoolderMap @JvmOverloads constructor(
 
         getMapboxMap().flyTo(cameraOption, mapAnimationOption)
     }
+
+    private fun zoomToCircuitBounds(circuitCoordinates: CoordinateBounds) {
+        val defaultMarginPixels = 24.0 * resources.displayMetrics.density
+        val cameraOption = getMapboxMap().cameraForCoordinateBounds(
+            circuitCoordinates,
+            EdgeInsets(
+                140.0 * resources.displayMetrics.density + insets.top,
+                defaultMarginPixels,
+                88.0 * resources.displayMetrics.density + insets.bottom,
+                defaultMarginPixels
+            ),
+            0.0,
+            0.0
+        )
+
+        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions {
+            duration(500L)
+        }
+
+        getMapboxMap().flyTo(cameraOption, mapAnimationOption)
+    }
+
 
     private fun zoomToBoulderProblemLevel(feature: Feature) {
         val cameraOption = CameraOptions.Builder()
@@ -352,8 +419,14 @@ class BoolderMap @JvmOverloads constructor(
         getMapboxMap().easeTo(cameraOption, mapAnimationOption)
     }
 
-    fun applyCompassTopInset(topInset: Float) {
-        compass.marginTop = resources.getDimension(R.dimen.margin_compass_top) + topInset
+    fun applyInsets(insets: Insets) {
+        this.insets = insets
+
+        compass.marginBottom = resources.getDimension(R.dimen.margin_map_controls) + insets.bottom
+    }
+
+    fun onCircuitSelected(circuit: Circuit) {
+        zoomToCircuitBounds(circuitCoordinates = circuit.coordinateBounds)
     }
 
     private inline fun <reified T : Layer> getLayerAs(layerId: String): T? =

@@ -3,6 +3,8 @@ package com.boolder.boolder.domain.model
 import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.boolder.boolder.R
 import com.mapbox.maps.extension.style.expressions.generated.Expression.ExpressionBuilder
@@ -36,8 +38,9 @@ enum class CircuitColor(@ColorRes val colorRes: Int) {
         OFF_CIRCUIT -> expressionBuilder.rgb(135.0, 138.0, 141.0)
     }
 
-    fun localize(context: Context): String {
-        val id = when (this) {
+    @Composable
+    fun localizedName(): String {
+        val stringId = when (this) {
             YELLOW -> R.string.circuit_short_name_yellow
             PURPLE -> R.string.circuit_short_name_purple
             ORANGE -> R.string.circuit_short_name_orange
@@ -51,7 +54,7 @@ enum class CircuitColor(@ColorRes val colorRes: Int) {
             BLACK -> R.string.circuit_short_name_black
             OFF_CIRCUIT -> R.string.circuit_short_name_off_circuit
         }
-        return context.getString(id)
+        return stringResource(stringId)
     }
 
     @ColorInt

@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.map.filter
+package com.boolder.boolder.view.map.filter.grade
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,6 @@ import androidx.fragment.app.setFragmentResult
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.map.filter.composable.GradesFilterLayout
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

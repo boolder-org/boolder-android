@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.map.filter.composable
+package com.boolder.boolder.view.map.filter.grade
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -42,7 +42,7 @@ import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.map.filter.GradesFilterViewModel.Companion.QUICK_GRADE_RANGES
+import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel.Companion.QUICK_GRADE_RANGES
 
 @Composable
 internal fun GradesFilterLayout(
@@ -243,8 +243,8 @@ private fun CustomRangeSelectorItem(
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .1f)
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .1f)
                 )
             )
 

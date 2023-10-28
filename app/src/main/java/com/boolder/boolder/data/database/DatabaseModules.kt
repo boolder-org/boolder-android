@@ -1,9 +1,8 @@
 package com.boolder.boolder.data.database
 
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.boolder.boolder.data.database.repository.AreaRepository
+import com.boolder.boolder.data.database.repository.CircuitRepository
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import org.koin.android.ext.koin.androidContext
@@ -18,6 +17,7 @@ val databaseModule = module {
     }
 
     single { AreaRepository(get<BoolderAppDatabase>().areaDao()) }
+    single { CircuitRepository(get<BoolderAppDatabase>().circuitDao()) }
     single { LineRepository(get<BoolderAppDatabase>().lineDao()) }
     single { ProblemRepository(get<BoolderAppDatabase>().problemDao()) }
 

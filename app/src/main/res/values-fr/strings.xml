@@ -19,7 +19,7 @@
     <string name="circuit_short_name_purple">Violet</string>
     <string name="circuit_short_name_orange">Orange</string>
     <string name="circuit_short_name_green">Vert</string>
-    <string name="circuit_short_name_blue">Blue</string>
+    <string name="circuit_short_name_blue">Bleu</string>
     <string name="circuit_short_name_skyblue">Bleu ciel</string>
     <string name="circuit_short_name_salmon">Saumon</string>
     <string name="circuit_short_name_red">Rouge</string>
@@ -48,6 +48,11 @@
     <string name="stepness_traverse">Traversée</string>
 
     <string name="no_name">Sans nom</string>
+
+    <string name="circuit">Circuit %s</string>
+    <string name="circuits">Circuits</string>
+    <string name="circuit_start">Départ circuit</string>
+    <string name="no_circuit_available">Auncun circuit disponible pour ce secteur</string>
 
     <string name="grade">Niveau</string>
     <string name="grades">Niveaux</string>

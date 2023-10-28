@@ -5,7 +5,7 @@ import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.TopoDataAggregator
-import com.boolder.boolder.view.map.filter.GradesFilterViewModel
+import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
 import com.boolder.boolder.view.search.SearchViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
