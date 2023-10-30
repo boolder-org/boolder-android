@@ -20,12 +20,12 @@ import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.ProblemWithLine
-import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.toUiProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.detail.composable.CircuitControls
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
+import com.boolder.boolder.view.detail.composable.TopoFooter
 import com.boolder.boolder.view.detail.uimodel.UiProblem
 import java.util.Locale
 
@@ -51,10 +51,7 @@ class TopoView(
 
         updateCircuitControls(circuitInfo = topo.circuitInfo)
 
-        topo.selectedCompleteProblem?.let {
-            updateLabels(it.problemWithLine.problem)
-            setupChipClick(it.problemWithLine.problem)
-        }
+        topo.selectedCompleteProblem?.let { updateFooter(it.problemWithLine.problem) }
     }
 
     private fun onProblemPictureLoaded(topo: Topo) {
@@ -86,8 +83,7 @@ class TopoView(
     private fun onProblemStartClicked(completeProblem: CompleteProblem) {
         val problem = completeProblem.problemWithLine.problem
 
-        updateLabels(problem)
-        setupChipClick(problem)
+        updateFooter(problem)
         setUiProblems(
             uiProblems = uiProblems,
             selectedProblem = completeProblem
@@ -105,10 +101,7 @@ class TopoView(
 
         uiProblems = newUiProblems
 
-        selectedProblem?.let {
-            updateLabels(it.problemWithLine.problem)
-            setupChipClick(it.problemWithLine.problem)
-        }
+        selectedProblem?.let { updateFooter(it.problemWithLine.problem) }
 
         setUiProblems(
             uiProblems = uiProblems,
@@ -138,59 +131,14 @@ class TopoView(
         }
     }
 
-    private fun updateLabels(problem: Problem) {
-        binding.title.text = problem.nameSafe()
-        binding.grade.text = problem.grade
-
-        val steepness = Steepness.fromTextValue(problem.steepness)
-
-        binding.typeIcon.apply {
-            val steepnessDrawable = steepness.iconRes
-                ?.let { ContextCompat.getDrawable(context, it) }
-
-            setImageDrawable(steepnessDrawable)
-            isVisible = steepnessDrawable != null
-        }
-
-        binding.typeText.apply {
-            val steepnessText = steepness.textRes?.let(context::getString)
-
-            val sitStartText = if (problem.sitStart) {
-                resources.getString(R.string.sit_start)
-            } else null
-
-            text = listOfNotNull(steepnessText, sitStartText).joinToString(separator = " • ")
-            isVisible = !text.isNullOrEmpty()
-        }
-    }
-
-    private fun setupChipClick(problem: Problem) {
-        binding.bleauInfo.isVisible = !problem.bleauInfoId.isNullOrEmpty()
-        binding.bleauInfo.setOnClickListener {
-            try {
-                val bleauUrl = "https://bleau.info/a/${problem.bleauInfoId}.html"
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bleauUrl))
-                context.startActivity(browserIntent)
-            } catch (e: Exception) {
-                Log.i("Bottom Sheet", "No apps can handle this kind of intent")
-            }
-        }
-
-        binding.share.setOnClickListener {
-            val sendIntent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(
-                    Intent.EXTRA_TEXT,
-                    "https://www.boolder.com/${Locale.getDefault().language}/p/${problem.id}"
+    private fun updateFooter(problem: Problem) {
+        binding.footerLayout.setContent {
+            BoolderTheme {
+                TopoFooter(
+                    problem = problem,
+                    onBleauInfoClicked = ::onBleauInfoClicked,
+                    onShareClicked = ::onShareClicked
                 )
-                type = "text/plain"
-            }
-
-            try {
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
-            } catch (e: Exception) {
-                Log.i("Bottom Sheet", "No apps can handle this kind of intent")
             }
         }
     }
@@ -247,10 +195,31 @@ class TopoView(
         }
     }
 
-    private fun Problem.nameSafe(): String =
-        if (Locale.getDefault().language == "fr") {
-            name.orEmpty()
-        } else {
-            nameEn.orEmpty()
+    private fun onBleauInfoClicked(bleauInfoId: String?) {
+        try {
+            val bleauUrl = "https://bleau.info/a/$bleauInfoId.html"
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bleauUrl))
+            context.startActivity(browserIntent)
+        } catch (e: Exception) {
+            Log.i("Bottom Sheet", "No apps can handle this kind of intent")
         }
+    }
+
+    private fun onShareClicked(problemId: Int) {
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "https://www.boolder.com/${Locale.getDefault().language}/p/$problemId"
+            )
+            type = "text/plain"
+        }
+
+        try {
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            context.startActivity(shareIntent)
+        } catch (e: Exception) {
+            Log.i("Bottom Sheet", "No apps can handle this kind of intent")
+        }
+    }
 }
