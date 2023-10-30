@@ -10,11 +10,12 @@ import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.TopoOrigin
-import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS_TEXT
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS_TEXT
+import com.boolder.boolder.utils.extension.coerceZoomAtLeast
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
@@ -356,7 +357,7 @@ class BoolderMap @JvmOverloads constructor(
         coordinates: CoordinateBounds,
         areaId: Int?
     ) {
-        val cameraOption = getMapboxMap().cameraForCoordinateBounds(
+        val cameraOptions = getMapboxMap().cameraForCoordinateBounds(
             coordinates,
             EdgeInsets(60.0, 8.0, 8.0, 8.0),
             0.0,
@@ -371,12 +372,12 @@ class BoolderMap @JvmOverloads constructor(
             animatorListener(animationEndListener { listener?.onAreaVisited(areaId) })
         }
 
-        getMapboxMap().flyTo(cameraOption, mapAnimationOption)
+        getMapboxMap().flyTo(cameraOptions, mapAnimationOption)
     }
 
     private fun zoomToCircuitBounds(circuitCoordinates: CoordinateBounds) {
         val defaultMarginPixels = 24.0 * resources.displayMetrics.density
-        val cameraOption = getMapboxMap().cameraForCoordinateBounds(
+        val cameraOptions = getMapboxMap().cameraForCoordinateBounds(
             circuitCoordinates,
             EdgeInsets(
                 140.0 * resources.displayMetrics.density + insets.top,
@@ -386,18 +387,18 @@ class BoolderMap @JvmOverloads constructor(
             ),
             0.0,
             0.0
-        )
+        ).coerceZoomAtLeast(15.0)
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions {
             duration(500L)
         }
 
-        getMapboxMap().flyTo(cameraOption, mapAnimationOption)
+        getMapboxMap().flyTo(cameraOptions, mapAnimationOption)
     }
 
 
     private fun zoomToBoulderProblemLevel(feature: Feature) {
-        val cameraOption = CameraOptions.Builder()
+        val cameraOptions = CameraOptions.Builder()
             .center(feature.geometry() as Point)
             .padding(EdgeInsets(0.0, 0.0,0.0, 0.0))
             .zoom(19.0)
@@ -405,18 +406,18 @@ class BoolderMap @JvmOverloads constructor(
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        getMapboxMap().easeTo(cameraOption, mapAnimationOption)
+        getMapboxMap().easeTo(cameraOptions, mapAnimationOption)
     }
 
     private fun focusOnBoulderProblem(feature: Feature) {
-        val cameraOption = CameraOptions.Builder()
+        val cameraOptions = CameraOptions.Builder()
             .center(feature.geometry() as Point)
             .padding(EdgeInsets(40.0, 8.8, (height / 2).toDouble(), 8.8))
             .build()
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        getMapboxMap().easeTo(cameraOption, mapAnimationOption)
+        getMapboxMap().easeTo(cameraOptions, mapAnimationOption)
     }
 
     fun applyInsets(insets: Insets) {
@@ -433,8 +434,8 @@ class BoolderMap @JvmOverloads constructor(
         getMapboxMap().getStyle()?.getLayerAs(layerId)
 
     fun filterGrades(grades: List<String>) {
-        val problemsLayer = getLayerAs<CircleLayer>(MapboxStyleFactory.LAYER_PROBLEMS)
-        val problemsTextLayer = getLayerAs<SymbolLayer>(MapboxStyleFactory.LAYER_PROBLEMS_TEXT)
+        val problemsLayer = getLayerAs<CircleLayer>(LAYER_PROBLEMS)
+        val problemsTextLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_TEXT)
 
         val query = match {
             get("grade")
