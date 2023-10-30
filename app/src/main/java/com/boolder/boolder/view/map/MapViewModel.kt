@@ -37,6 +37,7 @@ class MapViewModel(
                 gradeRangeButtonTitle = resources.getString(R.string.grades),
                 grades = ALL_GRADES
             ),
+            popularFilterState = PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = false
         )
     )
@@ -223,7 +224,8 @@ class MapViewModel(
                 gradeState = GradeState(
                     gradeRangeButtonTitle = resources.getString(R.string.grades),
                     grades = ALL_GRADES
-                )
+                ),
+                popularFilterState = PopularFilterState(isEnabled = false)
             )
         }
     }
@@ -249,6 +251,16 @@ class MapViewModel(
         }
     }
 
+    fun onPopularFilterChipClicked() {
+        val popularFilterValue = _screenStateFlow.value.popularFilterState.isEnabled
+
+        _screenStateFlow.update {
+            it.copy(
+                popularFilterState = it.popularFilterState.copy(isEnabled = !popularFilterValue)
+            )
+        }
+    }
+
     fun onCircuitDepartureButtonClicked() {
         viewModelScope.launch {
             val circuitId = _screenStateFlow.value.circuitState?.circuitId ?: return@launch
@@ -266,6 +278,7 @@ class MapViewModel(
         val areaState: AreaState?,
         val circuitState: CircuitState?,
         val gradeState: GradeState,
+        val popularFilterState: PopularFilterState,
         val shouldShowFiltersBar: Boolean
     )
 
@@ -279,6 +292,8 @@ class MapViewModel(
         val gradeRangeButtonTitle: String,
         val grades: List<String>
     )
+
+    data class PopularFilterState(val isEnabled: Boolean)
 
     data class AreaState(
         val id: Int,

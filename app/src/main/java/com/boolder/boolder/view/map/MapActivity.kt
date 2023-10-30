@@ -146,20 +146,25 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
                         areaName = screenState.areaState?.name,
                         circuitState = screenState.circuitState,
                         gradeState = screenState.gradeState,
+                        popularState = screenState.popularFilterState,
                         shouldShowFiltersBar = screenState.shouldShowFiltersBar,
                         onHideAreaName = ::onAreaLeft,
                         onSearchBarClicked = ::navigateToSearchScreen,
                         onCircuitFilterChipClicked = mapViewModel::onCircuitFilterChipClicked,
                         onGradeFilterChipClicked = mapViewModel::onGradeFilterChipClicked,
-                        onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked,
-                        onResetFiltersClicked = mapViewModel::onResetFiltersButtonClicked
+                        onPopularFilterChipClicked = mapViewModel::onPopularFilterChipClicked,
+                        onResetFiltersClicked = mapViewModel::onResetFiltersButtonClicked,
+                        onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked
                     )
                 }
             }
 
             binding.mapView.apply {
                 updateCircuit(screenState.circuitState?.circuitId?.toLong())
-                filterGrades(screenState.gradeState.grades)
+                applyFilters(
+                    grades = screenState.gradeState.grades,
+                    showPopular = screenState.popularFilterState.isEnabled
+                )
             }
         }
 

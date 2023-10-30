@@ -38,11 +38,13 @@ fun MapHeaderLayout(
     areaName: String?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
+    popularState: MapViewModel.PopularFilterState,
     shouldShowFiltersBar: Boolean,
     onHideAreaName: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
+    onPopularFilterChipClicked: () -> Unit,
     onResetFiltersClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -51,6 +53,9 @@ fun MapHeaderLayout(
         verticalArrangement = spacedBy(8.dp)
     ) {
         MapTopBar(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp),
             areaName = areaName,
             onHideAreaName = onHideAreaName,
             onSearchBarClicked = onSearchBarClicked
@@ -64,9 +69,11 @@ fun MapHeaderLayout(
             FiltersRow(
                 circuitState = circuitState,
                 gradeState = gradeState,
+                popularState = popularState,
                 showCircuitFilterChip = areaName != null,
                 onCircuitFilterChipClicked = onCircuitFilterChipClicked,
                 onGradeFilterChipClicked = onGradeFilterChipClicked,
+                onPopularFilterChipClicked = onPopularFilterChipClicked,
                 onResetFiltersClicked = onResetFiltersClicked
             )
         }
@@ -78,19 +85,23 @@ fun MapHeaderLayout(
 private fun FiltersRow(
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
+    popularState: MapViewModel.PopularFilterState,
     showCircuitFilterChip: Boolean,
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
+    onPopularFilterChipClicked: () -> Unit,
     onResetFiltersClicked: () -> Unit
 ) {
     val isCircuitFilterActive = circuitState != null
     val isGradeFilterActive = gradeState.grades != ALL_GRADES
+    val isPopularFilterActive = popularState.isEnabled
 
-    val showResetButton = isCircuitFilterActive || isGradeFilterActive
+    val showResetButton = isCircuitFilterActive || isGradeFilterActive || isPopularFilterActive
 
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = spacedBy(8.dp)
+        horizontalArrangement = spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         if (showResetButton) {
             item(key = "reset_button") {
@@ -121,6 +132,15 @@ private fun FiltersRow(
                 label = gradeState.gradeRangeButtonTitle,
                 iconRes = R.drawable.ic_signal_cellular_alt,
                 onClick = onGradeFilterChipClicked
+            )
+        }
+
+        item(key = "popular-filter") {
+            MapFilterChip(
+                selected = isPopularFilterActive,
+                label = stringResource(id = R.string.popular),
+                iconRes = R.drawable.ic_favorite_border,
+                onClick = onPopularFilterChipClicked
             )
         }
     }
@@ -192,11 +212,13 @@ private fun MapHeaderLayoutPreview() {
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),
                 grades = ALL_GRADES
             ),
+            popularState = MapViewModel.PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = true,
             onHideAreaName = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},
             onGradeFilterChipClicked = {},
+            onPopularFilterChipClicked = {},
             onResetFiltersClicked = {}
         )
     }
