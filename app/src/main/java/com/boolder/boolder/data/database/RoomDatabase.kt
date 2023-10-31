@@ -18,7 +18,7 @@ import com.boolder.boolder.data.database.entity.ProblemEntity
         LineEntity::class,
         ProblemEntity::class
     ],
-    version = 10, // increment version number everytime the boolder.db database changes (schema or data)
+    version = 11, // increment version number everytime the boolder.db database changes (schema or data)
     exportSchema = true
 )
 abstract class BoolderAppDatabase : RoomDatabase() {
