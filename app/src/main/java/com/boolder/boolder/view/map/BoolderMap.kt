@@ -14,6 +14,8 @@ import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS_TEXT
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS_NAMES
+import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS_NAMES_ANTI_OVERLAP
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS_TEXT
 import com.boolder.boolder.utils.extension.coerceZoomAtLeast
 import com.boolder.boolder.view.map.animator.animationEndListener
@@ -32,6 +34,7 @@ import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenBox
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.extension.style.StyleContract.StyleExtension
+import com.mapbox.maps.extension.style.expressions.dsl.generated.all
 import com.mapbox.maps.extension.style.expressions.dsl.generated.match
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.Layer
@@ -171,7 +174,7 @@ class BoolderMap @JvmOverloads constructor(
         )
 
         val problemsOption = RenderedQueryOptions(
-            listOf(LAYER_PROBLEMS, LAYER_CIRCUIT_PROBLEMS),
+            listOf(LAYER_PROBLEMS, LAYER_CIRCUIT_PROBLEMS, LAYER_PROBLEMS_NAMES),
             null
         )
 
@@ -433,19 +436,36 @@ class BoolderMap @JvmOverloads constructor(
     private inline fun <reified T : Layer> getLayerAs(layerId: String): T? =
         getMapboxMap().getStyle()?.getLayerAs(layerId)
 
-    fun filterGrades(grades: List<String>) {
+    fun applyFilters(
+        grades: List<String>,
+        showPopular: Boolean
+    ) {
         val problemsLayer = getLayerAs<CircleLayer>(LAYER_PROBLEMS)
         val problemsTextLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_TEXT)
+        val popularLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_NAMES)
+        val popularAntiOverlapLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_NAMES_ANTI_OVERLAP)
 
-        val query = match {
-            get("grade")
-            literal(grades)
-            literal(true)
-            literal(false)
+        val query = all {
+            match {
+                get("grade")
+                literal(grades)
+                literal(true)
+                literal(false)
+            }
+
+            if (showPopular) get("featured")
         }
 
         problemsLayer?.filter(query)
         problemsTextLayer?.filter(query)
+
+        fun SymbolLayer.update() = apply {
+            filter(query)
+            visibility(if (showPopular) Visibility.VISIBLE else Visibility.NONE)
+        }
+
+        popularLayer?.update()
+        popularAntiOverlapLayer?.update()
     }
 
     private fun onCameraChanged() {

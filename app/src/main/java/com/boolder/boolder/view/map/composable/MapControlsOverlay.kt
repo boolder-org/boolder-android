@@ -27,29 +27,31 @@ fun MapControlsOverlay(
     areaName: String?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
+    popularState: MapViewModel.PopularFilterState,
     shouldShowFiltersBar: Boolean,
     onHideAreaName: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
-    onCircuitStartClicked: () -> Unit,
+    onPopularFilterChipClicked: () -> Unit,
     onResetFiltersClicked: () -> Unit,
+    onCircuitStartClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
-            .systemBarsPadding()
-            .padding(16.dp)
+        modifier = modifier.systemBarsPadding()
     ) {
         MapHeaderLayout(
             areaName = areaName,
             circuitState = circuitState,
             gradeState = gradeState,
+            popularState = popularState,
             shouldShowFiltersBar = shouldShowFiltersBar,
             onHideAreaName = onHideAreaName,
             onSearchBarClicked = onSearchBarClicked,
             onCircuitFilterChipClicked = onCircuitFilterChipClicked,
             onGradeFilterChipClicked = onGradeFilterChipClicked,
+            onPopularFilterChipClicked = onPopularFilterChipClicked,
             onResetFiltersClicked = onResetFiltersClicked
         )
 
@@ -57,7 +59,9 @@ fun MapControlsOverlay(
 
         if (circuitState?.showCircuitStartButton == true) {
             Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp),
                 colors = ButtonDefaults.elevatedButtonColors(),
                 onClick = onCircuitStartClicked
             ) {
@@ -89,13 +93,15 @@ private fun MapControlsOverlayPreview() {
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),
                 grades = ALL_GRADES
             ),
+            popularState = MapViewModel.PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = true,
             onHideAreaName = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},
             onGradeFilterChipClicked = {},
-            onCircuitStartClicked = {},
-            onResetFiltersClicked = {}
+            onPopularFilterChipClicked = {},
+            onResetFiltersClicked = {},
+            onCircuitStartClicked = {}
         )
     }
 }
