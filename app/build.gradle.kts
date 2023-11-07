@@ -62,7 +62,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     //Mapbox
-    implementation("com.mapbox.maps:android:10.16.0")
+    implementation("com.mapbox.maps:android:10.16.1")
 
     // Play Services
     implementation("com.google.android.gms:play-services-location:21.0.1")
@@ -77,24 +77,30 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.3.3")
 
     // Coil
-    implementation("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil:2.5.0")
 
     // Jetpack compose
     val composeBom = platform("androidx.compose:compose-bom:2023.09.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.ui:ui-viewbinding")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.activity:activity-compose:1.8.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("com.google.android.material:material:1.10.0")
     testImplementation("io.insert-koin:koin-test-junit4:3.2.2")
     testImplementation("org.mockito:mockito-core:4.9.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+    // Work manager
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 }

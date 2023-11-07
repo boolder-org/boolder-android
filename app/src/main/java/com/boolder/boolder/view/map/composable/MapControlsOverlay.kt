@@ -18,17 +18,23 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.CircuitColor
+import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.utils.extension.composeColor
+import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.MapViewModel
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 
 @Composable
 fun MapControlsOverlay(
-    areaName: String?,
+    offlineAreaItem: OfflineAreaItem?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
     popularState: MapViewModel.PopularFilterState,
     shouldShowFiltersBar: Boolean,
+    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
@@ -42,17 +48,18 @@ fun MapControlsOverlay(
         modifier = modifier.systemBarsPadding()
     ) {
         MapHeaderLayout(
-            areaName = areaName,
+            offlineAreaItem = offlineAreaItem,
             circuitState = circuitState,
             gradeState = gradeState,
             popularState = popularState,
             shouldShowFiltersBar = shouldShowFiltersBar,
+            offlineAreaDownloader = offlineAreaDownloader,
             onHideAreaName = onHideAreaName,
             onSearchBarClicked = onSearchBarClicked,
             onCircuitFilterChipClicked = onCircuitFilterChipClicked,
             onGradeFilterChipClicked = onGradeFilterChipClicked,
             onPopularFilterChipClicked = onPopularFilterChipClicked,
-            onResetFiltersClicked = onResetFiltersClicked
+            onResetFiltersClicked = onResetFiltersClicked,
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -83,7 +90,10 @@ fun MapControlsOverlay(
 private fun MapControlsOverlayPreview() {
     BoolderTheme {
         MapControlsOverlay(
-            areaName = "Apremont",
+            offlineAreaItem = OfflineAreaItem(
+                area = dummyArea(),
+                status = OfflineAreaItemStatus.NotDownloaded
+            ),
             circuitState = MapViewModel.CircuitState(
                 circuitId = 0,
                 color = CircuitColor.ORANGE,
@@ -95,6 +105,7 @@ private fun MapControlsOverlayPreview() {
             ),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = true,
+            offlineAreaDownloader = dummyOfflineAreaDownloader(),
             onHideAreaName = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},

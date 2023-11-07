@@ -12,4 +12,7 @@ interface AreaDao {
 
     @Query("SELECT * FROM areas WHERE id = :id")
     suspend fun getAreaById(id: Int): AreasEntity
+
+    @Query("SELECT * FROM areas ORDER BY name_searchable ASC")
+    suspend fun getAllAreas(): List<AreasEntity>
 }

@@ -11,11 +11,13 @@ import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
+import com.boolder.boolder.offline.FileExplorer
 
 class TopoDataAggregator(
     private val topoRepository: TopoRepository,
     private val problemRepository: ProblemRepository,
-    private val lineRepository: LineRepository
+    private val lineRepository: LineRepository,
+    private val fileExplorer: FileExplorer
 ) {
 
     suspend fun aggregate(problemId: Int, origin: TopoOrigin): Topo {
@@ -24,6 +26,10 @@ class TopoDataAggregator(
         val mainLine = lineRepository.loadByProblemId(problemId)
 
         val topoId = mainLine?.topoId
+
+        val imageFile = topoId?.let {
+            fileExplorer.getTopoImageFile(areaId = mainProblem.areaId, topoId = it)
+        }
 
         val topoPictureUrl = topoId?.let { topoRepository.getTopoPictureById(it) }
 
@@ -47,6 +53,7 @@ class TopoDataAggregator(
 
         return Topo(
             pictureUrl = topoPictureUrl,
+            imageFile = imageFile,
             selectedCompleteProblem = mainCompleteProblem,
             otherCompleteProblems = otherCompleteProblems,
             circuitInfo = CircuitInfo(
@@ -158,6 +165,7 @@ class TopoDataAggregator(
     companion object {
         private val EMPTY_TOPO = Topo(
             pictureUrl = null,
+            imageFile = null,
             selectedCompleteProblem = null,
             otherCompleteProblems = emptyList(),
             circuitInfo = null,
