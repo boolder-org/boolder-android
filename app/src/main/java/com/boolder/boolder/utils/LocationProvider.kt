@@ -20,12 +20,11 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
-interface LocationCallback {
-    fun onGPSLocation(location: Location)
-}
-
-class LocationProvider(private val activity: AppCompatActivity, private val callback: LocationCallback) {
+class LocationProvider(private val activity: AppCompatActivity) {
 
     private var isWaitingPosition = false
     private var locationPermissionRequest: ActivityResultLauncher<Array<String>> = activity.registerForActivityResult(
@@ -50,6 +49,12 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
     private var fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(activity)
 
+    private val _locationFlow = MutableSharedFlow<Location>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val locationFlow = _locationFlow.asSharedFlow()
+
     // Entry point
     fun askForPosition() {
         isWaitingPosition = true
@@ -61,14 +66,11 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
     }
 
     private fun enableGPS() {
-
-        val locationRequest = LocationRequest.create().apply {
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-            numUpdates = 1
-            fastestInterval = 50
-            interval = 100
-
-        }
+        val locationRequest = LocationRequest.Builder(100)
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            .setMaxUpdates(1)
+            .setMinUpdateIntervalMillis(50)
+            .build()
 
         val locationSettingsRequest = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
@@ -98,7 +100,7 @@ class LocationProvider(private val activity: AppCompatActivity, private val call
             override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
             override fun isCancellationRequested() = false
         }).addOnSuccessListener {
-            callback.onGPSLocation(it)
+            _locationFlow.tryEmit(it)
             isWaitingPosition = false
         }
     }
