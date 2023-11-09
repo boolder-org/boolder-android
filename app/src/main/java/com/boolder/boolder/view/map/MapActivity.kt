@@ -27,7 +27,6 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
-import com.boolder.boolder.utils.LocationCallback
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
@@ -60,7 +59,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Double.max
 
 
-class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
+class MapActivity : AppCompatActivity(), BoolderMapListener {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -104,7 +103,8 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
             insets
         }
 
-        locationProvider = LocationProvider(this, this)
+        locationProvider = LocationProvider(this)
+        locationProvider.locationFlow.launchAndCollectIn(owner = this, collector = ::onGPSLocation)
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet).also {
             it.state = STATE_HIDDEN
@@ -204,7 +204,7 @@ class MapActivity : AppCompatActivity(), LocationCallback, BoolderMapListener {
         super.onDestroy()
     }
 
-    override fun onGPSLocation(location: Location) {
+    private fun onGPSLocation(location: Location) {
         val point = Point.fromLngLat(location.longitude, location.latitude)
         val zoomLevel = max(binding.mapView.getMapboxMap().cameraState.zoom, 17.0)
 
