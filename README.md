@@ -39,7 +39,7 @@ Here is a 15-min video describing the architecture of the app : https://youtu.be
 Create a file named `gradle.properties` in the `~/.gradle/` directory, with the following content:
 
 ```
-MAPBOX_DOWNLOAD_TOKEN={TOKEN}
+MAPBOX_DOWNLOADS_TOKEN={TOKEN}
 ```
 
 Replace `{TOKEN}` with mapbox secret key.
