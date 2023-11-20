@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.boolder.boolder.R.string
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -24,7 +25,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-class LocationProvider(private val activity: AppCompatActivity) {
+class LocationProvider(private val activity: FragmentActivity) {
 
     private var isWaitingPosition = false
     private var locationPermissionRequest: ActivityResultLauncher<Array<String>> = activity.registerForActivityResult(

@@ -19,13 +19,6 @@ class GradesFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private val viewModel by viewModel<GradesFilterViewModel>()
 
-    private lateinit var selectedGradeRange: GradeRange
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        selectedGradeRange = requireNotNull(arguments?.getParcelable(ARG_GRADE_RANGE))
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,15 +61,7 @@ class GradesFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        private const val ARG_GRADE_RANGE = "arg_grade_range"
-
         const val REQUEST_KEY = "grade_range_selection"
         const val RESULT_GRADE_RANGE = "result_grade_range"
-        const val TAG = "GradesFilterBottomSheetDialogFragment"
-
-        fun newInstance(selectedGradeRange: GradeRange) =
-            GradesFilterBottomSheetDialogFragment().apply {
-                arguments = bundleOf(ARG_GRADE_RANGE to selectedGradeRange)
-            }
     }
 }

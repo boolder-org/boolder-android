@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@+id/map_fragment">
+
+    <fragment
+        android:id="@+id/map_fragment"
+        android:name="com.boolder.boolder.view.map.MapFragment"
+        android:label="Map fragment"
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/navigate_to_search"
+            app:destination="@+id/search_fragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/navigate_to_offline_photos_screen"
+            app:destination="@+id/offline_photos_fragment" />
+        <action
+            android:id="@+id/show_circuits_filter"
+            app:destination="@+id/dialog_circuit_filter" />
+        <action
+            android:id="@+id/show_grades_filter"
+            app:destination="@+id/dialog_grades_filter" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/search_fragment"
+        android:name="com.boolder.boolder.view.search.SearchFragment"
+        android:label="Search fragment"
+        tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/offline_photos_fragment"
+        android:name="com.boolder.boolder.view.offlinephotos.OfflinePhotosFragment"
+        android:label="Offline photos" />
+
+    <dialog
+        android:id="@+id/dialog_circuit_filter"
+        android:name="com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment"
+        android:label="Circuit filter">
+        <argument
+            android:name="available_circuits"
+            app:argType="com.boolder.boolder.domain.model.Circuit[]" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/dialog_grades_filter"
+        android:name="com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment"
+        android:label="Grades filter">
+        <argument
+            android:name="grade_range"
+            app:argType="com.boolder.boolder.domain.model.GradeRange" />
+    </dialog>
+
+</navigation>

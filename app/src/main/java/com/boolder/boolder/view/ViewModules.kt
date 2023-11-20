@@ -3,7 +3,6 @@ package com.boolder.boolder.view
 import android.content.res.Resources
 import com.boolder.boolder.utils.FileSizeFormatter
 import com.boolder.boolder.utils.MapboxStyleFactory
-import com.boolder.boolder.utils.NetworkObserverImpl
 import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.TopoDataAggregator
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
@@ -21,8 +20,7 @@ val viewModelModule = module {
     single<Resources> { androidApplication().resources }
 
     viewModelOf(::MapViewModel)
-    single { SearchViewModel(get(), get()) }
-    single { NetworkObserverImpl() }
+    viewModelOf(::SearchViewModel)
     factory { MapboxStyleFactory() }
 
     factoryOf(::TopoDataAggregator)
