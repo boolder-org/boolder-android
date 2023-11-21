@@ -160,7 +160,9 @@ private class OfflinePhotosScreenPreviewParameterProvider :
         southWestLat = 0f,
         southWestLon = 0f,
         northEastLat = 0f,
-        northEastLon = 0f
+        northEastLon = 0f,
+        problemsCount = 0,
+        problemsCountsPerGrade = emptyMap()
     )
 
     override val values = sequenceOf(

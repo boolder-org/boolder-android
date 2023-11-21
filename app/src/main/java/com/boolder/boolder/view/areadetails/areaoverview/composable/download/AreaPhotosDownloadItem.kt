@@ -50,7 +50,7 @@ import com.boolder.boolder.offline.WORK_DATA_PROGRESS
 import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.compose.Orange
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 
 @Composable
@@ -115,7 +115,7 @@ internal fun AreaPhotosDownloadItem(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_error_outline),
                     contentDescription = null,
-                    tint = Color.Orange
+                    tint = Color.BoolderOrange
                 )
             },
             title = { Text(stringResource(id = R.string.area_overview_photos_deletion_dialog_title)) },

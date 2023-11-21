@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name" translatable="false">Boolder</string>
 
+    <string name="tab_map">Map</string>
+    <string name="tab_discover">Discover</string>
+
     <string name="search_query_hint">Problem or area name</string>
     <string name="cd_find_my_position">Find my position</string>
     <string name="cancel_search">Cancel search</string>
@@ -92,6 +95,24 @@
     <string name="area_circuit_see_on_map">See on the map</string>
     <string name="area_problems_tab_all">All</string>
     <string name="area_problems_tab_popular">Popular</string>
+
+    <string name="discover_header_item_beginner_guide">Beginner\'s guide</string>
+    <string name="discover_header_item_dries_fast">Dries fast</string>
+    <string name="discover_header_item_per_level">For your level</string>
+    <string name="discover_header_item_train_and_bike">Accessible by train + bike</string>
+    <string name="discover_section_all_areas">All areas</string>
+    <string name="discover_section_popular_areas">Popular</string>
+    <string name="discover_section_support">Want to help?</string>
+    <string name="discover_support_rate">Rate the app</string>
+    <string name="discover_support_contribute">Contribute</string>
+
+    <string name="top_areas_levels_all_areas">All areas</string>
+    <string name="top_areas_levels_beginner_friendly">Beginner friendly</string>
+    <string name="top_areas_levels_beginner_friendly_intro">Areas with beginner friendly circuits:</string>
+    <string name="top_areas_dry_fast_description">These areas dry faster than most areas thanks to the sun &amp; wind exposure</string>
+    <string name="top_areas_dry_fast_warning">Don\'t climb if the rock is still wet, you may damage it</string>
+    <string name="top_areas_dry_fast_useful_link">Useful link:</string>
+    <string name="top_areas_train_and_bike_intro">Bike time from the station:</string>
 
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>

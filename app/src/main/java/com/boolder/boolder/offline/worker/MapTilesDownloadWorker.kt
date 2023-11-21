@@ -6,7 +6,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.boolder.boolder.data.database.repository.AreaRepository
-import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS_DETAIL
@@ -40,7 +39,6 @@ class MapTilesDownloadWorker(
             ?: return Result.failure()
 
         val areaGeometry = areaRepository.getAreaById(areaId)
-            .convert()
             .let {
                 val northLat = it.northEastLat.toDouble()
                 val southLat = it.southWestLat.toDouble()

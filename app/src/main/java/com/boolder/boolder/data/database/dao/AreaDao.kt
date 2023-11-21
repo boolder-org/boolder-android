@@ -1,10 +1,11 @@
 package com.boolder.boolder.data.database.dao
 
 import androidx.room.Dao
-import androidx.room.MapColumn
 import androidx.room.Query
 import com.boolder.boolder.data.database.entity.AccessFromPoi
 import com.boolder.boolder.data.database.entity.AreasEntity
+import com.boolder.boolder.domain.model.AreasEntityWithBeginnerCircuitsCount
+import com.boolder.boolder.domain.model.TrainStationPoiWithBikeRoutes
 
 @Dao
 interface AreaDao {
@@ -15,8 +16,36 @@ interface AreaDao {
     @Query("SELECT * FROM areas WHERE id = :id")
     suspend fun getAreaById(id: Int): AreasEntity
 
-    @Query("SELECT * FROM areas ORDER BY name_searchable ASC")
+    @Query("SELECT * FROM areas ORDER BY name COLLATE UNICODE")
     suspend fun getAllAreas(): List<AreasEntity>
+
+    @Query("SELECT * FROM areas ORDER BY problems_count DESC")
+    suspend fun getAllAreasByProblemsCount(): List<AreasEntity>
+
+    @Query("""
+        SELECT 
+            *,
+            (
+                SELECT COUNT(*) FROM circuits 
+                WHERE id IN (
+                    SELECT circuit_id FROM problems
+                    WHERE area_id = parentArea.id AND circuit_id IS NOT NULL AND beginner_friendly = 1
+                    GROUP BY circuit_id
+                    HAVING COUNT(*) >= 10
+                )
+            ) AS 'beginnerCircuitsCount'
+        FROM areas parentArea
+        WHERE beginnerCircuitsCount > 0
+        ORDER BY beginnerCircuitsCount DESC, problems_count DESC
+    """)
+    suspend fun getAllBeginnerFriendlyAreas(): List<AreasEntityWithBeginnerCircuitsCount>
+
+    @Query("""
+        SELECT * FROM areas
+        WHERE tags LIKE '%' || :tag || '%'
+        ORDER BY problems_count DESC
+    """)
+    suspend fun getTaggedAreas(tag: String): List<AreasEntity>
 
     @Query("""
         SELECT 
@@ -31,11 +60,17 @@ interface AreaDao {
     suspend fun getAccessesFromPoiByAreaId(areaId: Int): List<AccessFromPoi>
 
     @Query("""
-        SELECT substr(grade, 1, 1) as degree, count(id) as count
-        FROM problems
-        WHERE area_id = :areaId
-        GROUP BY degree
+        SELECT 
+            pois.name AS 'trainStationName',
+            pois.google_url AS 'googleUrl',
+            areas.id AS 'areaId',
+            areas.name AS 'areaName',
+            poi_routes.distance_in_minutes AS 'bikingTime'
+        FROM pois 
+            JOIN poi_routes ON pois.id = poi_routes.poi_id 
+            JOIN areas ON poi_routes.area_id = areas.id
+        WHERE pois.poi_type == 'train_station' AND poi_routes.transport == 'bike'
+        ORDER BY pois.id ASC, poi_routes.distance_in_minutes ASC
     """)
-    suspend fun getDegreeCountsByArea(areaId: Int):
-        Map<@MapColumn("degree") String, @MapColumn("count") Int>
+    suspend fun getTrainStationPoiWithBikeRoutes(): List<TrainStationPoiWithBikeRoutes>
 }

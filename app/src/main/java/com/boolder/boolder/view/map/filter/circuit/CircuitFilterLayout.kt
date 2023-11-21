@@ -33,7 +33,7 @@ import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.CircuitItem
-import com.boolder.boolder.view.compose.Orange
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CoordinateBounds
 
@@ -83,7 +83,7 @@ private fun CircuitsEmptyContent() {
             modifier = Modifier.size(32.dp),
             painter = painterResource(id = R.drawable.ic_outline_wrong_location),
             contentDescription = null,
-            tint = Color.Orange
+            tint = Color.BoolderOrange
         )
 
         Text(

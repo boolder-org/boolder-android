@@ -14,6 +14,7 @@ fun BoolderTheme(
         onPrimary = Color.White,
         secondary = Color(0xFF65C466),
         onSecondary = Color(0xFF018786),
+        background = Color(0xFFEBEBEB),
         surface = Color.White,
         onSurface = Color.Black,
         onSurfaceVariant = Color(0xFFA5A5A5),
@@ -29,4 +30,7 @@ fun BoolderTheme(
 }
 
 @Stable
-val Color.Companion.Orange get() = Color(red = 1f, .5f, 0f)
+val Color.Companion.BoolderOrange get() = Color(red = 255, 149, 0)
+
+@Stable
+val Color.Companion.BoolderYellow get() = Color(red = 255, 204, 0)

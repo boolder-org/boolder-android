@@ -18,9 +18,9 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,8 +42,9 @@ import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.previewgenerator.dummyProblem
 import com.boolder.boolder.view.areadetails.composable.SectionContainer
+import com.boolder.boolder.view.areadetails.composable.SeeOnMapButton
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.compose.Orange
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.ProblemItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,14 +83,17 @@ internal fun AreaCircuitScreen(
                 }
             )
         },
+        floatingActionButton = {
+            SeeOnMapButton(onClick = onSeeOnMapClicked)
+        },
+        floatingActionButtonPosition = FabPosition.Center,
         content = {
             when (screenState) {
                 is AreaCircuitViewModel.ScreenState.Loading -> LoadingContent()
                 is AreaCircuitViewModel.ScreenState.Content -> AreaCircuitScreenContent(
                     modifier = Modifier.padding(it),
                     screenState = screenState,
-                    onProblemClicked = onProblemClicked,
-                    onSeeOnMapClicked = onSeeOnMapClicked
+                    onProblemClicked = onProblemClicked
                 )
             }
         }
@@ -109,72 +113,55 @@ private fun LoadingContent() {
 private fun AreaCircuitScreenContent(
     screenState: AreaCircuitViewModel.ScreenState.Content,
     onProblemClicked: (Problem) -> Unit,
-    onSeeOnMapClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    Box(
-        modifier = modifier
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            top = 16.dp,
+            end = 16.dp,
+            bottom = 80.dp
+        )
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.LightGray.copy(alpha = .25f)),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp,
-                bottom = 80.dp
+        if (screenState.isBeginnerFriendly) {
+            infoItem(
+                iconRes = R.drawable.ic_sentiment_satisfied_alt,
+                textRes = R.string.area_circuit_beginner_friendly,
+                tint = primaryColor
             )
-        ) {
-            if (screenState.isBeginnerFriendly) {
-                infoItem(
-                    iconRes = R.drawable.ic_sentiment_satisfied_alt,
-                    textRes = R.string.area_circuit_beginner_friendly,
-                    tint = primaryColor
-                )
-            }
-
-            if (screenState.isDangerous) {
-                infoItem(
-                    iconRes = R.drawable.ic_error_outline,
-                    textRes = R.string.area_circuit_dangerous,
-                    tint = Color.Orange
-                )
-            }
-
-            itemsIndexed(
-                items = screenState.problems,
-                key = { _, item -> item.id }
-            ) { index, problem ->
-                val shape = RoundedCornerShape(
-                    topStart = if (index == 0) 16.dp else 0.dp,
-                    topEnd = if (index == 0) 16.dp else 0.dp,
-                    bottomStart = if (index == screenState.problems.lastIndex) 16.dp else 0.dp,
-                    bottomEnd = if (index == screenState.problems.lastIndex) 16.dp else 0.dp
-                )
-
-                ProblemItem(
-                    modifier = Modifier
-                        .clip(shape = shape)
-                        .background(color = Color.White)
-                        .clickable { onProblemClicked(problem) }
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    problem = problem,
-                    showFeatured = true
-                )
-            }
         }
 
-        Button(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp),
-            onClick = onSeeOnMapClicked
-        ) {
-            Text(text = stringResource(id = R.string.area_circuit_see_on_map))
+        if (screenState.isDangerous) {
+            infoItem(
+                iconRes = R.drawable.ic_error_outline,
+                textRes = R.string.area_circuit_dangerous,
+                tint = Color.BoolderOrange
+            )
+        }
+
+        itemsIndexed(
+            items = screenState.problems,
+            key = { _, item -> item.id }
+        ) { index, problem ->
+            val shape = RoundedCornerShape(
+                topStart = if (index == 0) 16.dp else 0.dp,
+                topEnd = if (index == 0) 16.dp else 0.dp,
+                bottomStart = if (index == screenState.problems.lastIndex) 16.dp else 0.dp,
+                bottomEnd = if (index == screenState.problems.lastIndex) 16.dp else 0.dp
+            )
+
+            ProblemItem(
+                modifier = Modifier
+                    .clip(shape = shape)
+                    .background(color = Color.White)
+                    .clickable { onProblemClicked(problem) }
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                problem = problem,
+                showFeatured = true
+            )
         }
     }
 }

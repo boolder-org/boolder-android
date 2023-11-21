@@ -30,6 +30,7 @@ import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
+import com.boolder.boolder.view.areadetails.KEY_AREA_ID
 import com.boolder.boolder.view.areadetails.KEY_CIRCUIT_ID
 import com.boolder.boolder.view.areadetails.KEY_PROBLEM
 import com.boolder.boolder.view.areadetails.REQUEST_KEY_AREA_DETAILS
@@ -172,6 +173,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
                 is MapViewModel.Event.ZoomOnCircuitStartProblem -> onProblemSelected(event.problemId, TopoOrigin.CIRCUIT)
+                is MapViewModel.Event.ZoomOnArea -> flyToArea(event.area)
             }
         }
 
@@ -204,6 +206,12 @@ class MapFragment : Fragment(), BoolderMapListener {
                 bundle.containsKey(KEY_CIRCUIT_ID) -> binding.mapView.postDelayed(300L) {
                     mapViewModel.onCircuitSelected(
                         requireNotNull(bundle.getInt(KEY_CIRCUIT_ID))
+                    )
+                }
+
+                bundle.containsKey(KEY_AREA_ID) -> binding.mapView.postDelayed(300L) {
+                    mapViewModel.onAreaSelected(
+                        requireNotNull(bundle.getInt(KEY_AREA_ID))
                     )
                 }
             }

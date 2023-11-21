@@ -78,6 +78,17 @@ fun AreasEntity.convert(): Area {
         southWestLat = southWestLat,
         southWestLon = southWestLon,
         northEastLat = northEastLat,
-        northEastLon = northEastLon
+        northEastLon = northEastLon,
+        problemsCount = problemsCount,
+        problemsCountsPerGrade = buildMap {
+            put("1", level1Count)
+            put("2", level2Count)
+            put("3", level3Count)
+            put("4", level4Count)
+            put("5", level5Count)
+            put("6", level6Count)
+            put("7", level7Count)
+            put("8", level8Count)
+        }
     )
 }

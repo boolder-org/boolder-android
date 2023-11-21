@@ -21,9 +21,6 @@
             android:id="@+id/navigate_to_area_overview_screen"
             app:destination="@+id/area_overview_fragment" />
         <action
-            android:id="@+id/navigate_to_offline_photos_screen"
-            app:destination="@+id/offline_photos_fragment" />
-        <action
             android:id="@+id/show_circuits_filter"
             app:destination="@+id/dialog_circuit_filter" />
         <action
@@ -44,6 +41,10 @@
         <argument
             android:name="area_id"
             app:argType="integer" />
+        <argument
+            android:name="display_show_on_map_button"
+            android:defaultValue="false"
+            app:argType="boolean" />
 
         <action
             android:id="@+id/navigate_to_area_problems_screen"
@@ -83,6 +84,99 @@
         android:id="@+id/offline_photos_fragment"
         android:name="com.boolder.boolder.view.offlinephotos.OfflinePhotosFragment"
         android:label="Offline photos" />
+
+    <fragment
+        android:id="@+id/discover_fragment"
+        android:name="com.boolder.boolder.view.discover.discover.DiscoverFragment"
+        android:label="Discover">
+        <action
+            android:id="@+id/navigate_to_area_overview_screen"
+            app:destination="@+id/area_overview_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/navigate_to_levels_screen"
+            app:destination="@+id/levels_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/navigate_to_dries_fast_screen"
+            app:destination="@+id/dries_fast_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/navigate_to_train_and_bike_screen"
+            app:destination="@+id/train_and_bike_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/levels_fragment"
+        android:name="com.boolder.boolder.view.discover.levels.LevelsFragment"
+        android:label="Levels">
+        <action
+            android:id="@+id/navigate_to_beginner_levels_screen"
+            app:destination="@+id/beginner_levels_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/navigate_to_area_overview_screen"
+            app:destination="@+id/area_overview_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/beginner_levels_fragment"
+        android:name="com.boolder.boolder.view.discover.levels.beginner.BeginnerLevelsFragment"
+        android:label="Beginner levels">
+        <action
+            android:id="@+id/navigate_to_area_overview_screen"
+            app:destination="@+id/area_overview_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dries_fast_fragment"
+        android:name="com.boolder.boolder.view.discover.driesfast.DriesFastFragment"
+        android:label="Dries fast">
+        <action
+            android:id="@+id/navigate_to_area_overview_screen"
+            app:destination="@+id/area_overview_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/train_and_bike_fragment"
+        android:name="com.boolder.boolder.view.discover.trainandbike.TrainAndBikeFragment"
+        android:label="Train and bike">
+        <action
+            android:id="@+id/navigate_to_area_overview_screen"
+            app:destination="@+id/area_overview_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
     <dialog
         android:id="@+id/dialog_circuit_filter"

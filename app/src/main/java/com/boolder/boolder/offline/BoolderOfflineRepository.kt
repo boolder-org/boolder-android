@@ -10,14 +10,12 @@ import androidx.work.workDataOf
 import com.boolder.boolder.offline.worker.PhotosDownloadWorker
 import com.boolder.boolder.utils.FileSizeFormatter
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
-import com.mapbox.common.TileStore
 import java.util.concurrent.TimeUnit
 
 class BoolderOfflineRepository(
     private val workManager: WorkManager,
     private val fileExplorer: FileExplorer,
-    private val fileSizeFormatter: FileSizeFormatter,
-    private val tileStore: TileStore
+    private val fileSizeFormatter: FileSizeFormatter
 ) {
 
     fun getStatusForAreaId(areaId: Int): OfflineAreaItemStatus {
@@ -62,7 +60,6 @@ class BoolderOfflineRepository(
     }
 
     fun deleteArea(areaId: Int) {
-        tileStore.removeTileRegion("map-tiles-area-$areaId")
         fileExplorer.deleteFolder(areaId)
     }
 }
