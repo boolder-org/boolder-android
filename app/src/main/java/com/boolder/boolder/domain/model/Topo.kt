@@ -1,11 +1,16 @@
 package com.boolder.boolder.domain.model
 
+import java.io.File
+
 /**
  * Represents the content that should be displayed in the boulder problem
  * details bottom sheet.
  *
  * @param pictureUrl The URL of the picture on which the problem starts and
  * lines will be displayed.
+ * @param imageFile The file that stores the picture on which the problem
+ * starts and lines will be displayed. Non-null when already downloaded for an
+ * offline usage.
  * @param selectedCompleteProblem The problem that is currently displayed in
  * the detail information. Its line should also be shown.
  * @param otherCompleteProblems The problems that are on the same picture, but
@@ -15,6 +20,7 @@ package com.boolder.boolder.domain.model
  */
 data class Topo(
     val pictureUrl: String?,
+    val imageFile: File?,
     val selectedCompleteProblem: CompleteProblem?,
     val otherCompleteProblems: List<CompleteProblem>,
     val circuitInfo: CircuitInfo?,

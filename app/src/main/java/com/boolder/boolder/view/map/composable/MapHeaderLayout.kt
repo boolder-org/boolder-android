@@ -30,16 +30,21 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.CircuitColor
+import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.offline.dummyOfflineAreaDownloader
+import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.MapViewModel
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 
 @Composable
 fun MapHeaderLayout(
-    areaName: String?,
+    offlineAreaItem: OfflineAreaItem?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
     popularState: MapViewModel.PopularFilterState,
     shouldShowFiltersBar: Boolean,
+    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
@@ -56,7 +61,8 @@ fun MapHeaderLayout(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp),
-            areaName = areaName,
+            offlineAreaItem = offlineAreaItem,
+            offlineAreaDownloader = offlineAreaDownloader,
             onHideAreaName = onHideAreaName,
             onSearchBarClicked = onSearchBarClicked
         )
@@ -70,7 +76,7 @@ fun MapHeaderLayout(
                 circuitState = circuitState,
                 gradeState = gradeState,
                 popularState = popularState,
-                showCircuitFilterChip = areaName != null,
+                showCircuitFilterChip = offlineAreaItem != null,
                 onCircuitFilterChipClicked = onCircuitFilterChipClicked,
                 onGradeFilterChipClicked = onGradeFilterChipClicked,
                 onPopularFilterChipClicked = onPopularFilterChipClicked,
@@ -202,7 +208,7 @@ private fun MapFilterChip(
 private fun MapHeaderLayoutPreview() {
     BoolderTheme {
         MapHeaderLayout(
-            areaName = "Apremont",
+            offlineAreaItem = dummyOfflineAreaItem(),
             circuitState = MapViewModel.CircuitState(
                 circuitId = 42,
                 color = CircuitColor.BLUE,
@@ -214,6 +220,7 @@ private fun MapHeaderLayoutPreview() {
             ),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = true,
+            offlineAreaDownloader = dummyOfflineAreaDownloader(),
             onHideAreaName = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},

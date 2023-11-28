@@ -6,9 +6,14 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -40,6 +45,19 @@ class TopoView(
 
     var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
     var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
+
+    init {
+        // Immediately set a footer content to avoid a bug on the bottom sheet not fully expanding
+        // on the first time it is expanded
+        binding.footerLayout.setContent {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(210.dp)
+                    .background(color = Color.White)
+            )
+        }
+    }
 
     fun setTopo(topo: Topo) {
         setUiProblems(
@@ -146,22 +164,17 @@ class TopoView(
     private fun loadTopoImage(topo: Topo) {
         binding.progressCircular.isVisible = true
 
-        if (topo.pictureUrl == null) {
-            loadErrorPicture()
-            return
-        }
+        val imageData = topo.imageFile ?: topo.pictureUrl
 
-        binding.picture.load(topo.pictureUrl) {
+        binding.picture.load(imageData) {
             crossfade(true)
             error(R.drawable.ic_placeholder)
 
             listener(
                 onSuccess = { _, _ ->
-                    context?.let {
-                        binding.picture.setPadding(0)
-                        binding.progressCircular.isVisible = false
-                        onProblemPictureLoaded(topo)
-                    }
+                    binding.picture.setPadding(0)
+                    binding.progressCircular.isVisible = false
+                    onProblemPictureLoaded(topo)
                 },
                 onError = { _, _ -> loadErrorPicture() }
             )

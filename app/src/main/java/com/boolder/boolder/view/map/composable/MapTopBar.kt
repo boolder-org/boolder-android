@@ -8,11 +8,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.boolder.boolder.databinding.SearchComponentBinding
+import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.offline.dummyOfflineAreaDownloader
+import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 
 @Composable
 fun MapTopBar(
-    areaName: String?,
+    offlineAreaItem: OfflineAreaItem?,
+    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
     onSearchBarClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -33,8 +38,9 @@ fun MapTopBar(
         )
 
         AreaName(
-            name = areaName,
-            onHideAreaName = onHideAreaName
+            offlineAreaItem = offlineAreaItem,
+            offlineAreaDownloader = offlineAreaDownloader,
+            onHideAreaName = onHideAreaName,
         )
     }
 }
@@ -43,17 +49,18 @@ fun MapTopBar(
 @Composable
 private fun MapTopBarPreview(
     @PreviewParameter(MapTopBarParameterPreviewProvider::class)
-    areaName: String?
+    offlineAreaItem: OfflineAreaItem?
 ) {
     BoolderTheme {
         MapTopBar(
-            areaName = areaName,
+            offlineAreaItem = offlineAreaItem,
+            offlineAreaDownloader = dummyOfflineAreaDownloader(),
             onHideAreaName = {},
             onSearchBarClicked = {}
         )
     }
 }
 
-private class MapTopBarParameterPreviewProvider : PreviewParameterProvider<String?> {
-    override val values = sequenceOf(null, "Apremont")
+private class MapTopBarParameterPreviewProvider : PreviewParameterProvider<OfflineAreaItem?> {
+    override val values = sequenceOf(null, dummyOfflineAreaItem())
 }

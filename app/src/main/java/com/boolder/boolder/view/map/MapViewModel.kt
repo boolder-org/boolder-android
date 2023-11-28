@@ -7,6 +7,7 @@ import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
@@ -14,6 +15,10 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
+import com.boolder.boolder.offline.BoolderOfflineRepository
+import com.boolder.boolder.offline.OfflineAreaDownloader
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,8 +31,9 @@ class MapViewModel(
     private val circuitRepository: CircuitRepository,
     private val problemRepository: ProblemRepository,
     private val topoDataAggregator: TopoDataAggregator,
-    private val resources: Resources
-) : ViewModel() {
+    private val resources: Resources,
+    private val boolderOfflineRepository: BoolderOfflineRepository
+) : ViewModel(), OfflineAreaDownloader {
 
     private val _screenStateFlow = MutableStateFlow(
         ScreenState(
@@ -170,13 +176,14 @@ class MapViewModel(
         viewModelScope.launch {
             val currentState = _screenStateFlow.value.areaState
 
-            if (currentState?.id == areaId) return@launch
+            if (currentState?.area?.id == areaId) return@launch
 
-            val area = areaRepository.getAreaById(areaId)
+            val area = areaRepository.getAreaById(areaId).convert()
+            val offlineStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
 
-            val newAreaState = AreaState(
-                id = areaId,
-                name = area.name
+            val newAreaState = OfflineAreaItem(
+                area = area,
+                status = offlineStatus
             )
 
             _screenStateFlow.update {
@@ -234,7 +241,7 @@ class MapViewModel(
         viewModelScope.launch {
             val areaState = _screenStateFlow.value.areaState ?: return@launch
 
-            val availableCircuits = circuitRepository.getAvailableCircuits(areaState.id)
+            val availableCircuits = circuitRepository.getAvailableCircuits(areaState.area.id)
 
             val event = Event.ShowAvailableCircuits(
                 selectedCircuit = null,
@@ -274,8 +281,59 @@ class MapViewModel(
         }
     }
 
+    // region OfflineAreaDownloader
+
+    override fun onDownloadArea(areaId: Int) {
+        val currentAreaState = _screenStateFlow.value.areaState ?: return
+
+        if (currentAreaState.area.id != areaId) return
+
+        _screenStateFlow.update {
+            it.copy(
+                areaState = currentAreaState.copy(
+                    status = OfflineAreaItemStatus.Downloading(areaId)
+                )
+            )
+        }
+
+        boolderOfflineRepository.downloadArea(areaId)
+    }
+
+    override fun onCancelAreaDownload(areaId: Int) {
+        val currentAreaState = _screenStateFlow.value.areaState ?: return
+
+        if (currentAreaState.area.id != areaId) return
+
+        boolderOfflineRepository.cancelAreaDownload(areaId)
+        boolderOfflineRepository.deleteArea(areaId)
+
+        _screenStateFlow.update {
+            it.copy(
+                areaState = currentAreaState.copy(
+                    status = OfflineAreaItemStatus.NotDownloaded
+                )
+            )
+        }
+    }
+
+    override fun onAreaDownloadTerminated(areaId: Int) {
+        val currentAreaState = _screenStateFlow.value.areaState ?: return
+
+        if (currentAreaState.area.id != areaId) return
+
+        _screenStateFlow.update {
+            it.copy(
+                areaState = currentAreaState.copy(
+                    status = OfflineAreaItemStatus.Downloaded(folderSize = "")
+                )
+            )
+        }
+    }
+
+    // endregion OfflineAreaDownloader
+
     data class ScreenState(
-        val areaState: AreaState?,
+        val areaState: OfflineAreaItem?,
         val circuitState: CircuitState?,
         val gradeState: GradeState,
         val popularFilterState: PopularFilterState,
@@ -294,11 +352,6 @@ class MapViewModel(
     )
 
     data class PopularFilterState(val isEnabled: Boolean)
-
-    data class AreaState(
-        val id: Int,
-        val name: String
-    )
 
     sealed interface Event {
         data class ShowAvailableCircuits(

@@ -39,6 +39,7 @@ import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialo
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
+import com.boolder.boolder.view.offlinephotos.OfflinePhotosActivity
 import com.boolder.boolder.view.search.SearchActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -107,6 +108,7 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
         locationProvider.locationFlow.launchAndCollectIn(owner = this, collector = ::onGPSLocation)
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet).also {
+            it.skipCollapsed = true
             it.state = STATE_HIDDEN
             it.addBottomSheetCallback(object : BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -127,6 +129,10 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
             locationProvider.askForPosition()
         }
 
+//        binding.offlinePhotosButton.setOnClickListener {
+//            startActivity(Intent(this, OfflinePhotosActivity::class.java))
+//        }
+
         binding.topoView.apply {
             onSelectProblemOnMap = { problemId ->
                 binding.mapView.selectProblem(problemId)
@@ -143,11 +149,12 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
             binding.controlsOverlayComposeView.setContent {
                 BoolderTheme {
                     MapControlsOverlay(
-                        areaName = screenState.areaState?.name,
+                        offlineAreaItem = screenState.areaState,
                         circuitState = screenState.circuitState,
                         gradeState = screenState.gradeState,
                         popularState = screenState.popularFilterState,
                         shouldShowFiltersBar = screenState.shouldShowFiltersBar,
+                        offlineAreaDownloader = mapViewModel,
                         onHideAreaName = ::onAreaLeft,
                         onSearchBarClicked = ::navigateToSearchScreen,
                         onCircuitFilterChipClicked = mapViewModel::onCircuitFilterChipClicked,
