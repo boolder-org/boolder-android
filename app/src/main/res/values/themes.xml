@@ -16,6 +16,7 @@
         <!-- Customize your theme here. -->
         <item name="android:windowActivityTransitions">true</item>
 
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
 

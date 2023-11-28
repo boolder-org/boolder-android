@@ -7,20 +7,21 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.boolder.boolder.R
-import com.boolder.boolder.databinding.ActivityMainBinding
+import com.boolder.boolder.databinding.FragmentMapBinding
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.GradeRange
@@ -30,7 +31,6 @@ import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
-import com.boolder.boolder.utils.viewBinding
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
@@ -39,14 +39,12 @@ import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialo
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
-import com.boolder.boolder.view.offlinephotos.OfflinePhotosActivity
-import com.boolder.boolder.view.search.SearchActivity
+import com.boolder.boolder.view.search.SearchFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment.STYLE_NORMAL
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -60,29 +58,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Double.max
 
 
-class MapActivity : AppCompatActivity(), BoolderMapListener {
+class MapFragment : Fragment(), BoolderMapListener {
 
-    private val binding by viewBinding(ActivityMainBinding::inflate)
+    private var binding: FragmentMapBinding? = null
 
     private val mapViewModel by viewModel<MapViewModel>()
     private val layerFactory by inject<MapboxStyleFactory>()
-
-    private val searchScreenLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode != RESULT_OK) return@registerForActivityResult
-
-        val resultData = result.data ?: return@registerForActivityResult
-
-        when {
-            resultData.hasExtra("AREA") -> flyToArea(
-                requireNotNull(resultData.getParcelableExtra("AREA"))
-            )
-
-            resultData.hasExtra("PROBLEM") -> onProblemSelected(
-                problemId = requireNotNull(resultData.getParcelableExtra<Problem>("PROBLEM")).id,
-                origin = TopoOrigin.SEARCH
-            )
-        }
-    }
 
     private lateinit var locationProvider: LocationProvider
 
@@ -90,7 +71,20 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+        locationProvider = LocationProvider(requireActivity())
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View =
+        FragmentMapBinding.inflate(inflater, container, false)
+            .also { binding = it }
+            .root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val binding = binding ?: return
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -104,7 +98,6 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
             insets
         }
 
-        locationProvider = LocationProvider(this)
         locationProvider.locationFlow.launchAndCollectIn(owner = this, collector = ::onGPSLocation)
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.detailBottomSheet).also {
@@ -130,7 +123,7 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
         }
 
 //        binding.offlinePhotosButton.setOnClickListener {
-//            startActivity(Intent(this, OfflinePhotosActivity::class.java))
+//            findNavController().navigate(MapFragmentDirections.navigateToOfflinePhotosScreen())
 //        }
 
         binding.topoView.apply {
@@ -184,7 +177,23 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
             }
         }
 
-        supportFragmentManager.setFragmentResultListener(
+        parentFragmentManager.setFragmentResultListener(
+            /* requestKey = */ SearchFragment.REQUEST_KEY,
+            /* lifecycleOwner = */ this
+        ) { _, bundle ->
+            when {
+                bundle.containsKey("AREA") -> binding.root.postDelayed(500L) {
+                    flyToArea(requireNotNull(bundle.getParcelable("AREA")))
+                }
+
+                bundle.containsKey("PROBLEM") -> onProblemSelected(
+                    problemId = requireNotNull(bundle.getParcelable<Problem>("PROBLEM")).id,
+                    origin = TopoOrigin.SEARCH
+                )
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
             /* requestKey = */ CircuitFilterBottomSheetDialogFragment.REQUEST_KEY,
             /* lifecycleOwner = */ this
         ) { _, bundle ->
@@ -193,7 +202,7 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
             mapViewModel.onCircuitSelected(circuit)
         }
 
-        supportFragmentManager.setFragmentResultListener(
+        parentFragmentManager.setFragmentResultListener(
             /* requestKey = */ GradesFilterBottomSheetDialogFragment.REQUEST_KEY,
             /* lifecycleOwner = */ this
         ) { _, bundle ->
@@ -203,15 +212,20 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
         }
     }
 
-    override fun onDestroy() {
-        binding.topoView.apply {
+    override fun onDestroyView() {
+        binding?.topoView?.apply {
             onSelectProblemOnMap = null
             onCircuitProblemSelected = null
         }
-        super.onDestroy()
+
+        binding = null
+
+        super.onDestroyView()
     }
 
     private fun onGPSLocation(location: Location) {
+        val binding = binding ?: return
+
         val point = Point.fromLngLat(location.longitude, location.latitude)
         val zoomLevel = max(binding.mapView.getMapboxMap().cameraState.zoom, 17.0)
 
@@ -224,7 +238,7 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
     }
 
     private fun setupMap() {
-        binding.mapView.setup(this, layerFactory.buildStyle())
+        binding?.mapView?.setup(this, layerFactory.buildStyle())
     }
 
     // Triggered when user click on a Problem on Map
@@ -237,9 +251,11 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
     }
 
     override fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?) {
+        val context = context ?: return
+        val binding = binding ?: return
 
-        val view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_pois, binding.root, false)
-        val bottomSheet = BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
+        val view = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_pois, binding.root, false)
+        val bottomSheet = BottomSheetDialog(context, R.style.BottomSheetDialogTheme)
 
         view.apply {
             findViewById<TextView>(R.id.pois_title).text = poisName
@@ -266,6 +282,8 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
 
     private fun onNewTopo(nullableTopo: Topo?) {
         nullableTopo?.let { topo ->
+            val binding = binding ?: return
+
             binding.topoView.setTopo(topo)
 
             val selectedProblem = topo.selectedCompleteProblem
@@ -290,6 +308,8 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
     }
 
     private fun flyToArea(area: Area) {
+        val binding = binding ?: return
+
         val southWest = Point.fromLngLat(
             area.southWestLon.toDouble(),
             area.southWestLat.toDouble()
@@ -318,6 +338,8 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
     }
 
     private fun flyToProblem(problem: Problem, origin: TopoOrigin) {
+        val binding = binding ?: return
+
         binding.mapView.selectProblem(problem.id.toString())
 
         val point = Point.fromLngLat(
@@ -351,25 +373,34 @@ class MapActivity : AppCompatActivity(), BoolderMapListener {
         }
 
     private fun navigateToSearchScreen() {
-        val intent = Intent(this, SearchActivity::class.java)
-        val option = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
-
-        searchScreenLauncher.launch(intent, option)
+        findNavController().navigate(MapFragmentDirections.navigateToSearch())
     }
 
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {
-        CircuitFilterBottomSheetDialogFragment.newInstance(event.availableCircuits)
-            .apply { setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme) }
-            .show(supportFragmentManager, CircuitFilterBottomSheetDialogFragment.TAG)
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.dialog_circuit_filter) return
+
+        val direction = MapFragmentDirections.showCircuitsFilter(
+            availableCircuits = event.availableCircuits.toTypedArray()
+        )
+
+        navController.navigate(direction)
     }
 
     private fun showGradesFilterBottomSheet(event: MapViewModel.Event.ShowGradeRanges) {
-        GradesFilterBottomSheetDialogFragment.newInstance(event.currentGradeRange)
-            .apply { setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme) }
-            .show(supportFragmentManager, GradesFilterBottomSheetDialogFragment.TAG)
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.dialog_grades_filter) return
+
+        val direction = MapFragmentDirections.showGradesFilter(gradeRange = event.currentGradeRange)
+
+        navController.navigate(direction)
     }
 
     private fun zoomOnCircuit(event: MapViewModel.Event.ZoomOnCircuit) {
+        val binding = binding ?: return
+
         bottomSheetBehavior.state = STATE_HIDDEN
         binding.mapView.onCircuitSelected(event.circuit)
     }

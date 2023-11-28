@@ -4,6 +4,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
     kotlin("plugin.serialization")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -95,6 +96,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
     implementation("com.google.android.material:material:1.10.0")
     testImplementation("io.insert-koin:koin-test-junit4:3.2.2")
     testImplementation("org.mockito:mockito-core:4.9.0")

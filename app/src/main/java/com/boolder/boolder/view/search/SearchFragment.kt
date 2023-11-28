@@ -1,59 +1,58 @@
 package com.boolder.boolder.view.search
 
-import android.content.Intent
 import android.os.Bundle
+import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.lifecycleScope
+import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boolder.boolder.R
-import com.boolder.boolder.databinding.ActivitySearchBinding
-import com.boolder.boolder.utils.NetworkObserver
-import com.boolder.boolder.utils.NetworkObserverImpl
+import com.boolder.boolder.databinding.FragmentSearchBinding
 import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
-import com.boolder.boolder.utils.viewBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity(), NetworkObserver {
+class SearchFragment : Fragment() {
 
-    private val binding by viewBinding(ActivitySearchBinding::inflate)
+    private var binding: FragmentSearchBinding? = null
 
-    private val searchViewModel: SearchViewModel = SearchViewModel(get(), get())
-    private val networkObserverImpl: NetworkObserverImpl by inject()
+    private val searchViewModel by viewModel<SearchViewModel>()
 
     private val searchAdapter = SearchAdapter(
         onAreaClicked = { area ->
-            setResult(RESULT_OK, Intent().apply { putExtra("AREA", area) })
-            finish()
+            setFragmentResult(REQUEST_KEY, bundleOf("AREA" to area))
+            findNavController().popBackStack()
         },
         onProblemClicked = { problem ->
-            setResult(RESULT_OK, Intent().apply { putExtra("PROBLEM", problem) })
-            finish()
+            setFragmentResult(REQUEST_KEY, bundleOf("PROBLEM" to problem))
+            findNavController().popBackStack()
         }
     )
 
     private val suggestions = listOf("Isatis", "La Marie-Rose", "Cul de Chien")
 
-    private val query
-        get() = binding.searchComponent.searchBar.text
-    private val isQueryEmpty
-        get() = query == null || query.isEmpty() || query.isBlank()
+    private lateinit var textWatcher: TextWatcher
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View =
+        FragmentSearchBinding.inflate(inflater, container, false)
+            .also { binding = it }
+            .root
 
-    private var isConnectedToNetwork = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val binding = binding ?: return
 
         binding.root.setOnApplyWindowTopInsetListener { topInset ->
             val topMargin = topInset + resources.getDimensionPixelSize(R.dimen.margin_search_component)
@@ -63,18 +62,13 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
                 .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
         }
 
-        // Listen to network change
-        networkObserverImpl.subscribeOn(this, this)
-
         binding.searchComponent.searchBar.requestFocus()
 
         binding.searchComponent.searchFirstIcon.apply {
-            val drawable = ContextCompat.getDrawable(
-                this@SearchActivity,
-                R.drawable.ic_arrow_back
-            )
+            val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_arrow_back)
+
             setImageDrawable(drawable)
-            setOnClickListener { finish() }
+            setOnClickListener { findNavController().popBackStack() }
         }
 
         binding.searchComponent.searchLastIcon.setOnClickListener {
@@ -86,12 +80,11 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         binding.recyclerView.apply {
             adapter = searchAdapter
-            addItemDecoration(DividerItemDecoration(this@SearchActivity, LinearLayoutManager.VERTICAL))
-            layoutManager = LinearLayoutManager(this@SearchActivity)
+            addItemDecoration(DividerItemDecoration(view.context, LinearLayoutManager.VERTICAL))
         }
 
-        binding.searchComponent.searchBar.addTextChangedListener { query ->
-            if (isQueryEmpty) {
+        textWatcher = binding.searchComponent.searchBar.doAfterTextChanged { query ->
+            if (query.isNullOrBlank()) {
                 binding.searchComponent.searchLastIcon.visibility = View.GONE
                 searchAdapter.submitList(emptyList())
                 refreshSuggestionsVisibility(true)
@@ -103,10 +96,10 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
 
         applySuggestions()
 
-        searchViewModel.searchResult.observe(this) {
+        searchViewModel.searchResult.observe(viewLifecycleOwner) {
             refreshNoResultVisibility(it.isEmpty())
             refreshSuggestionsVisibility(false)
-            if (isQueryEmpty) {
+            if (binding.searchComponent.searchBar.text.isNullOrBlank()) {
                 searchAdapter.submitList(emptyList())
             } else {
                 searchAdapter.submitList(it)
@@ -114,7 +107,17 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
         }
     }
 
+    override fun onDestroyView() {
+        textWatcher.let {
+            binding?.searchComponent?.searchBar?.removeTextChangedListener(it)
+        }
+
+        super.onDestroyView()
+    }
+
     private fun applySuggestions() {
+        val binding = binding ?: return
+
         binding.suggestionFirst.text = suggestions[0]
         binding.suggestionSecond.text = suggestions[1]
         binding.suggestionThird.text = suggestions[2]
@@ -125,31 +128,21 @@ class SearchActivity : AppCompatActivity(), NetworkObserver {
     }
 
     private fun onSuggestionClick(text: String) {
+        val binding = binding ?: return
+
         binding.searchComponent.searchBar.setText(text)
         binding.searchComponent.searchBar.setSelection(text.length)
     }
 
-    override fun onConnectivityChange(connected: Boolean) {
-        isConnectedToNetwork = connected
-        lifecycleScope.launch(Dispatchers.Main) {
-            if (connected) {
-                binding.connectivityErrorMessage.visibility = View.GONE
-                val isNoResult = searchAdapter.currentList.isEmpty()
-                refreshSuggestionsVisibility(isQueryEmpty)
-                refreshNoResultVisibility(!isQueryEmpty && isNoResult)
-            } else {
-                binding.connectivityErrorMessage.visibility = View.VISIBLE
-                refreshSuggestionsVisibility(false)
-                refreshNoResultVisibility(false)
-            }
-        }
-    }
-
     private fun refreshSuggestionsVisibility(show: Boolean) {
-        binding.suggestionContainer.visibility = if (show && isConnectedToNetwork) View.VISIBLE else View.GONE
+        binding?.suggestionContainer?.isVisible = show
     }
 
     private fun refreshNoResultVisibility(show: Boolean) {
-        binding.emptyQueryMessage.visibility = if (show && isConnectedToNetwork) View.VISIBLE else View.GONE
+        binding?.emptyQueryMessage?.isVisible = show
+    }
+
+    companion object {
+        const val REQUEST_KEY = "search"
     }
 }

@@ -80,7 +80,7 @@ class GradesFilterViewModel(
     }
 
     companion object {
-        private const val ARG_GRADE_RANGE = "arg_grade_range"
+        private const val ARG_GRADE_RANGE = "grade_range"
 
         private val DEFAULT_CUSTOM_RANGE = GradeRange(min = "4a", max = "5a")
 

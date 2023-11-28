@@ -16,10 +16,8 @@
         android:theme="@style/Theme.Boolder"
         tools:targetApi="31">
 
-        <activity android:name=".view.search.SearchActivity" />
-
         <activity
-            android:name=".view.map.MapActivity"
+            android:name=".view.main.MainActivity"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
@@ -28,8 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".view.offlinephotos.OfflinePhotosActivity" />
 
         <!-- Remove default work manager initialization -->
         <provider
