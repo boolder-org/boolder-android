@@ -23,7 +23,6 @@ import androidx.navigation.fragment.findNavController
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.FragmentMapBinding
 import com.boolder.boolder.domain.model.Area
-import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
@@ -31,12 +30,15 @@ import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.launchAndCollectIn
+import com.boolder.boolder.view.areadetails.KEY_CIRCUIT_ID
+import com.boolder.boolder.view.areadetails.KEY_PROBLEM
+import com.boolder.boolder.view.areadetails.REQUEST_KEY_AREA_DETAILS
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.MapControlsOverlay
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment
-import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT
+import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT_ID
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
 import com.boolder.boolder.view.search.SearchFragment
@@ -122,10 +124,6 @@ class MapFragment : Fragment(), BoolderMapListener {
             locationProvider.askForPosition()
         }
 
-//        binding.offlinePhotosButton.setOnClickListener {
-//            findNavController().navigate(MapFragmentDirections.navigateToOfflinePhotosScreen())
-//        }
-
         binding.topoView.apply {
             onSelectProblemOnMap = { problemId ->
                 binding.mapView.selectProblem(problemId)
@@ -147,8 +145,8 @@ class MapFragment : Fragment(), BoolderMapListener {
                         gradeState = screenState.gradeState,
                         popularState = screenState.popularFilterState,
                         shouldShowFiltersBar = screenState.shouldShowFiltersBar,
-                        offlineAreaDownloader = mapViewModel,
                         onHideAreaName = ::onAreaLeft,
+                        onAreaInfoClicked = { navigateToAreaOverviewScreen(screenState.areaState?.area?.id) },
                         onSearchBarClicked = ::navigateToSearchScreen,
                         onCircuitFilterChipClicked = mapViewModel::onCircuitFilterChipClicked,
                         onGradeFilterChipClicked = mapViewModel::onGradeFilterChipClicked,
@@ -194,12 +192,30 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
 
         parentFragmentManager.setFragmentResultListener(
+            REQUEST_KEY_AREA_DETAILS,
+            this
+        ) { _, bundle ->
+            when {
+                bundle.containsKey(KEY_PROBLEM) -> onProblemSelected(
+                    problemId = requireNotNull(bundle.getParcelable<Problem>(KEY_PROBLEM)).id,
+                    origin = TopoOrigin.SEARCH
+                )
+
+                bundle.containsKey(KEY_CIRCUIT_ID) -> binding.mapView.postDelayed(300L) {
+                    mapViewModel.onCircuitSelected(
+                        requireNotNull(bundle.getInt(KEY_CIRCUIT_ID))
+                    )
+                }
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
             /* requestKey = */ CircuitFilterBottomSheetDialogFragment.REQUEST_KEY,
             /* lifecycleOwner = */ this
         ) { _, bundle ->
-            val circuit = bundle.getParcelable<Circuit?>(RESULT_CIRCUIT)
+            val circuitId = bundle.getInt(RESULT_CIRCUIT_ID)
 
-            mapViewModel.onCircuitSelected(circuit)
+            mapViewModel.onCircuitSelected(circuitId)
         }
 
         parentFragmentManager.setFragmentResultListener(
@@ -210,6 +226,43 @@ class MapFragment : Fragment(), BoolderMapListener {
 
             mapViewModel.onGradeRangeSelected(gradeRange)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val cameraOptions = mapViewModel.mapState?.let { mapState ->
+            val center = Point.fromLngLat(
+                mapState.centerLongitude,
+                mapState.centerLatitude
+            )
+
+            CameraOptions.Builder()
+                .center(center)
+                .zoom(mapState.zoom)
+                .build()
+        } ?: CameraOptions.Builder()
+            .center(Point.fromLngLat(2.5968216, 48.3925623))
+            .zoom(10.2)
+            .build()
+
+        binding?.mapView?.apply {
+            getMapboxMap().setCamera(cameraOptions)
+            postDelayed(1_000L) { detectArea() }
+        }
+        mapViewModel.mapState = null
+    }
+
+    override fun onPause() {
+        val cameraState = binding?.mapView?.getMapboxMap()?.cameraState ?: return
+
+        mapViewModel.mapState = MapState(
+            centerLongitude = cameraState.center.longitude(),
+            centerLatitude = cameraState.center.latitude(),
+            zoom = cameraState.zoom
+        )
+
+        super.onPause()
     }
 
     override fun onDestroyView() {
@@ -242,8 +295,9 @@ class MapFragment : Fragment(), BoolderMapListener {
         mapViewModel.fetchTopo(problemId = problemId, origin = origin)
     }
 
-    override fun onProblemUnselected() {
+    override fun onTopoUnselected() {
         bottomSheetBehavior.state = STATE_HIDDEN
+        mapViewModel.onTopoUnselected()
     }
 
     override fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?) {
@@ -368,7 +422,17 @@ class MapFragment : Fragment(), BoolderMapListener {
             block()
         }
 
+    private fun navigateToAreaOverviewScreen(areaId: Int?) {
+        areaId ?: return
+
+        val direction = MapFragmentDirections.navigateToAreaOverviewScreen(areaId = areaId)
+
+        onTopoUnselected()
+        findNavController().navigate(direction)
+    }
+
     private fun navigateToSearchScreen() {
+        onTopoUnselected()
         findNavController().navigate(MapFragmentDirections.navigateToSearch())
     }
 
@@ -397,7 +461,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun zoomOnCircuit(event: MapViewModel.Event.ZoomOnCircuit) {
         val binding = binding ?: return
 
-        bottomSheetBehavior.state = STATE_HIDDEN
+        onTopoUnselected()
         binding.mapView.onCircuitSelected(event.circuit)
     }
 }

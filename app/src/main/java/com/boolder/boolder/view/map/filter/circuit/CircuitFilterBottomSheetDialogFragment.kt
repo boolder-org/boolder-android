@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
-import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -32,16 +31,16 @@ class CircuitFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
         }
 
-    private fun onCircuitSelected(circuit: Circuit?) {
+    private fun onCircuitSelected(circuitId: Int) {
         setFragmentResult(
             requestKey = REQUEST_KEY,
-            result = bundleOf(RESULT_CIRCUIT to circuit)
+            result = bundleOf(RESULT_CIRCUIT_ID to circuitId)
         )
         dismiss()
     }
 
     companion object {
         const val REQUEST_KEY = "circuit_selection"
-        const val RESULT_CIRCUIT = "result_circuit"
+        const val RESULT_CIRCUIT_ID = "result_circuit_id"
     }
 }

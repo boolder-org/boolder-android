@@ -18,8 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.CircuitColor
-import com.boolder.boolder.offline.OfflineAreaDownloader
-import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.utils.extension.composeColor
 import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.view.compose.BoolderTheme
@@ -34,8 +32,8 @@ fun MapControlsOverlay(
     gradeState: MapViewModel.GradeState,
     popularState: MapViewModel.PopularFilterState,
     shouldShowFiltersBar: Boolean,
-    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
+    onAreaInfoClicked: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
@@ -53,8 +51,8 @@ fun MapControlsOverlay(
             gradeState = gradeState,
             popularState = popularState,
             shouldShowFiltersBar = shouldShowFiltersBar,
-            offlineAreaDownloader = offlineAreaDownloader,
             onHideAreaName = onHideAreaName,
+            onAreaInfoClicked = onAreaInfoClicked,
             onSearchBarClicked = onSearchBarClicked,
             onCircuitFilterChipClicked = onCircuitFilterChipClicked,
             onGradeFilterChipClicked = onGradeFilterChipClicked,
@@ -105,8 +103,8 @@ private fun MapControlsOverlayPreview() {
             ),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = true,
-            offlineAreaDownloader = dummyOfflineAreaDownloader(),
             onHideAreaName = {},
+            onAreaInfoClicked = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},
             onGradeFilterChipClicked = {},

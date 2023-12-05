@@ -4,13 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -34,15 +31,16 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
-import com.boolder.boolder.utils.extension.composeColor
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.compose.CircuitItem
+import com.boolder.boolder.view.compose.Orange
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CoordinateBounds
 
 @Composable
 fun CircuitFilterLayout(
     availableCircuits: List<Circuit>,
-    onCircuitSelected: (Circuit?) -> Unit,
+    onCircuitSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -85,7 +83,7 @@ private fun CircuitsEmptyContent() {
             modifier = Modifier.size(32.dp),
             painter = painterResource(id = R.drawable.ic_outline_wrong_location),
             contentDescription = null,
-            tint = Color(red = 1f, .5f, 0f)
+            tint = Color.Orange
         )
 
         Text(
@@ -100,7 +98,7 @@ private fun CircuitsEmptyContent() {
 @Composable
 private fun CircuitsContent(
     availableCircuits: List<Circuit>,
-    onCircuitSelected: (Circuit?) -> Unit
+    onCircuitSelected: (Int) -> Unit
 ) {
     Column {
         CircuitsList(
@@ -112,7 +110,7 @@ private fun CircuitsContent(
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(top = 16.dp),
-            onReset = { onCircuitSelected(null) }
+            onReset = { onCircuitSelected(-1) }
         )
     }
 }
@@ -120,7 +118,7 @@ private fun CircuitsContent(
 @Composable
 private fun CircuitsList(
     availableCircuits: List<Circuit>,
-    onCircuitSelected: (Circuit) -> Unit
+    onCircuitSelected: (Int) -> Unit
 ) {
     val shape = MaterialTheme.shapes.small
 
@@ -135,7 +133,7 @@ private fun CircuitsList(
     ) {
         availableCircuits.forEachIndexed { index, circuit ->
             CircuitItem(
-                modifier = Modifier.clickable { onCircuitSelected(circuit) },
+                modifier = Modifier.clickable { onCircuitSelected(circuit.id) },
                 circuit = circuit
             )
 
@@ -143,59 +141,6 @@ private fun CircuitsList(
                 Divider(color = MaterialTheme.colorScheme.outline)
             }
         }
-    }
-}
-
-@Composable
-private fun CircuitItem(
-    circuit: Circuit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .background(color = circuit.color.composeColor(), shape = CircleShape)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = CircleShape
-                )
-        )
-
-        Text(
-            modifier = Modifier.weight(1f),
-            text = stringResource(id = R.string.circuit, circuit.color.localizedName()),
-            style = MaterialTheme.typography.bodyMedium
-                .copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        if (circuit.isBeginnerFriendly) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_sentiment_satisfied_alt),
-                contentDescription = null,
-                tint = Color(red = .4f, .76f, .4f)
-            )
-        }
-
-        if (circuit.isDangerous) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_error_outline),
-                contentDescription = null,
-                tint = Color(red = 1f, .5f, 0f)
-            )
-        }
-
-        Text(
-            text = circuit.averageGrade,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

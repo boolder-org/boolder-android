@@ -2,6 +2,7 @@ package com.boolder.boolder.view.compose
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
 @Composable
@@ -26,3 +27,6 @@ fun BoolderTheme(
         content = content
     )
 }
+
+@Stable
+val Color.Companion.Orange get() = Color(red = 1f, .5f, 0f)

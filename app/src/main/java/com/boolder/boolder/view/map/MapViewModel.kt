@@ -15,10 +15,10 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
-import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
-import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.offline.BoolderOfflineRepository
 import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -63,6 +63,8 @@ class MapViewModel(
 
     private var lastZoomValue = 0.0
     private var isProblemTopoShown = false
+
+    var mapState: MapState? = null
 
     fun fetchTopo(problemId: Int, origin: TopoOrigin) {
         viewModelScope.launch {
@@ -129,23 +131,28 @@ class MapViewModel(
         }
     }
 
-    fun onCircuitSelected(circuit: Circuit?) {
-        val currentCircuitState = _screenStateFlow.value.circuitState
-        val newCircuitState = circuit?.let {
-            CircuitState(
-                circuitId = it.id,
-                color = it.color,
-                showCircuitStartButton = true
-            )
+    fun onCircuitSelected(circuitId: Int) {
+        if (circuitId < 0) {
+            _screenStateFlow.update { it.copy(circuitState = null) }
+            return
         }
 
-        if (newCircuitState == currentCircuitState) return
+        val currentCircuitState = _screenStateFlow.value.circuitState
 
-        _screenStateFlow.update { it.copy(circuitState = newCircuitState) }
+        if (circuitId == currentCircuitState?.circuitId) return
 
-        if (circuit == null) return
+        viewModelScope.launch {
+            val circuit = circuitRepository.getCircuitById(circuitId) ?: return@launch
 
-        viewModelScope.launch { _eventFlow.emit(Event.ZoomOnCircuit(circuit)) }
+            val newCircuitState = CircuitState(
+                circuitId = circuit.id,
+                color = circuit.color,
+                showCircuitStartButton = true
+            )
+
+            _screenStateFlow.update { it.copy(circuitState = newCircuitState) }
+            _eventFlow.emit(Event.ZoomOnCircuit(circuit))
+        }
     }
 
     fun onGradeRangeSelected(gradeRange: GradeRange) {
@@ -174,9 +181,10 @@ class MapViewModel(
 
     fun onAreaVisited(areaId: Int) {
         viewModelScope.launch {
-            val currentState = _screenStateFlow.value.areaState
+            val currentAreaState = _screenStateFlow.value.areaState
+            val currentCircuitState = _screenStateFlow.value.circuitState
 
-            if (currentState?.area?.id == areaId) return@launch
+            if (currentAreaState?.area?.id == areaId) return@launch
 
             val area = areaRepository.getAreaById(areaId).convert()
             val offlineStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
@@ -185,11 +193,12 @@ class MapViewModel(
                 area = area,
                 status = offlineStatus
             )
+            val newCircuitState = if (currentAreaState?.area == null) currentCircuitState else null
 
             _screenStateFlow.update {
                 it.copy(
                     areaState = newAreaState,
-                    circuitState = null
+                    circuitState = newCircuitState
                 )
             }
         }
@@ -214,6 +223,10 @@ class MapViewModel(
     fun onProblemTopoVisibilityChanged(isVisible: Boolean) {
         isProblemTopoShown = isVisible
         updateFilterBarVisibility()
+    }
+
+    fun onTopoUnselected() {
+        _topoStateFlow.value = null
     }
 
     private fun updateFilterBarVisibility() {
@@ -328,6 +341,10 @@ class MapViewModel(
                 )
             )
         }
+    }
+
+    override fun onDeleteAreaPhotos(areaId: Int) {
+        // not implemented here as no button can trigger this function in this view model
     }
 
     // endregion OfflineAreaDownloader

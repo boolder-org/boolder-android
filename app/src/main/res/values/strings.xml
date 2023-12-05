@@ -51,9 +51,16 @@
     <string name="stepness_roof">Roof</string>
     <string name="stepness_traverse">Traverse</string>
 
+    <string name="tags_popular">Popular</string>
+    <string name="tags_beginner_friendly">Beginner friendly</string>
+    <string name="tags_family_friendly">Family friendly</string>
+    <string name="tags_dry_fast">Dry fast</string>
+
+    <string name="poi_distance_in_min">%d min</string>
+
     <string name="no_name">No name</string>
 
-    <string name="circuit">Circuit %s</string>
+    <string name="circuit">%s circuit</string>
     <string name="circuits">Circuits</string>
     <string name="circuit_start">Circuit start</string>
     <string name="no_circuit_available">No circuit available for this area</string>
@@ -68,6 +75,24 @@
     <string name="custom">Custom</string>
 
     <string name="popular">Popular</string>
+
+    <string name="area_overview_area_info">Area info</string>
+    <string name="area_overview_problems">Problems</string>
+    <string name="area_overview_levels">Levels</string>
+    <string name="area_overview_download_photos">Download photos</string>
+    <string name="area_overview_cancel_download">Cancel download</string>
+    <string name="area_overview_delete_photos">Delete photos</string>
+    <string name="area_overview_download_in_progress">Download in progress…</string>
+    <string name="area_overview_downloaded_photos">Downloaded photos (%s)</string>
+    <string name="area_overview_photos_deletion_dialog_title">Warning</string>
+    <string name="area_overview_photos_deletion_dialog_text">Are you sure to delete the downloaded photos?</string>
+    <string name="area_overview_photos_deletion_dialog_confirm_button">Delete</string>
+    <string name="area_overview_photos_deletion_dialog_cancel_button">Cancel</string>
+    <string name="area_circuit_beginner_friendly">This circuit is beginner friendly</string>
+    <string name="area_circuit_dangerous">This circuit is dangerous: some boulders are very high and/or with difficult landings</string>
+    <string name="area_circuit_see_on_map">See on the map</string>
+    <string name="area_problems_tab_all">All</string>
+    <string name="area_problems_tab_popular">Popular</string>
 
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>

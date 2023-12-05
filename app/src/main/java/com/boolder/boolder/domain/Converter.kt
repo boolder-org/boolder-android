@@ -1,14 +1,14 @@
 package com.boolder.boolder.domain
 
+import com.boolder.boolder.R
 import com.boolder.boolder.data.database.entity.AreasEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.ProblemWithAreaName
-import com.boolder.boolder.data.network.model.TopoRemote
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
-import com.boolder.boolder.domain.model.Topo
+import java.util.Locale
 
 fun ProblemEntity.convert(areaName: String? = null): Problem {
     return Problem(
@@ -55,5 +55,29 @@ fun LineEntity.convert(): Line {
 }
 
 fun AreasEntity.convert(): Area {
-    return Area(id, name, southWestLat, southWestLon, northEastLat, northEastLon)
+    val language = Locale.getDefault().language
+    val description = if (language == "fr") descriptionFr else descriptionEn
+    val warning = if (language == "fr") warningFr else warningEn
+    val rawTags = tags?.split(",") ?: emptyList()
+    val tags = rawTags.mapNotNull {
+        when (it) {
+            "popular" -> R.string.tags_popular
+            "beginner_friendly" -> R.string.tags_beginner_friendly
+            "family_friendly" -> R.string.tags_family_friendly
+            "dry_fast" -> R.string.tags_dry_fast
+            else -> null
+        }
+    }
+
+    return Area(
+        id = id,
+        name = name,
+        description = description,
+        warning = warning,
+        tags = tags,
+        southWestLat = southWestLat,
+        southWestLon = southWestLon,
+        northEastLat = northEastLat,
+        northEastLon = northEastLon
+    )
 }

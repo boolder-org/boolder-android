@@ -30,8 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.CircuitColor
-import com.boolder.boolder.offline.OfflineAreaDownloader
-import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.MapViewModel
@@ -44,8 +42,8 @@ fun MapHeaderLayout(
     gradeState: MapViewModel.GradeState,
     popularState: MapViewModel.PopularFilterState,
     shouldShowFiltersBar: Boolean,
-    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
+    onAreaInfoClicked: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitFilterChipClicked: () -> Unit,
     onGradeFilterChipClicked: () -> Unit,
@@ -62,8 +60,8 @@ fun MapHeaderLayout(
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp),
             offlineAreaItem = offlineAreaItem,
-            offlineAreaDownloader = offlineAreaDownloader,
             onHideAreaName = onHideAreaName,
+            onAreaInfoClicked = onAreaInfoClicked,
             onSearchBarClicked = onSearchBarClicked
         )
 
@@ -220,8 +218,8 @@ private fun MapHeaderLayoutPreview() {
             ),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
             shouldShowFiltersBar = true,
-            offlineAreaDownloader = dummyOfflineAreaDownloader(),
             onHideAreaName = {},
+            onAreaInfoClicked = {},
             onSearchBarClicked = {},
             onCircuitFilterChipClicked = {},
             onGradeFilterChipClicked = {},

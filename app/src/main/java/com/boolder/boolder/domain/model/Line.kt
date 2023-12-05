@@ -3,7 +3,6 @@ package com.boolder.boolder.domain.model
 import android.os.Parcelable
 import com.boolder.boolder.view.detail.PointD
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 @Parcelize

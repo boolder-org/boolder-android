@@ -10,6 +10,9 @@ import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModelImpl
 import com.boolder.boolder.view.search.SearchViewModel
 import com.boolder.boolder.offline.FileExplorer
+import com.boolder.boolder.view.areadetails.areacircuit.AreaCircuitViewModel
+import com.boolder.boolder.view.areadetails.areaoverview.AreaOverviewViewModel
+import com.boolder.boolder.view.areadetails.areaproblems.AreaProblemsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.binds
@@ -30,4 +33,8 @@ val viewModelModule = module {
     viewModelOf(::OfflinePhotosViewModelImpl) { binds(listOf(OfflinePhotosViewModel::class)) }
     factory { FileExplorer(androidApplication()) }
     factory { FileSizeFormatter() }
+
+    viewModelOf(::AreaOverviewViewModel)
+    viewModelOf(::AreaProblemsViewModel)
+    viewModelOf(::AreaCircuitViewModel)
 }

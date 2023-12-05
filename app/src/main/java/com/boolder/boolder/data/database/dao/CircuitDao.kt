@@ -7,6 +7,9 @@ import com.boolder.boolder.data.database.entity.CircuitEntity
 @Dao
 interface CircuitDao {
 
+    @Query("SELECT * FROM circuits WHERE id = :circuitId")
+    suspend fun getCircuitById(circuitId: Int): CircuitEntity?
+
     @Query(
         """
             SELECT * FROM circuits 
