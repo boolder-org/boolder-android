@@ -116,7 +116,7 @@ class MapFragment : Fragment(), BoolderMapListener {
             })
         }
 
-        setupMap()
+        binding.mapView.setup(this, layerFactory.buildStyle())
 
         binding.fabLocation.setOnClickListener {
             locationProvider.askForPosition()
@@ -235,10 +235,6 @@ class MapFragment : Fragment(), BoolderMapListener {
             enabled = true
             pulsingEnabled = true
         }
-    }
-
-    private fun setupMap() {
-        binding?.mapView?.setup(this, layerFactory.buildStyle())
     }
 
     // Triggered when user click on a Problem on Map
