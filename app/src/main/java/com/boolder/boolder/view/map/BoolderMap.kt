@@ -43,10 +43,12 @@ import com.mapbox.maps.extension.style.layers.generated.LineLayer
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.getLayerAs
 import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
+import com.mapbox.maps.plugin.Plugin
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.animation.easeTo
 import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.attribution.AttributionPlugin
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
@@ -106,6 +108,15 @@ class BoolderMap @JvmOverloads constructor(
 
     fun setup(listener: BoolderMapListener, buildStyle: StyleExtension) {
         this.listener = listener
+
+        getPlugin<AttributionPlugin>(Plugin.MAPBOX_ATTRIBUTION_PLUGIN_ID)
+            ?.getMapAttributionDelegate()
+            ?.telemetry()
+            ?.apply {
+                disableTelemetrySession()
+                userTelemetryRequestState = false
+            }
+
         getMapboxMap().loadStyle(buildStyle)
     }
 
