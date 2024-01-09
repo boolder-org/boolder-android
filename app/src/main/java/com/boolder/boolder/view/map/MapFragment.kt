@@ -269,14 +269,14 @@ class MapFragment : Fragment(), BoolderMapListener {
             .build()
 
         binding?.mapView?.apply {
-            getMapboxMap().setCamera(cameraOptions)
+            mapboxMap.setCamera(cameraOptions)
             postDelayed(1_000L) { detectArea() }
         }
         mapViewModel.mapState = null
     }
 
     override fun onPause() {
-        val cameraState = binding?.mapView?.getMapboxMap()?.cameraState ?: return
+        val cameraState = binding?.mapView?.mapboxMap?.cameraState ?: return
 
         mapViewModel.mapState = MapState(
             centerLongitude = cameraState.center.longitude(),
@@ -303,9 +303,9 @@ class MapFragment : Fragment(), BoolderMapListener {
         val binding = binding ?: return
 
         val point = Point.fromLngLat(location.longitude, location.latitude)
-        val zoomLevel = max(binding.mapView.getMapboxMap().cameraState.zoom, 17.0)
+        val zoomLevel = max(binding.mapView.mapboxMap.cameraState.zoom, 17.0)
 
-        binding.mapView.getMapboxMap()
+        binding.mapView.mapboxMap
             .setCamera(CameraOptions.Builder().center(point).zoom(zoomLevel).bearing(location.bearing.toDouble()).build())
         binding.mapView.location.updateSettings {
             enabled = true
@@ -398,7 +398,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         )
         val coordinates = CoordinateBounds(southWest, northEst)
 
-        val cameraOptions = binding.mapView.getMapboxMap().cameraForCoordinateBounds(
+        val cameraOptions = binding.mapView.mapboxMap.cameraForCoordinateBounds(
             coordinates,
             EdgeInsets(60.0, 8.0, 8.0, 8.0),
             0.0,
@@ -407,9 +407,8 @@ class MapFragment : Fragment(), BoolderMapListener {
 
         binding.mapView.camera.flyTo(
             cameraOptions = cameraOptions,
-            animationOptions = defaultMapAnimationOptions {
-                animatorListener(animationEndListener { delayedVisitToArea(area.id) })
-            }
+            animationOptions = defaultMapAnimationOptions {},
+            animatorListener = animationEndListener { delayedVisitToArea(area.id) }
         )
 
         bottomSheetBehavior.state = STATE_HIDDEN
@@ -425,7 +424,7 @@ class MapFragment : Fragment(), BoolderMapListener {
             problem.latitude.toDouble()
         )
 
-        val zoomLevel = binding.mapView.getMapboxMap().cameraState.zoom
+        val zoomLevel = binding.mapView.mapboxMap.cameraState.zoom
 
         val cameraOptions = CameraOptions.Builder().run {
             if (origin in arrayOf(TopoOrigin.SEARCH, TopoOrigin.CIRCUIT)) center(point)
@@ -437,9 +436,8 @@ class MapFragment : Fragment(), BoolderMapListener {
 
         binding.mapView.camera.flyTo(
             cameraOptions = cameraOptions,
-            animationOptions = defaultMapAnimationOptions {
-                animatorListener(animationEndListener { delayedVisitToArea(problem.areaId) })
-            }
+            animationOptions = defaultMapAnimationOptions {},
+            animatorListener = animationEndListener { delayedVisitToArea(problem.areaId) }
         )
     }
 
