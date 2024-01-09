@@ -5,10 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -44,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.utils.previewgenerator.dummyProblem
@@ -148,9 +151,9 @@ internal fun AreaProblemsScreen(
             when (screenState) {
                 is AreaProblemsViewModel.ScreenState.Loading -> LoadingContent()
                 is AreaProblemsViewModel.ScreenState.Content -> AreaProblemsScreenContent(
-                    modifier = Modifier.padding(it),
                     problems = screenState.problems,
                     popularProblems = screenState.popularProblems,
+                    contentPadding = it,
                     onProblemClicked = onProblemClicked
                 )
             }
@@ -171,11 +174,11 @@ private fun LoadingContent() {
 private fun AreaProblemsScreenContent(
     problems: List<Problem>,
     popularProblems: List<Problem>,
-    onProblemClicked: (Problem) -> Unit,
-    modifier: Modifier = Modifier
+    contentPadding: PaddingValues,
+    onProblemClicked: (Problem) -> Unit
 ) {
     Column(
-        modifier = modifier.imePadding()
+        modifier = Modifier.padding(top = contentPadding.calculateTopPadding())
     ) {
         var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -195,9 +198,19 @@ private fun AreaProblemsScreenContent(
             )
         }
 
+        val bottomInset = max(
+            WindowInsets.ime.asPaddingValues().calculateBottomPadding(),
+            contentPadding.calculateBottomPadding()
+        )
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(
+                top = 16.dp,
+                bottom = bottomInset + 16.dp,
+                start = 16.dp,
+                end = 16.dp,
+            )
         ) {
             val problemsToDisplay = if (selectedTabIndex == 0) problems else popularProblems
 

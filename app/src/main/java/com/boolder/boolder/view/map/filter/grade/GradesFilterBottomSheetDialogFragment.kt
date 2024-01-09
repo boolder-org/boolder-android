@@ -13,10 +13,10 @@ import androidx.navigation.fragment.findNavController
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class GradesFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
+class GradesFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
 
     private val viewModel by viewModel<GradesFilterViewModel>()
 

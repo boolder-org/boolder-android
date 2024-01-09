@@ -65,8 +65,8 @@ internal fun DiscoverScreen(
             when (screenState) {
                 is DiscoverViewModel.ScreenState.Loading -> LoadingScreen()
                 is DiscoverViewModel.ScreenState.Content -> DiscoverScreenContent(
-                    modifier = Modifier.padding(it),
                     screenState = screenState,
+                    contentPadding = it,
                     onDiscoverHeaderItemClicked = onDiscoverHeaderItemClicked,
                     onAreaClicked = onAreaClicked,
                     onRateAppClicked = onRateAppClicked,
@@ -80,15 +80,18 @@ internal fun DiscoverScreen(
 @Composable
 private fun DiscoverScreenContent(
     screenState: DiscoverViewModel.ScreenState.Content,
+    contentPadding: PaddingValues,
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit,
-    onContributeClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    onContributeClicked: () -> Unit
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 16.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = contentPadding.calculateTopPadding() + 16.dp,
+            bottom = 16.dp
+        ),
         verticalArrangement = spacedBy(8.dp)
     ) {
         item {

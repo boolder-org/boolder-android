@@ -87,7 +87,7 @@ dependencies {
     implementation("io.coil-kt:coil:2.5.0")
 
     // Jetpack compose
-    val composeBom = platform("androidx.compose:compose-bom:2023.09.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.01.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation("androidx.compose.material3:material3")

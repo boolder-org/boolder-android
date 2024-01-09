@@ -7,9 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -18,7 +21,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.FragmentSearchBinding
-import com.boolder.boolder.utils.extension.setOnApplyWindowTopInsetListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -54,12 +56,19 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val binding = binding ?: return
 
-        binding.root.setOnApplyWindowTopInsetListener { topInset ->
-            val topMargin = topInset + resources.getDimensionPixelSize(R.dimen.margin_search_component)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val typeMask = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+            val contentInsets = insets.getInsets(typeMask)
+
+            val topMargin = contentInsets.top + resources.getDimensionPixelSize(R.dimen.margin_search_component)
 
             binding.searchComponent
                 .searchContainer
                 .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
+
+            binding.recyclerView.updatePadding(bottom = contentInsets.bottom)
+
+            WindowInsetsCompat.CONSUMED
         }
 
         binding.searchComponent.searchBar.requestFocus()
