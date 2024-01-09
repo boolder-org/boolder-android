@@ -11,6 +11,9 @@ class CircuitRepository(
     private val circuitDao: CircuitDao
 ) {
 
+    suspend fun getCircuitById(circuitId: Int): Circuit? =
+        circuitDao.getCircuitById(circuitId)?.toCircuit()
+
     suspend fun getAvailableCircuits(areaId: Int): List<Circuit> =
         circuitDao.getAvailableCircuits(areaId = areaId)
             .map { it.toCircuit() }

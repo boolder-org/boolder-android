@@ -18,6 +18,9 @@
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
         <action
+            android:id="@+id/navigate_to_area_overview_screen"
+            app:destination="@+id/area_overview_fragment" />
+        <action
             android:id="@+id/navigate_to_offline_photos_screen"
             app:destination="@+id/offline_photos_fragment" />
         <action
@@ -33,6 +36,48 @@
         android:name="com.boolder.boolder.view.search.SearchFragment"
         android:label="Search fragment"
         tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/area_overview_fragment"
+        android:name="com.boolder.boolder.view.areadetails.areaoverview.AreaOverviewFragment"
+        android:label="Area overview fragment">
+        <argument
+            android:name="area_id"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/navigate_to_area_problems_screen"
+            app:destination="@+id/area_problems_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/navigate_to_area_circuit_screen"
+            app:destination="@+id/area_circuit_fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/area_problems_fragment"
+        android:name="com.boolder.boolder.view.areadetails.areaproblems.AreaProblemsFragment"
+        android:label="Area problems fragment">
+        <argument
+            android:name="area_id"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/area_circuit_fragment"
+        android:name="com.boolder.boolder.view.areadetails.areacircuit.AreaCircuitFragment"
+        android:label="Area circuit fragment">
+        <argument
+            android:name="circuit_id"
+            app:argType="integer" />
+    </fragment>
 
     <fragment
         android:id="@+id/offline_photos_fragment"

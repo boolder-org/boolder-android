@@ -40,4 +40,28 @@ interface ProblemDao {
         circuitId: Int,
         circuitProblemNumber: Int
     ): Int?
+
+    @Query("""
+        SELECT * FROM problems
+        WHERE area_id = :areaId
+        ORDER BY grade DESC, popularity DESC
+        """
+    )
+    suspend fun problemsForArea(areaId: Int): List<ProblemEntity>
+
+    @Query("""
+        SELECT * FROM problems
+        WHERE area_id = :areaId and name_searchable LIKE '%' || :query || '%'
+        ORDER BY grade DESC, popularity DESC
+        """
+    )
+    suspend fun problemsForArea(areaId: Int, query: String): List<ProblemEntity>
+
+    @Query("""
+        SELECT * FROM problems 
+        WHERE circuit_id = :circuitId
+        ORDER BY CAST(circuit_number AS INTEGER)
+        """
+    )
+    suspend fun problemsForCircuit(circuitId: Int): List<ProblemEntity>
 }

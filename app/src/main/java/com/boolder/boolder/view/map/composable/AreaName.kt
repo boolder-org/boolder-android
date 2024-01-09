@@ -6,12 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,10 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.boolder.boolder.R
-import com.boolder.boolder.offline.DOWNLOAD_TERMINATED_STATUSES
-import com.boolder.boolder.offline.OfflineAreaDownloader
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS
-import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
 import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
 import com.boolder.boolder.view.compose.BoolderTheme
@@ -54,8 +49,8 @@ import kotlin.math.roundToInt
 @Composable
 internal fun AreaName(
     offlineAreaItem: OfflineAreaItem?,
-    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
+    onAreaInfoClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val alpha by animateFloatAsState(
@@ -68,18 +63,14 @@ internal fun AreaName(
         modifier = modifier
             .alpha(alpha)
             .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(8.dp))
-            .then(if (alpha == 1f) Modifier.clickable(enabled = false) {} else Modifier),
+            .heightIn(min = 50.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(color = Color.White)
+            .then(if (alpha == 1f) Modifier.clickable(onClick = onAreaInfoClicked) else Modifier),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            modifier = Modifier
-                .padding(4.dp)
-                .clip(shape = CircleShape)
-                .clickable(onClick = onHideAreaName)
-                .padding(8.dp)
-                .size(24.dp),
+            modifier = Modifier.iconActionModifier(onClick = onHideAreaName),
             painter = painterResource(id = R.drawable.ic_chevron_left),
             contentDescription = "Hide area name"
         )
@@ -102,12 +93,21 @@ internal fun AreaName(
             AreaOfflineStatusInfo(item = offlineAreaItem)
         }
 
-        AreaOfflineStatusAction(
-            item = offlineAreaItem,
-            offlineAreaDownloader = offlineAreaDownloader
+        Icon(
+            modifier = Modifier.iconActionModifier(onClick = onAreaInfoClicked),
+            painter = painterResource(id = R.drawable.ic_outline_info),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
         )
     }
 }
+
+private fun Modifier.iconActionModifier(onClick: () -> Unit) =
+    padding(4.dp)
+        .clip(CircleShape)
+        .clickable(onClick = onClick)
+        .padding(8.dp)
+        .size(24.dp)
 
 @Composable
 private fun AreaOfflineStatusInfo(item: OfflineAreaItem?) {
@@ -159,69 +159,6 @@ private fun AreaDownloadProgress(progress: Float) {
 }
 
 @Composable
-private fun AreaOfflineStatusAction(
-    item: OfflineAreaItem?,
-    offlineAreaDownloader: OfflineAreaDownloader
-) {
-    item ?: return
-
-    when (item.status) {
-        is OfflineAreaItemStatus.NotDownloaded -> IconNotDownloaded(
-            modifier = Modifier.statusIconModifier { offlineAreaDownloader.onDownloadArea(item.area.id) }
-        )
-        is OfflineAreaItemStatus.Downloading -> IconDownloading(
-            modifier = Modifier.statusIconModifier { offlineAreaDownloader.onCancelAreaDownload(item.area.id) },
-            areaId = item.area.id,
-            onDownloadTerminated = offlineAreaDownloader::onAreaDownloadTerminated
-        )
-        is OfflineAreaItemStatus.Downloaded -> Spacer(modifier = Modifier.width(48.dp))
-    }
-}
-
-private fun Modifier.statusIconModifier(onClick: () -> Unit) =
-    padding(4.dp)
-        .clip(shape = CircleShape)
-        .clickable(onClick = onClick)
-        .padding(8.dp)
-        .size(24.dp)
-
-@Composable
-private fun IconNotDownloaded(
-    modifier: Modifier = Modifier
-) {
-    Icon(
-        modifier = modifier,
-        painter = painterResource(id = R.drawable.ic_download_for_offline),
-        contentDescription = null,
-        tint = MaterialTheme.colorScheme.primary
-    )
-}
-
-@Composable
-private fun IconDownloading(
-    areaId: Int,
-    onDownloadTerminated: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    if (!LocalInspectionMode.current) {
-        val workInfoList by WorkManager.getInstance(LocalContext.current)
-            .getWorkInfosForUniqueWorkLiveData(areaId.getDownloadTopoImagesWorkName())
-            .observeAsState()
-
-        if (workInfoList?.all { it.state in DOWNLOAD_TERMINATED_STATUSES } == true) {
-            onDownloadTerminated(areaId)
-        }
-    }
-
-    Icon(
-        modifier = modifier,
-        painter = painterResource(id = R.drawable.ic_cancel),
-        contentDescription = null,
-        tint = Color.Gray
-    )
-}
-
-@Composable
 private fun IconDownloaded(
     modifier: Modifier = Modifier
 ) {
@@ -242,8 +179,8 @@ private fun AreaNamePreview(
     BoolderTheme {
         AreaName(
             offlineAreaItem = dummyOfflineAreaItem(status = offlineAreaItemStatus),
-            offlineAreaDownloader = dummyOfflineAreaDownloader(),
-            onHideAreaName = {}
+            onHideAreaName = {},
+            onAreaInfoClicked = {}
         )
     }
 }

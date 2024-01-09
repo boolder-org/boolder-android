@@ -47,6 +47,13 @@
     <string name="stepness_roof">Toit</string>
     <string name="stepness_traverse">Traversée</string>
 
+    <string name="tags_popular">Populaire</string>
+    <string name="tags_beginner_friendly">Convient aux débutants</string>
+    <string name="tags_family_friendly">Idéal en famille</string>
+    <string name="tags_dry_fast">Sèche vite</string>
+
+    <string name="poi_distance_in_min">%d min</string>
+
     <string name="no_name">Sans nom</string>
 
     <string name="circuit">Circuit %s</string>
@@ -64,6 +71,24 @@
     <string name="custom">Personnalisé</string>
 
     <string name="popular">Populaires</string>
+
+    <string name="area_overview_area_info">Infos secteur</string>
+    <string name="area_overview_problems">Voies</string>
+    <string name="area_overview_levels">Niveaux</string>
+    <string name="area_overview_download_photos">Télécharger les photos</string>
+    <string name="area_overview_cancel_download">Annuler le téléchargement</string>
+    <string name="area_overview_delete_photos">Supprimer les photos</string>
+    <string name="area_overview_download_in_progress">Téléchargement en cours…</string>
+    <string name="area_overview_downloaded_photos">Photos téléchargées (%s)</string>
+    <string name="area_overview_photos_deletion_dialog_title">Attention</string>
+    <string name="area_overview_photos_deletion_dialog_text">Voulez-vous supprimer les photos téléchargées ?</string>
+    <string name="area_overview_photos_deletion_dialog_confirm_button">Supprimer</string>
+    <string name="area_overview_photos_deletion_dialog_cancel_button">Annuler</string>
+    <string name="area_circuit_beginner_friendly">Ce circuit convient aux débutants</string>
+    <string name="area_circuit_dangerous">Ce circuit est dangereux : certains blocs sont très hauts et/ou avec une réception difficile</string>
+    <string name="area_circuit_see_on_map">Voir sur la carte</string>
+    <string name="area_problems_tab_all">Toutes</string>
+    <string name="area_problems_tab_popular">Populaires</string>
 
     <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
     <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>

@@ -68,7 +68,7 @@ class BoolderMap @JvmOverloads constructor(
 
     interface BoolderMapListener {
         fun onProblemSelected(problemId: Int, origin: TopoOrigin)
-        fun onProblemUnselected()
+        fun onTopoUnselected()
         fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?)
 
         fun onAreaVisited(areaId: Int)
@@ -85,13 +85,6 @@ class BoolderMap @JvmOverloads constructor(
     private var insets = Insets.NONE
 
     init {
-        val cameraOptions = CameraOptions.Builder()
-            .center(Point.fromLngLat(2.5968216, 48.3925623))
-            .zoom(10.2)
-            .build()
-
-        getMapboxMap().setCamera(cameraOptions)
-
         gestures.pitchEnabled = false
         scalebar.enabled = false
         compass.updateSettings {
@@ -102,7 +95,16 @@ class BoolderMap @JvmOverloads constructor(
         }
         addClickEvent()
 
-        getMapboxMap().addOnCameraChangeListener { onCameraChanged() }
+        getMapboxMap().addOnCameraChangeListener {
+            val now = System.currentTimeMillis()
+
+            if (now - lastCameraCheckTimestamp < CAMERA_CHECK_THROTTLE_DELAY) return@addOnCameraChangeListener
+
+            lastCameraCheckTimestamp = now
+
+            detectArea()
+        }
+
         camera.addCameraZoomChangeListener { listener?.onZoomLevelChanged(it) }
     }
 
@@ -197,7 +199,7 @@ class BoolderMap @JvmOverloads constructor(
                 val feature = features.value?.firstOrNull()?.feature
                     ?: run {
                         unselectProblem()
-                        listener?.onProblemUnselected()
+                        listener?.onTopoUnselected()
                         return@queryRenderedFeatures
                     }
 
@@ -479,13 +481,7 @@ class BoolderMap @JvmOverloads constructor(
         popularAntiOverlapLayer?.update()
     }
 
-    private fun onCameraChanged() {
-        val now = System.currentTimeMillis()
-
-        if (now - lastCameraCheckTimestamp < CAMERA_CHECK_THROTTLE_DELAY) return
-
-        lastCameraCheckTimestamp = now
-
+    fun detectArea() {
         val halfSquareSize = width / 8
 
         val left = (width / 2 - halfSquareSize).toDouble()

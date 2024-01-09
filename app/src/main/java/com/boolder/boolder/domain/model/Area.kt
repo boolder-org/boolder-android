@@ -8,6 +8,9 @@ import kotlinx.parcelize.Parcelize
 data class Area(
     val id: Int,
     val name: String,
+    val description: String? = null,
+    val warning: String? = null,
+    val tags: List<Int> = emptyList(),
     val southWestLat: Float,
     val southWestLon: Float,
     val northEastLat: Float,

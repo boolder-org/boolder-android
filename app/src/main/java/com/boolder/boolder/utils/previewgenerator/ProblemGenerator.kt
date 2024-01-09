@@ -4,7 +4,10 @@ import com.boolder.boolder.domain.model.Problem
 
 fun dummyProblem(
     id: Int = 1000,
-    name: String = "The dummy problem"
+    name: String = "The dummy problem",
+    circuitNumber: String? = "10",
+    circuitColor: String? = "RED",
+    featured: Boolean = false
 ) = Problem(
     id = id,
     name = name,
@@ -13,13 +16,13 @@ fun dummyProblem(
     latitude = 0f,
     longitude = 0f,
     circuitId = null,
-    circuitNumber = "10",
-    circuitColor = "RED",
+    circuitNumber = circuitNumber,
+    circuitColor = circuitColor,
     steepness = "wall",
     sitStart = true,
     areaId = 1000,
     bleauInfoId = null,
-    featured = false,
+    featured = featured,
     parentId = null,
     areaName = null
 )

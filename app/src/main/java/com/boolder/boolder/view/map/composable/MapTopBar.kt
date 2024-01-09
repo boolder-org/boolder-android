@@ -8,8 +8,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.boolder.boolder.databinding.SearchComponentBinding
-import com.boolder.boolder.offline.OfflineAreaDownloader
-import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
@@ -17,8 +15,8 @@ import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 @Composable
 fun MapTopBar(
     offlineAreaItem: OfflineAreaItem?,
-    offlineAreaDownloader: OfflineAreaDownloader,
     onHideAreaName: () -> Unit,
+    onAreaInfoClicked: () -> Unit,
     onSearchBarClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -39,8 +37,8 @@ fun MapTopBar(
 
         AreaName(
             offlineAreaItem = offlineAreaItem,
-            offlineAreaDownloader = offlineAreaDownloader,
             onHideAreaName = onHideAreaName,
+            onAreaInfoClicked = onAreaInfoClicked
         )
     }
 }
@@ -54,8 +52,8 @@ private fun MapTopBarPreview(
     BoolderTheme {
         MapTopBar(
             offlineAreaItem = offlineAreaItem,
-            offlineAreaDownloader = dummyOfflineAreaDownloader(),
             onHideAreaName = {},
+            onAreaInfoClicked = {},
             onSearchBarClicked = {}
         )
     }

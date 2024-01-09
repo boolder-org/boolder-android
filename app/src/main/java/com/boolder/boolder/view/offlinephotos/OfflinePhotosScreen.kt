@@ -156,6 +156,7 @@ private class OfflinePhotosScreenPreviewParameterProvider :
     private fun area(id: Int, name: String) = Area(
         id = id,
         name = name,
+        description = "",
         southWestLat = 0f,
         southWestLon = 0f,
         northEastLat = 0f,
