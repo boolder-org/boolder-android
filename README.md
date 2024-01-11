@@ -20,6 +20,8 @@ We'd be happy to share the fun with you :)
 
 As the project is still young, the best way to get started is to drop us a line at hello@boolder.com
 
+You can also contribute to our mapping efforts at https://www.boolder.com/en/contribute
+
 ## Build the app
 
 ### Codebase overview
