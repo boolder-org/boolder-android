@@ -41,10 +41,12 @@ Here is a 15-min video describing the architecture of the app : https://youtu.be
 Create a file named `gradle.properties` in the `~/.gradle/` directory, with the following content:
 
 ```
-MAPBOX_DOWNLOADS_TOKEN={TOKEN}
+MAPBOX_ACCESS_TOKEN={ACCESS_TOKEN}
+MAPBOX_DOWNLOADS_TOKEN={DOWNLOADS_TOKEN}
 ```
 
-Replace `{TOKEN}` with mapbox secret key.
+Replace respectively `{ACCESS_TOKEN}` and `{DOWNLOADS_TOKEN}` with the mapbox default public token
+and the secret download key.
 
 More info [here](https://docs.mapbox.com/help/troubleshooting/private-access-token-android-and-ios/).
 
