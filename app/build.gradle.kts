@@ -19,6 +19,12 @@ android {
         versionName = "1.16" // bump when new version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        resValue(
+            type = "string",
+            name = "mapbox_access_token",
+            value = providers.gradleProperty("MAPBOX_ACCESS_TOKEN").get()
+        )
     }
 
     buildTypes {
