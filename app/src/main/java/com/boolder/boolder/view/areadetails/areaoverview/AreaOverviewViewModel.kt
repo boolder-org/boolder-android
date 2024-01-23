@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
-import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.AccessFromPoi
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
@@ -31,15 +30,12 @@ class AreaOverviewViewModel(
         viewModelScope.launch {
             val areaId = savedStateHandle.get<Int>("area_id") ?: return@launch
 
-            val area = areaRepository.getAreaById(areaId).convert()
-            val degreeCounts = areaRepository.getDegreeCountsByArea(areaId)
+            val area = areaRepository.getAreaById(areaId)
             val circuits = circuitRepository.getAvailableCircuits(areaId)
             val accessesFromPoi = areaRepository.getAccessesFromPoiByAreaId(areaId)
 
             _screenState.value = ScreenState.Content(
                 area = area,
-                boulderProblemsCount = degreeCounts.values.sum().toString(),
-                degreeCounts = degreeCounts,
                 circuits = circuits,
                 accessesFromPoi = accessesFromPoi,
                 offlineAreaItemStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
@@ -91,8 +87,6 @@ class AreaOverviewViewModel(
 
         data class Content(
             val area: Area,
-            val boulderProblemsCount: String,
-            val degreeCounts: Map<String, Int>,
             val circuits: List<Circuit>,
             val accessesFromPoi: List<AccessFromPoi>,
             val offlineAreaItemStatus: OfflineAreaItemStatus

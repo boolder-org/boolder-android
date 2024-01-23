@@ -1,18 +1,23 @@
 package com.boolder.boolder.view
 
 import android.content.res.Resources
+import com.boolder.boolder.offline.FileExplorer
 import com.boolder.boolder.utils.FileSizeFormatter
 import com.boolder.boolder.utils.MapboxStyleFactory
+import com.boolder.boolder.view.areadetails.areacircuit.AreaCircuitViewModel
+import com.boolder.boolder.view.areadetails.areaoverview.AreaOverviewViewModel
+import com.boolder.boolder.view.areadetails.areaproblems.AreaProblemsViewModel
+import com.boolder.boolder.view.discover.discover.DiscoverViewModel
+import com.boolder.boolder.view.discover.driesfast.DriesFastViewModel
+import com.boolder.boolder.view.discover.levels.LevelsViewModel
+import com.boolder.boolder.view.discover.levels.beginner.BeginnerLevelsViewModel
+import com.boolder.boolder.view.discover.trainandbike.TrainAndBikeViewModel
 import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.TopoDataAggregator
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModelImpl
 import com.boolder.boolder.view.search.SearchViewModel
-import com.boolder.boolder.offline.FileExplorer
-import com.boolder.boolder.view.areadetails.areacircuit.AreaCircuitViewModel
-import com.boolder.boolder.view.areadetails.areaoverview.AreaOverviewViewModel
-import com.boolder.boolder.view.areadetails.areaproblems.AreaProblemsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.binds
@@ -37,4 +42,10 @@ val viewModelModule = module {
     viewModelOf(::AreaOverviewViewModel)
     viewModelOf(::AreaProblemsViewModel)
     viewModelOf(::AreaCircuitViewModel)
+
+    viewModelOf(::DiscoverViewModel)
+    viewModelOf(::DriesFastViewModel)
+    viewModelOf(::LevelsViewModel)
+    viewModelOf(::BeginnerLevelsViewModel)
+    viewModelOf(::TrainAndBikeViewModel)
 }

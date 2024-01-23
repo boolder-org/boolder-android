@@ -18,6 +18,10 @@ class CircuitRepository(
         circuitDao.getAvailableCircuits(areaId = areaId)
             .map { it.toCircuit() }
 
+    suspend fun getBeginnerFriendlyCircuits(areaId: Int): List<Circuit> =
+        circuitDao.getBeginnerFriendlyCircuits(areaId = areaId)
+            .map { it.toCircuit() }
+
     suspend fun getCircuitFromProblemId(problemId: Int): Circuit? =
         circuitDao.getCircuitFromProblemId(problemId)?.toCircuit()
 

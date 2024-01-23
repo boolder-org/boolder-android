@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.view.compose.BoolderTheme
@@ -57,7 +58,7 @@ class GradesFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
             requestKey = REQUEST_KEY,
             result = bundleOf(RESULT_GRADE_RANGE to gradeRange)
         )
-        dismiss()
+        findNavController().popBackStack()
     }
 
     companion object {

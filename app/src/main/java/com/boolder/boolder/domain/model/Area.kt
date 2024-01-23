@@ -14,5 +14,7 @@ data class Area(
     val southWestLat: Float,
     val southWestLon: Float,
     val northEastLat: Float,
-    val northEastLon: Float
+    val northEastLon: Float,
+    val problemsCount: Int,
+    val problemsCountsPerGrade: Map<String, Int>
 ) : BaseObject, Parcelable

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -51,13 +53,14 @@ import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.utils.previewgenerator.dummyCircuit
 import com.boolder.boolder.view.areadetails.areaoverview.composable.acessfrompoi.AccessFromPoi
-import com.boolder.boolder.view.areadetails.areaoverview.composable.degreecounts.DegreeCountsChart
-import com.boolder.boolder.view.areadetails.areaoverview.composable.degreecounts.DegreeCountsRow
+import com.boolder.boolder.view.compose.degreecounts.DegreeCountsChart
+import com.boolder.boolder.view.compose.degreecounts.DegreeCountsRow
 import com.boolder.boolder.view.areadetails.areaoverview.composable.download.AreaPhotosDownloadItem
 import com.boolder.boolder.view.areadetails.composable.SectionContainer
+import com.boolder.boolder.view.areadetails.composable.SeeOnMapButton
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.CircuitItem
-import com.boolder.boolder.view.compose.Orange
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.domain.model.AccessFromPoi as AccessFromPoiModel
 
@@ -66,7 +69,9 @@ import com.boolder.boolder.domain.model.AccessFromPoi as AccessFromPoiModel
 internal fun AreaOverviewScreen(
     screenState: AreaOverviewViewModel.ScreenState,
     offlineAreaDownloader: OfflineAreaDownloader,
+    displayShowOnMapButton: Boolean,
     onBackPressed: () -> Unit,
+    onSeeOnMapClicked: () -> Unit,
     onAreaProblemsCountClicked: () -> Unit,
     onCircuitClicked: (Int) -> Unit,
     onPoiClicked: (String) -> Unit,
@@ -94,6 +99,10 @@ internal fun AreaOverviewScreen(
                 }
             )
         },
+        floatingActionButton = {
+            if (displayShowOnMapButton) SeeOnMapButton(onClick = onSeeOnMapClicked)
+        },
+        floatingActionButtonPosition = FabPosition.Center,
         content = {
             when (screenState) {
                 is AreaOverviewViewModel.ScreenState.Loading -> LoadingContent()
@@ -101,6 +110,7 @@ internal fun AreaOverviewScreen(
                     modifier = Modifier.padding(it),
                     screenState = screenState,
                     offlineAreaDownloader = offlineAreaDownloader,
+                    displayShowOnMapButton = displayShowOnMapButton,
                     onAreaProblemsCountClicked = onAreaProblemsCountClicked,
                     onCircuitClicked = onCircuitClicked,
                     onPoiClicked = onPoiClicked
@@ -124,6 +134,7 @@ private fun LoadingContent() {
 private fun AreaOverviewScreenContent(
     screenState: AreaOverviewViewModel.ScreenState.Content,
     offlineAreaDownloader: OfflineAreaDownloader,
+    displayShowOnMapButton: Boolean,
     onAreaProblemsCountClicked: () -> Unit,
     onCircuitClicked: (Int) -> Unit,
     onPoiClicked: (String) -> Unit,
@@ -132,10 +143,13 @@ private fun AreaOverviewScreenContent(
     var showGradesCountChart by remember { mutableStateOf(false) }
 
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = Color.LightGray.copy(alpha = .25f)),
-        contentPadding = PaddingValues(16.dp)
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 16.dp,
+            bottom = if (displayShowOnMapButton) 80.dp else 16.dp
+        )
     ) {
         if (screenState.area.tags.isNotEmpty()
             || screenState.area.description != null
@@ -144,7 +158,9 @@ private fun AreaOverviewScreenContent(
             item(key = "info") {
                 SectionContainer {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         verticalArrangement = spacedBy(16.dp)
                     ) {
                         if (screenState.area.tags.isNotEmpty()) {
@@ -181,7 +197,7 @@ private fun AreaOverviewScreenContent(
                             Text(
                                 text = it,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Color.Orange,
+                                color = Color.BoolderOrange,
                                 textAlign = TextAlign.Justify
                             )
                         }
@@ -196,13 +212,13 @@ private fun AreaOverviewScreenContent(
             SectionContainer {
                 Column {
                     GradeCountsItem(
-                        gradeCounts = screenState.degreeCounts,
+                        gradeCounts = screenState.area.problemsCountsPerGrade,
                         showGradesCountChart = showGradesCountChart,
                         onToggleGradesCountChartVisibility = { showGradesCountChart = !showGradesCountChart }
                     )
 
                     BoulderProblemsItem(
-                        boulderProblemsCount = screenState.boulderProblemsCount,
+                        boulderProblemsCount = screenState.area.problemsCount.toString(),
                         onAreaProblemsCountClicked = onAreaProblemsCountClicked
                     )
                 }
@@ -331,7 +347,9 @@ private fun AreaOverviewScreenPreview(
         AreaOverviewScreen(
             screenState = screenState,
             offlineAreaDownloader = dummyOfflineAreaDownloader(),
+            displayShowOnMapButton = true,
             onBackPressed = {},
+            onSeeOnMapClicked = {},
             onAreaProblemsCountClicked = {},
             onCircuitClicked = {},
             onPoiClicked = {}
@@ -345,17 +363,6 @@ private class AreaOverviewScreenPreviewParameterProvider : PreviewParameterProvi
         AreaOverviewViewModel.ScreenState.Loading,
         AreaOverviewViewModel.ScreenState.Content(
             area = dummyArea(),
-            boulderProblemsCount = "513",
-            degreeCounts = mapOf(
-                "1" to 3,
-                "2" to 103,
-                "3" to 63,
-                "4" to 88,
-                "5" to 60,
-                "6" to 84,
-                "7" to 97,
-                "8" to 15,
-            ),
             circuits = List(3) {
                 dummyCircuit(
                     id = it,

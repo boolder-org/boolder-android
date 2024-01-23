@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/map_fragment"
+        android:icon="@drawable/ic_map"
+        android:title="@string/tab_map" />
+
+    <item
+        android:id="@+id/discover_fragment"
+        android:icon="@drawable/ic_auto_awesome"
+        android:title="@string/tab_discover" />
+
+</menu>

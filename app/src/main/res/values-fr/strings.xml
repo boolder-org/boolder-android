@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tab_map">Carte</string>
+    <string name="tab_discover">Découvrir</string>
+
     <string name="search_query_hint">Nom de voie ou secteur</string>
     <string name="cd_find_my_position">Me localiser</string>
     <string name="cancel_search">Annuler la recherche</string>
@@ -89,6 +92,24 @@
     <string name="area_circuit_see_on_map">Voir sur la carte</string>
     <string name="area_problems_tab_all">Toutes</string>
     <string name="area_problems_tab_popular">Populaires</string>
+
+    <string name="discover_header_item_beginner_guide">Le guide pour bien débuter</string>
+    <string name="discover_header_item_dries_fast">Sèche vite</string>
+    <string name="discover_header_item_per_level">Par niveau</string>
+    <string name="discover_header_item_train_and_bike">Accessible en train + vélo</string>
+    <string name="discover_section_all_areas">Tous les secteurs</string>
+    <string name="discover_section_popular_areas">Populaires</string>
+    <string name="discover_section_support">Envie d\'aider ?</string>
+    <string name="discover_support_rate">Noter l\'appli</string>
+    <string name="discover_support_contribute">Contribuer</string>
+
+    <string name="top_areas_levels_all_areas">Tous les secteurs</string>
+    <string name="top_areas_levels_beginner_friendly">Idéal pour débuter</string>
+    <string name="top_areas_levels_beginner_friendly_intro">Secteurs avec circuits qui conviennent aux débutants :</string>
+    <string name="top_areas_dry_fast_description">Ces secteurs sèchent plus vite que la moyenne grâce à leur exposition au soleil ou au vent</string>
+    <string name="top_areas_dry_fast_warning">Ne grimpez pas si la roche est encore humide, vous risquez de l\'abîmer</string>
+    <string name="top_areas_dry_fast_useful_link">Lien utile :</string>
+    <string name="top_areas_train_and_bike_intro">Temps d\'accès en vélo depuis la gare :</string>
 
     <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
     <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>

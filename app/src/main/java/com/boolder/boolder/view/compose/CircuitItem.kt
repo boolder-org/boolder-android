@@ -70,7 +70,7 @@ internal fun CircuitItem(
             Icon(
                 painter = painterResource(id = R.drawable.ic_error_outline),
                 contentDescription = null,
-                tint = Color.Orange
+                tint = Color.BoolderOrange
             )
         }
 

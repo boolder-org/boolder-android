@@ -196,9 +196,7 @@ private fun AreaProblemsScreenContent(
         }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.LightGray.copy(alpha = .25f)),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp)
         ) {
             val problemsToDisplay = if (selectedTabIndex == 0) problems else popularProblems

@@ -7,8 +7,8 @@ import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
-import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.ALL_GRADES
+import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
@@ -131,6 +131,14 @@ class MapViewModel(
         }
     }
 
+    fun onAreaSelected(areaId: Int) {
+        viewModelScope.launch {
+            val area = areaRepository.getAreaById(areaId)
+
+            _eventFlow.emit(Event.ZoomOnArea(area))
+        }
+    }
+
     fun onCircuitSelected(circuitId: Int) {
         if (circuitId < 0) {
             _screenStateFlow.update { it.copy(circuitState = null) }
@@ -186,7 +194,7 @@ class MapViewModel(
 
             if (currentAreaState?.area?.id == areaId) return@launch
 
-            val area = areaRepository.getAreaById(areaId).convert()
+            val area = areaRepository.getAreaById(areaId)
             val offlineStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
 
             val newAreaState = OfflineAreaItem(
@@ -381,5 +389,6 @@ class MapViewModel(
         data class ZoomOnCircuit(val circuit: Circuit) : Event
 
         data class ZoomOnCircuitStartProblem(val problemId: Int) : Event
+        data class ZoomOnArea(val area: Area) : Event
     }
 }

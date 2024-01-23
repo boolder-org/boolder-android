@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.areadetails.areaoverview.composable.degreecounts
+package com.boolder.boolder.view.compose.degreecounts
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

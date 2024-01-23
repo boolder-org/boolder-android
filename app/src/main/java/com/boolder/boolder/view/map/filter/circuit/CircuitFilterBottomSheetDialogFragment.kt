@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -36,7 +37,7 @@ class CircuitFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
             requestKey = REQUEST_KEY,
             result = bundleOf(RESULT_CIRCUIT_ID to circuitId)
         )
-        dismiss()
+        findNavController().popBackStack()
     }
 
     companion object {
