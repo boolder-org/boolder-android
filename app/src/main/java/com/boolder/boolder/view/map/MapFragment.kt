@@ -351,7 +351,12 @@ class MapFragment : Fragment(), BoolderMapListener {
 
             flyToProblem(problem = selectedProblem, origin = topo.origin)
         }
-        bottomSheetBehavior.state = if (nullableTopo == null) STATE_HIDDEN else STATE_EXPANDED
+
+        if (nullableTopo == null) {
+            bottomSheetBehavior.state = STATE_HIDDEN
+        } else {
+            binding?.mapView?.post { bottomSheetBehavior.state = STATE_EXPANDED }
+        }
     }
 
     private fun openGoogleMaps(url: String) {
@@ -388,7 +393,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         binding.mapView.camera.flyTo(
             cameraOptions = cameraOptions,
             animationOptions = defaultMapAnimationOptions {
-                animatorListener(animationEndListener { onAreaVisited(area.id) })
+                animatorListener(animationEndListener { delayedVisitToArea(area.id) })
             }
         )
 
@@ -415,12 +420,16 @@ class MapFragment : Fragment(), BoolderMapListener {
             build()
         }
 
-        binding.mapView.camera.easeTo(
+        binding.mapView.camera.flyTo(
             cameraOptions = cameraOptions,
             animationOptions = defaultMapAnimationOptions {
-                animatorListener(animationEndListener { onAreaVisited(problem.areaId) })
+                animatorListener(animationEndListener { delayedVisitToArea(problem.areaId) })
             }
         )
+    }
+
+    private fun delayedVisitToArea(areaId: Int) {
+        binding?.mapView?.postDelayed(500L) { onAreaVisited(areaId) }
     }
 
     private fun defaultMapAnimationOptions(block: MapAnimationOptions.Builder.() -> Unit) =
