@@ -15,8 +15,8 @@ android {
         applicationId = "com.boolder.boolder"
         minSdk = 21
         targetSdk = 34
-        versionCode = 22 // bump when new version
-        versionName = "1.17" // bump when new version
+        versionCode = 23 // bump when new version
+        versionName = "1.17.1" // bump when new version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -87,7 +87,7 @@ dependencies {
     implementation("io.coil-kt:coil:2.5.0")
 
     // Jetpack compose
-    val composeBom = platform("androidx.compose:compose-bom:2024.01.00")
+    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
     implementation("androidx.compose.material3:material3")
