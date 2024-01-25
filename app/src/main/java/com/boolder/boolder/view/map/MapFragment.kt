@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
@@ -16,8 +15,6 @@ import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.postDelayed
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.boolder.boolder.R
@@ -91,12 +88,8 @@ class MapFragment : Fragment(), BoolderMapListener {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val bottomMargin = systemInsets.bottom + resources.getDimensionPixelSize(R.dimen.margin_map_controls)
 
             binding.mapView.applyInsets(systemInsets)
-
-            binding.fabLocation
-                .updateLayoutParams<MarginLayoutParams> { updateMargins(bottom = bottomMargin) }
 
             insets
         }

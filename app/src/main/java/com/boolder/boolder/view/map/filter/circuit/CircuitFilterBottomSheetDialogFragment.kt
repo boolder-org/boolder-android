@@ -10,9 +10,9 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
 
-class CircuitFilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
+class CircuitFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
 
     private val args by navArgs<CircuitFilterBottomSheetDialogFragmentArgs>()
 

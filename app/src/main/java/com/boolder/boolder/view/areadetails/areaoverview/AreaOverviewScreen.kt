@@ -107,8 +107,8 @@ internal fun AreaOverviewScreen(
             when (screenState) {
                 is AreaOverviewViewModel.ScreenState.Loading -> LoadingContent()
                 is AreaOverviewViewModel.ScreenState.Content -> AreaOverviewScreenContent(
-                    modifier = Modifier.padding(it),
                     screenState = screenState,
+                    contentPadding = it,
                     offlineAreaDownloader = offlineAreaDownloader,
                     displayShowOnMapButton = displayShowOnMapButton,
                     onAreaProblemsCountClicked = onAreaProblemsCountClicked,
@@ -133,22 +133,23 @@ private fun LoadingContent() {
 @Composable
 private fun AreaOverviewScreenContent(
     screenState: AreaOverviewViewModel.ScreenState.Content,
+    contentPadding: PaddingValues,
     offlineAreaDownloader: OfflineAreaDownloader,
     displayShowOnMapButton: Boolean,
     onAreaProblemsCountClicked: () -> Unit,
     onCircuitClicked: (Int) -> Unit,
-    onPoiClicked: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onPoiClicked: (String) -> Unit
 ) {
     var showGradesCountChart by remember { mutableStateOf(false) }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            top = 16.dp,
-            bottom = if (displayShowOnMapButton) 80.dp else 16.dp
+            top = contentPadding.calculateTopPadding() + 16.dp,
+            bottom = contentPadding.calculateBottomPadding() +
+                if (displayShowOnMapButton) 80.dp else 16.dp
         )
     ) {
         if (screenState.area.tags.isNotEmpty()

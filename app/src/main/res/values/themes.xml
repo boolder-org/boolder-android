@@ -9,9 +9,6 @@
         <item name="colorSecondary">@color/primary</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
 
         <!-- Customize your theme here. -->
         <item name="android:windowActivityTransitions">true</item>
@@ -22,6 +19,8 @@
 
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetDialogStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="BottomSheetDialogStyle" parent="Widget.Design.BottomSheet.Modal">

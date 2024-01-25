@@ -69,8 +69,8 @@ internal fun TrainAndBikeScreen(
             when (screenState) {
                 is TrainAndBikeViewModel.ScreenState.Loading -> LoadingScreen()
                 is TrainAndBikeViewModel.ScreenState.Content -> TrainAndBikeScreenContent(
-                    modifier = Modifier.padding(it),
                     screenState = screenState,
+                    contentPadding = it,
                     onOpenGoogleMapsUrl = onOpenGoogleMapsUrl,
                     onAreaClicked = onAreaClicked
                 )
@@ -82,13 +82,15 @@ internal fun TrainAndBikeScreen(
 @Composable
 private fun TrainAndBikeScreenContent(
     screenState: TrainAndBikeViewModel.ScreenState.Content,
+    contentPadding: PaddingValues,
     onOpenGoogleMapsUrl: (String) -> Unit,
-    onAreaClicked: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    onAreaClicked: (Int) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(vertical = 16.dp),
+        contentPadding = PaddingValues(
+            top = contentPadding.calculateTopPadding() + 16.dp,
+            bottom = contentPadding.calculateBottomPadding() + 16.dp
+        ),
         verticalArrangement = spacedBy(8.dp)
     ) {
         item {

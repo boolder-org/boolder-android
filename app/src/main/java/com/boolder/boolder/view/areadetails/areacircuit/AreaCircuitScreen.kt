@@ -91,8 +91,8 @@ internal fun AreaCircuitScreen(
             when (screenState) {
                 is AreaCircuitViewModel.ScreenState.Loading -> LoadingContent()
                 is AreaCircuitViewModel.ScreenState.Content -> AreaCircuitScreenContent(
-                    modifier = Modifier.padding(it),
                     screenState = screenState,
+                    contentPadding = it,
                     onProblemClicked = onProblemClicked
                 )
             }
@@ -112,18 +112,18 @@ private fun LoadingContent() {
 @Composable
 private fun AreaCircuitScreenContent(
     screenState: AreaCircuitViewModel.ScreenState.Content,
-    onProblemClicked: (Problem) -> Unit,
-    modifier: Modifier = Modifier
+    contentPadding: PaddingValues,
+    onProblemClicked: (Problem) -> Unit
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             start = 16.dp,
-            top = 16.dp,
+            top = contentPadding.calculateTopPadding() + 16.dp,
             end = 16.dp,
-            bottom = 80.dp
+            bottom = contentPadding.calculateBottomPadding() + 80.dp
         )
     ) {
         if (screenState.isBeginnerFriendly) {

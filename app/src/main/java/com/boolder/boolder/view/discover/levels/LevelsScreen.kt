@@ -72,8 +72,8 @@ internal fun LevelsScreen(
             when (screenState) {
                 is LevelsViewModel.ScreenState.Loading -> LoadingScreen()
                 is LevelsViewModel.ScreenState.Content -> LevelsScreenContent(
-                    modifier = Modifier.padding(it),
                     screenState = screenState,
+                    contentPadding = it,
                     onMoreBeginnerFriendlyAreasClicked = onMoreBeginnerFriendlyAreasClicked,
                     onAreaClicked = onAreaClicked
                 )
@@ -85,13 +85,15 @@ internal fun LevelsScreen(
 @Composable
 private fun LevelsScreenContent(
     screenState: LevelsViewModel.ScreenState.Content,
+    contentPadding: PaddingValues,
     onMoreBeginnerFriendlyAreasClicked: () -> Unit,
     onAreaClicked: (Int) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(vertical = 16.dp),
+        contentPadding = PaddingValues(
+            top = contentPadding.calculateTopPadding() + 16.dp,
+            bottom = contentPadding.calculateBottomPadding() + 16.dp
+        ),
         verticalArrangement = spacedBy(8.dp)
     ) {
         item {

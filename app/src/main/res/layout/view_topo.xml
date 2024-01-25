@@ -12,8 +12,8 @@
         android:id="@+id/circuit_controls_compose_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/picture" />
+        app:layout_constraintBottom_toTopOf="@+id/picture"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/clicks_interceptor"
@@ -58,9 +58,19 @@
         android:id="@+id/footer_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_inset_space"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/picture" />
+
+    <View
+        android:id="@+id/bottom_inset_space"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/footer_layout" />
 
 </merge>
