@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="height_bottom_nav_bar">80dp</dimen>
+
     <dimen name="margin_search_component">16dp</dimen>
     <dimen name="margin_map_controls">20dp</dimen>
 
