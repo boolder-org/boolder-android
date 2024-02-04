@@ -6,6 +6,8 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import androidx.core.graphics.Insets
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updateMargins
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.domain.model.Circuit
@@ -88,10 +90,13 @@ class BoolderMap @JvmOverloads constructor(
         gestures.pitchEnabled = false
         scalebar.enabled = false
         compass.updateSettings {
+            val compassMargin = resources.getDimension(R.dimen.margin_map_controls)
+
             visibility = true
             position = Gravity.BOTTOM or Gravity.START
-            marginLeft = resources.getDimension(R.dimen.margin_map_controls)
-            marginRight = resources.getDimension(R.dimen.margin_map_controls)
+            marginLeft = compassMargin
+            marginRight = compassMargin
+            marginBottom = compassMargin
         }
         addClickEvent()
 
@@ -439,7 +444,11 @@ class BoolderMap @JvmOverloads constructor(
     fun applyInsets(insets: Insets) {
         this.insets = insets
 
-        compass.marginBottom = resources.getDimension(R.dimen.margin_map_controls) + insets.bottom
+        val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.height_bottom_nav_bar)
+
+        updateLayoutParams<MarginLayoutParams> {
+            updateMargins(bottom = insets.bottom + bottomNavHeight)
+        }
     }
 
     fun onCircuitSelected(circuit: Circuit) {

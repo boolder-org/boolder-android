@@ -16,8 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
+import androidx.core.view.updateLayoutParams
 import coil.load
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ViewTopoBinding
@@ -70,6 +72,10 @@ class TopoView(
         updateCircuitControls(circuitInfo = topo.circuitInfo)
 
         topo.selectedCompleteProblem?.let { updateFooter(it.problemWithLine.problem) }
+    }
+
+    fun applyInsets(insets: Insets) {
+        binding.bottomInsetSpace.updateLayoutParams { height = insets.bottom }
     }
 
     private fun onProblemPictureLoaded(topo: Topo) {
