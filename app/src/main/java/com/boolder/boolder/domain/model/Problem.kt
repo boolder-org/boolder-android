@@ -3,6 +3,7 @@ package com.boolder.boolder.domain.model
 import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.ColorInt
+import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.view.search.BaseObject
 import kotlinx.parcelize.Parcelize
 
@@ -24,7 +25,8 @@ data class Problem(
     val bleauInfoId: String?,
     val featured: Boolean,
     val parentId: Int?,
-    val areaName: String?
+    val areaName: String?,
+    val tickStatus: TickStatus?
 ) : Parcelable, BaseObject {
 
     val circuitColorSafe

@@ -25,7 +25,8 @@
             app:borderWidth="0dp"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="@color/black" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/controls_overlay_compose_view"

@@ -5,49 +5,57 @@ import com.boolder.boolder.data.database.entity.AreasEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.ProblemWithAreaName
+import com.boolder.boolder.data.userdatabase.entity.TickStatus
+import com.boolder.boolder.data.userdatabase.entity.TickedProblemEntity
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.TickedProblem
 import java.util.Locale
 
-fun ProblemEntity.convert(areaName: String? = null): Problem {
+fun ProblemEntity.convert(
+    areaName: String? = null,
+    tickStatus: TickStatus? = null
+): Problem {
     return Problem(
-        id,
-        name,
-        nameEn,
-        grade,
-        latitude,
-        longitude,
-        circuitId,
-        circuitNumber,
-        circuitColor,
-        steepness,
-        sitStart,
-        areaId,
-        bleauInfoId,
-        featured,
-        parentId,
-        areaName
+        id = id,
+        name = name,
+        nameEn = nameEn,
+        grade = grade,
+        latitude = latitude,
+        longitude = longitude,
+        circuitId = circuitId,
+        circuitNumber = circuitNumber,
+        circuitColor = circuitColor,
+        steepness = steepness,
+        sitStart = sitStart,
+        areaId = areaId,
+        bleauInfoId = bleauInfoId,
+        featured = featured,
+        parentId = parentId,
+        areaName = areaName,
+        tickStatus = tickStatus
     )
 }
 
 fun ProblemWithAreaName.convert() = Problem(
-    problemEntity.id,
-    problemEntity.name,
-    problemEntity.nameEn,
-    problemEntity.grade,
-    problemEntity.latitude,
-    problemEntity.longitude,
-    problemEntity.circuitId,
-    problemEntity.circuitNumber,
-    problemEntity.circuitColor,
-    problemEntity.steepness,
-    problemEntity.sitStart,
-    problemEntity.areaId,
-    problemEntity.bleauInfoId,
-    problemEntity.featured,
-    problemEntity.parentId,
-    areaName
+    id = problemEntity.id,
+    name = problemEntity.name,
+    nameEn = problemEntity.nameEn,
+    grade = problemEntity.grade,
+    latitude = problemEntity.latitude,
+    longitude = problemEntity.longitude,
+    circuitId = problemEntity.circuitId,
+    circuitNumber = problemEntity.circuitNumber,
+    circuitColor = problemEntity.circuitColor,
+    steepness = problemEntity.steepness,
+    sitStart = problemEntity.sitStart,
+    areaId = problemEntity.areaId,
+    bleauInfoId = problemEntity.bleauInfoId,
+    featured = problemEntity.featured,
+    parentId = problemEntity.parentId,
+    areaName = areaName,
+    tickStatus = null
 )
 
 fun LineEntity.convert(): Line {
@@ -92,3 +100,8 @@ fun AreasEntity.convert(): Area {
         }
     )
 }
+
+fun TickedProblemEntity.convert() = TickedProblem(
+    problemId = problemId,
+    tickStatus = tickStatus
+)

@@ -3,9 +3,11 @@
 
     <string name="tab_map">Map</string>
     <string name="tab_discover">Discover</string>
+    <string name="tab_tick_list">Tick List</string>
 
     <string name="search_query_hint">Problem or area name</string>
     <string name="cd_find_my_position">Find my position</string>
+    <string name="cancel">Cancel</string>
     <string name="cancel_search">Cancel search</string>
     <string name="cd_go_back">Go Back</string>
     <string name="cd_boolder_picture">Topo photo</string>
@@ -16,6 +18,7 @@
     <string name="rationale_negative_Btn">Maybe later</string>
     <string name="share">Share</string>
     <string name="save">Save</string>
+    <string name="saved">Saved</string>
     <string name="bleau_info">Bleau.info</string>
     <string name="report">Report</string>
 
@@ -52,6 +55,11 @@
     <string name="stepness_overhang">Overhang</string>
     <string name="stepness_roof">Roof</string>
     <string name="stepness_traverse">Traverse</string>
+
+    <string name="topo_action_project_add">Add to projects</string>
+    <string name="topo_action_project_remove">Remove from projects</string>
+    <string name="topo_action_tick">Tick</string>
+    <string name="topo_action_untick">Untick</string>
 
     <string name="tags_popular">Popular</string>
     <string name="tags_beginner_friendly">Beginner friendly</string>
@@ -113,6 +121,8 @@
     <string name="top_areas_dry_fast_warning">Don\'t climb if the rock is still wet, you may damage it</string>
     <string name="top_areas_dry_fast_useful_link">Useful link:</string>
     <string name="top_areas_train_and_bike_intro">Bike time from the station:</string>
+
+    <string name="tick_list_empty_state_body">Your projects and ticks will appear here.</string>
 
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>
