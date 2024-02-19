@@ -5,6 +5,7 @@ import com.boolder.boolder.data.database.entity.circuitColorSafe
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.network.repository.TopoRepository
+import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
 import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
@@ -17,14 +18,18 @@ class TopoDataAggregator(
     private val topoRepository: TopoRepository,
     private val problemRepository: ProblemRepository,
     private val lineRepository: LineRepository,
+    private val tickedProblemRepository: TickedProblemRepository,
     private val fileExplorer: FileExplorer
 ) {
 
     suspend fun aggregate(problemId: Int, origin: TopoOrigin): Topo {
-        val mainProblem: ProblemEntity = problemRepository.loadById(problemId) ?: return EMPTY_TOPO
+        val mainProblem = problemRepository.loadById(problemId) ?: return EMPTY_TOPO
+
+        val mainProblemTickStatus = tickedProblemRepository
+            .getTickedProblemByProblemId(mainProblem.id)
+            ?.tickStatus
 
         val mainLine = lineRepository.loadByProblemId(problemId)
-
         val topoId = mainLine?.topoId
 
         val imageFile = topoId?.let {
@@ -34,7 +39,7 @@ class TopoDataAggregator(
         val topoPictureUrl = topoId?.let { topoRepository.getTopoPictureById(it) }
 
         val mainProblemAndLine = ProblemWithLine(
-            problem = mainProblem.convert(),
+            problem = mainProblem.convert(tickStatus = mainProblemTickStatus),
             line = mainLine?.convert()
         )
 
@@ -107,9 +112,15 @@ class TopoDataAggregator(
                     && it.id != mainProblem.parentId
             }
 
-        val otherProblemsWithLines = problemsOnSameTopo.map { other ->
+        val tickStatuses = problemsOnSameTopo.map { problemEntity ->
+            tickedProblemRepository
+                .getTickedProblemByProblemId(problemEntity.id)
+                ?.tickStatus
+        }
+
+        val otherProblemsWithLines = problemsOnSameTopo.mapIndexed { index, other ->
             ProblemWithLine(
-                problem = other.convert(),
+                problem = other.convert(tickStatus = tickStatuses[index]),
                 line = otherLinesFromTopo.first { it.problemId == other.id }.convert()
             )
         }

@@ -18,6 +18,7 @@ import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModelImpl
 import com.boolder.boolder.view.search.SearchViewModel
+import com.boolder.boolder.view.ticklist.TickListViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.binds
@@ -48,4 +49,6 @@ val viewModelModule = module {
     viewModelOf(::LevelsViewModel)
     viewModelOf(::BeginnerLevelsViewModel)
     viewModelOf(::TrainAndBikeViewModel)
+
+    viewModelOf(::TickListViewModel)
 }

@@ -136,6 +136,7 @@ class MapFragment : Fragment(), BoolderMapListener {
             onCircuitProblemSelected = {
                 mapViewModel.fetchTopo(problemId = it, origin = TopoOrigin.CIRCUIT)
             }
+            tickedProblemSaver = mapViewModel
         }
 
         mapViewModel.topoStateFlow.launchAndCollectIn(owner = this, collector = ::onNewTopo)
@@ -280,6 +281,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         binding?.topoView?.apply {
             onSelectProblemOnMap = null
             onCircuitProblemSelected = null
+            tickedProblemSaver = null
         }
 
         binding = null

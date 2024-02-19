@@ -34,6 +34,7 @@ import com.boolder.boolder.view.detail.composable.CircuitControls
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
 import com.boolder.boolder.view.detail.composable.TopoFooter
 import com.boolder.boolder.view.detail.uimodel.UiProblem
+import com.boolder.boolder.view.ticklist.TickedProblemSaver
 import java.util.Locale
 
 class TopoView(
@@ -47,6 +48,7 @@ class TopoView(
 
     var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
     var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
+    var tickedProblemSaver: TickedProblemSaver? = null
 
     init {
         // Immediately set a footer content to avoid a bug on the bottom sheet not fully expanding
@@ -161,7 +163,11 @@ class TopoView(
                 TopoFooter(
                     problem = problem,
                     onBleauInfoClicked = ::onBleauInfoClicked,
-                    onShareClicked = ::onShareClicked
+                    onShareClicked = ::onShareClicked,
+                    onSaveProblem = { problemId, tickType ->
+                        tickedProblemSaver?.onSaveProblem(problemId, tickType)
+                    },
+                    onUnsaveProblem = { tickedProblemSaver?.onUnsaveProblem(it) }
                 )
             }
         }

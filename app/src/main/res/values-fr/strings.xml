@@ -2,9 +2,11 @@
 <resources>
     <string name="tab_map">Carte</string>
     <string name="tab_discover">Découvrir</string>
+    <string name="tab_tick_list">Mes voies</string>
 
     <string name="search_query_hint">Nom de voie ou secteur</string>
     <string name="cd_find_my_position">Me localiser</string>
+    <string name="cancel">Annuler</string>
     <string name="cancel_search">Annuler la recherche</string>
     <string name="cd_go_back">Retour</string>
     <string name="cd_boolder_picture">Photo du bloc</string>
@@ -15,6 +17,7 @@
     <string name="rationale_negative_Btn">Plus tard</string>
     <string name="share">Partager</string>
     <string name="save">Enregistrer</string>
+    <string name="saved">Enregistré</string>
     <string name="bleau_info">Bleau.info</string>
     <string name="report">Signaler</string>
 
@@ -49,6 +52,11 @@
     <string name="stepness_overhang">Dévers</string>
     <string name="stepness_roof">Toit</string>
     <string name="stepness_traverse">Traversée</string>
+
+    <string name="topo_action_project_add">Ajouter en projet</string>
+    <string name="topo_action_project_remove">Retirer des projets</string>
+    <string name="topo_action_tick">Marquer comme réussi</string>
+    <string name="topo_action_untick">Marquer comme non réussi</string>
 
     <string name="tags_popular">Populaire</string>
     <string name="tags_beginner_friendly">Convient aux débutants</string>
@@ -110,6 +118,8 @@
     <string name="top_areas_dry_fast_warning">Ne grimpez pas si la roche est encore humide, vous risquez de l\'abîmer</string>
     <string name="top_areas_dry_fast_useful_link">Lien utile :</string>
     <string name="top_areas_train_and_bike_intro">Temps d\'accès en vélo depuis la gare :</string>
+
+    <string name="tick_list_empty_state_body">Vos projets et vos voies réussies apparaîtront ici.</string>
 
     <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
     <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>

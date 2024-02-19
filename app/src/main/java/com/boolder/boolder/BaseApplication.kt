@@ -4,7 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.boolder.boolder.data.database.databaseModule
+import com.boolder.boolder.data.databaseModule
 import com.boolder.boolder.data.network.networkModule
 import com.boolder.boolder.view.viewModelModule
 import com.boolder.boolder.offline.worker.BoolderWorkerFactory

@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_auto_awesome"
         android:title="@string/tab_discover" />
 
+    <item
+        android:id="@+id/tick_list_fragment"
+        android:icon="@drawable/ic_bookmark"
+        android:title="@string/tab_tick_list" />
+
 </menu>

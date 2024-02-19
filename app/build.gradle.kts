@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("plugin.serialization")
     id("androidx.navigation.safeargs.kotlin")
+    id("androidx.room")
 }
 
 android {
@@ -52,6 +53,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.7"
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
@@ -102,8 +107,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("com.google.android.material:material:1.11.0")
     testImplementation("io.insert-koin:koin-test-junit4:3.3.3")
     testImplementation("org.mockito:mockito-core:5.3.1")

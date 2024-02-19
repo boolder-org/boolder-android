@@ -7,11 +7,14 @@ import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.data.userdatabase.entity.TickStatus
+import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
+import com.boolder.boolder.domain.model.TickedProblem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
@@ -19,6 +22,7 @@ import com.boolder.boolder.offline.BoolderOfflineRepository
 import com.boolder.boolder.offline.OfflineAreaDownloader
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
+import com.boolder.boolder.view.ticklist.TickedProblemSaver
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -30,10 +34,11 @@ class MapViewModel(
     private val areaRepository: AreaRepository,
     private val circuitRepository: CircuitRepository,
     private val problemRepository: ProblemRepository,
+    private val tickedProblemRepository: TickedProblemRepository,
     private val topoDataAggregator: TopoDataAggregator,
     private val resources: Resources,
     private val boolderOfflineRepository: BoolderOfflineRepository
-) : ViewModel(), OfflineAreaDownloader {
+) : ViewModel(), OfflineAreaDownloader, TickedProblemSaver {
 
     private val _screenStateFlow = MutableStateFlow(
         ScreenState(
@@ -356,6 +361,53 @@ class MapViewModel(
     }
 
     // endregion OfflineAreaDownloader
+
+    // region TickedProblemSaver
+
+    override fun onSaveProblem(problemId: Int, tickStatus: TickStatus) {
+        viewModelScope.launch {
+            tickedProblemRepository.deleteTickedProblemByProblemId(problemId)
+
+            val tickedProblem = TickedProblem(
+                problemId = problemId,
+                tickStatus = tickStatus
+            )
+
+            tickedProblemRepository.insertTickedProblem(tickedProblem)
+
+            updateTickStatusInCurrentTopo(problemId, tickStatus)
+        }
+    }
+
+    override fun onUnsaveProblem(problemId: Int) {
+        viewModelScope.launch {
+            tickedProblemRepository.deleteTickedProblemByProblemId(problemId)
+            updateTickStatusInCurrentTopo(problemId, null)
+        }
+    }
+
+    private fun updateTickStatusInCurrentTopo(problemId: Int, tickStatus: TickStatus?) {
+        val currentTopoProblem = _topoStateFlow.value
+            ?.selectedCompleteProblem
+            ?.problemWithLine
+            ?.problem
+
+        if (currentTopoProblem?.id != problemId) return
+
+        val updatedTopoProblem = currentTopoProblem.copy(tickStatus = tickStatus)
+
+        _topoStateFlow.update {
+            it?.copy(
+                selectedCompleteProblem = it.selectedCompleteProblem?.copy(
+                    problemWithLine = it.selectedCompleteProblem.problemWithLine.copy(
+                        problem = updatedTopoProblem
+                    )
+                )
+            )
+        }
+    }
+
+    // endregion TickedProblemSaver
 
     data class ScreenState(
         val areaState: OfflineAreaItem?,

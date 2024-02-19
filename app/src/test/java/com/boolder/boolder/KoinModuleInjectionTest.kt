@@ -1,7 +1,7 @@
 package com.boolder.boolder
 
 import android.content.Context
-import com.boolder.boolder.data.database.databaseModule
+import com.boolder.boolder.data.databaseModule
 import com.boolder.boolder.data.network.networkModule
 import com.boolder.boolder.view.viewModelModule
 import org.junit.Rule

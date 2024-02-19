@@ -1,5 +1,6 @@
 package com.boolder.boolder.utils.previewgenerator
 
+import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.domain.model.Problem
 
 fun dummyProblem(
@@ -7,7 +8,11 @@ fun dummyProblem(
     name: String = "The dummy problem",
     circuitNumber: String? = "10",
     circuitColor: String? = "RED",
-    featured: Boolean = false
+    steepness: String = "wall",
+    sitStart: Boolean = true,
+    featured: Boolean = false,
+    areaName: String? = null,
+    tickStatus: TickStatus? = null
 ) = Problem(
     id = id,
     name = name,
@@ -18,11 +23,12 @@ fun dummyProblem(
     circuitId = null,
     circuitNumber = circuitNumber,
     circuitColor = circuitColor,
-    steepness = "wall",
-    sitStart = true,
+    steepness = steepness,
+    sitStart = sitStart,
     areaId = 1000,
     bleauInfoId = null,
     featured = featured,
     parentId = null,
-    areaName = null
+    areaName = areaName,
+    tickStatus = tickStatus
 )

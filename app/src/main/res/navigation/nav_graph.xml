@@ -178,6 +178,11 @@
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
+    <fragment
+        android:id="@+id/tick_list_fragment"
+        android:name="com.boolder.boolder.view.ticklist.TickListFragment"
+        android:label="Tick list" />
+
     <dialog
         android:id="@+id/dialog_circuit_filter"
         android:name="com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment"
