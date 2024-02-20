@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,7 +25,7 @@ import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.Line
@@ -138,7 +139,7 @@ private fun Path.addCubicCurves(
 /**
  * Use the preview interactive mode in order to make the line appearing
  */
-@Preview
+@PreviewLightDark
 @Composable
 private fun ProblemLinePreview() {
     BoolderTheme {
@@ -146,7 +147,7 @@ private fun ProblemLinePreview() {
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(4f / 3f)
-                .background(color = Color.White),
+                .background(color = MaterialTheme.colorScheme.background),
             line = dummyLine(),
             color = CircuitColor.RED.composeColor()
         )

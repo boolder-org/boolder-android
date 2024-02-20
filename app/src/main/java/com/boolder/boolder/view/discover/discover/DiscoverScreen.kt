@@ -33,7 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -235,7 +235,7 @@ private fun DiscoverSectionTitle(text: String) {
         modifier = Modifier.padding(16.dp),
         text = text,
         style = MaterialTheme.typography.headlineSmall,
-        color = Color.Black,
+        color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Bold
     )
 }
@@ -252,7 +252,7 @@ private fun SupportItem(
             .heightIn(min = 48.dp)
             .padding(horizontal = 16.dp)
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = spacedBy(8.dp),
@@ -260,11 +260,13 @@ private fun SupportItem(
     ) {
         Icon(
             painter = painterResource(id = iconRes),
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
-            text = text
+            text = text,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -278,24 +280,24 @@ private fun AreaItem(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .clickable { onClick(area.id) }
             .padding(12.dp)
     ) {
         Text(
             modifier = Modifier.weight(1f),
             text = area.name,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
             text = area.problemsCount.toString(),
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun DiscoverScreenPreview(
     @PreviewParameter(DiscoverScreenPreviewParameterProvider::class)

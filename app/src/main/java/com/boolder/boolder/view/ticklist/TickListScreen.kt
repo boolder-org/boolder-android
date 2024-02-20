@@ -28,7 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -108,7 +108,7 @@ private fun TickListScreenContent(
                         .padding(bottom = 8.dp),
                     text = problem.areaName.orEmpty(),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -135,6 +135,7 @@ private fun TickListEmptyState(contentPadding: PaddingValues) {
     ) {
         Text(
             text = stringResource(id = R.string.tick_list_empty_state_body),
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
     }
@@ -148,7 +149,7 @@ private fun ProblemItem(
     Row(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .clickable(onClick = onProblemClicked)
             .padding(16.dp),
         horizontalArrangement = spacedBy(8.dp),
@@ -158,7 +159,8 @@ private fun ProblemItem(
 
         Text(
             modifier = Modifier.weight(1f),
-            text = problem.name.orEmpty()
+            text = problem.name.orEmpty(),
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         problem.tickStatus?.let {
@@ -174,11 +176,14 @@ private fun ProblemItem(
             )
         }
 
-        Text(text = problem.grade.orEmpty())
+        Text(
+            text = problem.grade.orEmpty(),
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun TickListScreenPreview(
     @PreviewParameter(TickListScreenPreviewParameterProvider::class)

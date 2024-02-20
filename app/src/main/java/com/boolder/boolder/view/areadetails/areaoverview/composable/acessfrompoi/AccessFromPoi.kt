@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -46,24 +46,27 @@ internal fun AccessFromPoi(
 
         Text(
             modifier = Modifier.weight(1f),
-            text = accessFromPoi.name
+            text = accessFromPoi.name,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Icon(
             painter = painterResource(id = accessFromPoi.transport.iconRes),
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
             text = stringResource(
                 id = R.string.poi_distance_in_min,
                 accessFromPoi.distanceInMinutes
-            )
+            ),
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun AccessFromPoiPreview(
     @PreviewParameter(AccessFromPoiPreviewParameterProvider::class)
@@ -71,7 +74,7 @@ private fun AccessFromPoiPreview(
 ) {
     BoolderTheme {
         AccessFromPoi(
-            modifier = Modifier.background(color = Color.White),
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
             accessFromPoi = accessFromPoi,
             onPoiClicked = {}
         )

@@ -1,14 +1,17 @@
 package com.boolder.boolder.view.map.composable
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.boolder.boolder.databinding.SearchComponentBinding
 import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
+import com.boolder.boolder.view.compose.BoolderRippleTheme
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 
@@ -35,15 +38,17 @@ fun MapTopBar(
             }
         )
 
-        AreaName(
-            offlineAreaItem = offlineAreaItem,
-            onHideAreaName = onHideAreaName,
-            onAreaInfoClicked = onAreaInfoClicked
-        )
+        CompositionLocalProvider(LocalRippleTheme provides BoolderRippleTheme) {
+            AreaName(
+                offlineAreaItem = offlineAreaItem,
+                onHideAreaName = onHideAreaName,
+                onAreaInfoClicked = onAreaInfoClicked
+            )
+        }
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun MapTopBarPreview(
     @PreviewParameter(MapTopBarParameterPreviewProvider::class)

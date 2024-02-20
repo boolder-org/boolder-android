@@ -19,14 +19,15 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin_map_controls"
             android:layout_marginBottom="@dimen/margin_map_controls"
-            android:backgroundTint="@color/white"
             android:contentDescription="@string/cd_find_my_position"
             android:src="@drawable/ic_fab_near_me"
+            app:backgroundTint="?colorSurface"
             app:borderWidth="0dp"
+            app:elevation="0dp"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/black" />
+            app:tint="?colorOnSurface" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/controls_overlay_compose_view"

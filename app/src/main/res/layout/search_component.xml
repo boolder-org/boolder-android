@@ -4,8 +4,8 @@
     android:id="@+id/search_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="10dp"
     android:background="@drawable/round_background"
+    android:elevation="10dp"
     android:padding="4dp">
 
     <ImageView
@@ -19,7 +19,8 @@
         android:src="@drawable/ic_search"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?colorOnSurface" />
 
     <EditText
         android:id="@+id/search_bar"
@@ -30,10 +31,10 @@
         android:hint="@string/search_query_hint"
         android:imeOptions="actionSearch"
         android:inputType="textFilter"
-        android:textColor="@color/black"
-        android:textColorHint="@android:color/darker_gray"
         android:paddingHorizontal="4dp"
         android:paddingVertical="8dp"
+        android:textColor="?colorOnSurface"
+        android:textColorHint="?colorOutline"
         app:layout_constraintBottom_toBottomOf="@id/search_first_icon"
         app:layout_constraintEnd_toStartOf="@id/search_last_icon"
         app:layout_constraintStart_toEndOf="@+id/search_first_icon"
@@ -48,9 +49,9 @@
         android:focusable="true"
         android:src="@drawable/ic_close"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/search_first_icon"
-        app:layout_constraintTop_toTopOf="@id/search_first_icon" />
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/search_first_icon"
+        app:tint="?colorOnSurface" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

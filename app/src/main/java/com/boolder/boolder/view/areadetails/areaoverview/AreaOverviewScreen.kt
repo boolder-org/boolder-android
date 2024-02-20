@@ -40,7 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -53,14 +53,14 @@ import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.utils.previewgenerator.dummyCircuit
 import com.boolder.boolder.view.areadetails.areaoverview.composable.acessfrompoi.AccessFromPoi
-import com.boolder.boolder.view.compose.degreecounts.DegreeCountsChart
-import com.boolder.boolder.view.compose.degreecounts.DegreeCountsRow
 import com.boolder.boolder.view.areadetails.areaoverview.composable.download.AreaPhotosDownloadItem
 import com.boolder.boolder.view.areadetails.composable.SectionContainer
 import com.boolder.boolder.view.areadetails.composable.SeeOnMapButton
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.CircuitItem
-import com.boolder.boolder.view.compose.BoolderOrange
+import com.boolder.boolder.view.compose.degreecounts.DegreeCountsChart
+import com.boolder.boolder.view.compose.degreecounts.DegreeCountsRow
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.domain.model.AccessFromPoi as AccessFromPoiModel
 
@@ -174,13 +174,13 @@ private fun AreaOverviewScreenContent(
                                         modifier = Modifier
                                             .border(
                                                 width = 1.dp,
-                                                color = Color.Black,
+                                                color = MaterialTheme.colorScheme.onSurface,
                                                 shape = CircleShape
                                             )
                                             .padding(horizontal = 8.dp, vertical = 4.dp),
                                         text = stringResource(id = tagRes),
                                         style = MaterialTheme.typography.labelLarge,
-                                        color = Color.Black
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -243,7 +243,7 @@ private fun AreaOverviewScreenContent(
                 CircuitItem(
                     modifier = Modifier
                         .clip(shape = shape)
-                        .background(color = Color.White)
+                        .background(color = MaterialTheme.colorScheme.surface)
                         .clickable { onCircuitClicked(circuit.id) },
                     circuit = circuit
                 )
@@ -338,7 +338,7 @@ private fun GradeCountsItem(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun AreaOverviewScreenPreview(
     @PreviewParameter(AreaOverviewScreenPreviewParameterProvider::class)

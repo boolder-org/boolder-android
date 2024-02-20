@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -65,14 +65,15 @@ internal fun AreaName(
             .fillMaxWidth()
             .heightIn(min = 50.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .then(if (alpha == 1f) Modifier.clickable(onClick = onAreaInfoClicked) else Modifier),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             modifier = Modifier.iconActionModifier(onClick = onHideAreaName),
             painter = painterResource(id = R.drawable.ic_chevron_left),
-            contentDescription = "Hide area name"
+            contentDescription = "Hide area name",
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         Row(
@@ -84,6 +85,7 @@ internal fun AreaName(
         ) {
             Text(
                 text = offlineAreaItem?.area?.name.orEmpty(),
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 fontSize = 18.sp,
                 maxLines = 1,
@@ -103,7 +105,7 @@ internal fun AreaName(
 }
 
 private fun Modifier.iconActionModifier(onClick: () -> Unit) =
-    padding(4.dp)
+    this.padding(4.dp)
         .clip(CircleShape)
         .clickable(onClick = onClick)
         .padding(8.dp)
@@ -149,7 +151,8 @@ private fun AreaDownloadProgress(progress: Float) {
     ) {
         Text(
             text = "${(progress * 100f).roundToInt()}%",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
         CircularProgressIndicator(
             modifier = Modifier.size(16.dp),
@@ -170,7 +173,7 @@ private fun IconDownloaded(
     )
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun AreaNamePreview(
     @PreviewParameter(AreaNamePreviewParameterProvider::class)
