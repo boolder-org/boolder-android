@@ -99,8 +99,8 @@ class LocationProvider(private val activity: FragmentActivity) {
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
             override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
             override fun isCancellationRequested() = false
-        }).addOnSuccessListener {
-            _locationFlow.tryEmit(it)
+        }).addOnSuccessListener { location ->
+            location?.let(_locationFlow::tryEmit)
             isWaitingPosition = false
         }
     }
