@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Area
@@ -118,13 +118,13 @@ private fun AreaThumbnailItem(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun AreaThumbnailsRowPreview() {
     BoolderTheme {
         AreaThumbnailsRow(
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = MaterialTheme.colorScheme.background)
                 .padding(vertical = 8.dp),
             areas = List(10) {
                 dummyArea(

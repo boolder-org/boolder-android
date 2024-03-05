@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -36,6 +36,7 @@ internal fun ProblemItem(
         Text(
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             text = problem.name.orEmpty()
         )
 
@@ -50,12 +51,12 @@ internal fun ProblemItem(
         Text(
             text = problem.grade.orEmpty(),
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun ProblemItemPreview(
     @PreviewParameter(ProblemItemPreviewParameterProvider::class)
@@ -64,7 +65,7 @@ private fun ProblemItemPreview(
     BoolderTheme {
         ProblemItem(
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = MaterialTheme.colorScheme.surface)
                 .padding(16.dp),
             problem = problem,
             showFeatured = true

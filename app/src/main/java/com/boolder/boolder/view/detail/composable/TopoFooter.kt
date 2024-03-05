@@ -2,6 +2,7 @@ package com.boolder.boolder.view.detail.composable
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.ChipBorder
 import androidx.compose.material3.ChipColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -98,6 +98,7 @@ private fun TopoFooterTitleRow(
         Text(
             modifier = Modifier.weight(1f),
             text = problemName,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -106,6 +107,7 @@ private fun TopoFooterTitleRow(
 
         Text(
             text = grade,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
@@ -127,7 +129,8 @@ private fun TopoProblemSteepness(
             Icon(
                 modifier = Modifier.size(24.dp),
                 painter = painterResource(id = steepness.iconRes),
-                contentDescription = null
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
             )
 
             val steepnessText = stringResource(id = steepness.textRes)
@@ -141,6 +144,7 @@ private fun TopoProblemSteepness(
             Text(
                 modifier = Modifier.weight(1f),
                 text = text,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp
             )
         } else {
@@ -187,10 +191,10 @@ private fun ChipsRow(
                 iconRes = R.drawable.ic_outline_info,
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = colorPrimary,
-                    labelColor = Color.White,
-                    leadingIconContentColor = Color.White
+                    labelColor = MaterialTheme.colorScheme.surface,
+                    leadingIconContentColor = MaterialTheme.colorScheme.surface
                 ),
-                border = AssistChipDefaults.assistChipBorder(borderWidth = 0.dp),
+                border = null,
                 onClick = { onBleauInfoClicked() }
             )
         }
@@ -210,7 +214,10 @@ private fun ChipsRow(
                     labelColor = colorPrimary,
                     leadingIconContentColor = colorPrimary
                 ),
-                border = AssistChipDefaults.assistChipBorder(borderColor = colorPrimary),
+                border = AssistChipDefaults.assistChipBorder(
+                    enabled = true,
+                    borderColor = colorPrimary
+                ),
                 onClick = { showSaveDialog = true }
             )
         }
@@ -224,7 +231,10 @@ private fun ChipsRow(
                     labelColor = colorPrimary,
                     leadingIconContentColor = colorPrimary
                 ),
-                border = AssistChipDefaults.assistChipBorder(borderColor = colorPrimary),
+                border = AssistChipDefaults.assistChipBorder(
+                    enabled = true,
+                    borderColor = colorPrimary
+                ),
                 onClick = onShareClicked
             )
         }
@@ -245,7 +255,7 @@ private fun ChipButton(
     @StringRes labelRes: Int,
     @DrawableRes iconRes: Int,
     colors: ChipColors,
-    border: ChipBorder,
+    border: BorderStroke?,
     onClick: () -> Unit
 ) {
     AssistChip(
@@ -268,7 +278,7 @@ private fun ChipButton(
     )
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun TopoFooterPreview(
     @PreviewParameter(TopoFooterPreviewParameterProvider::class)
@@ -276,7 +286,7 @@ fun TopoFooterPreview(
 ) {
     BoolderTheme {
         TopoFooter(
-            modifier = Modifier.background(color = Color.White),
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
             problem = problem,
             onBleauInfoClicked = {},
             onShareClicked = {},

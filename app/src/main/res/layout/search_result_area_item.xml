@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white">
+    android:background="?colorSurface">
 
 
     <TextView
@@ -16,7 +16,7 @@
         android:ellipsize="end"
         android:lines="1"
         android:maxWidth="200dp"
-        android:textColor="@color/black"
+        android:textColor="?colorOnSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"

@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,11 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -101,7 +101,7 @@ private fun BeginnerLevelsScreenContent(
             Text(
                 modifier = Modifier.padding(bottom = 8.dp),
                 text = stringResource(id = R.string.top_areas_levels_beginner_friendly_intro),
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -125,7 +125,7 @@ private fun AreaWithBeginnerCircuitsItem(
         modifier = Modifier
             .heightIn(min = 48.dp)
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = spacedBy(8.dp),
@@ -133,7 +133,8 @@ private fun AreaWithBeginnerCircuitsItem(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = area.name
+            text = area.name,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Row(
@@ -153,7 +154,7 @@ private fun AreaWithBeginnerCircuitsItem(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun BeginnerLevelsScreenPreview(
     @PreviewParameter(BeginnerLevelsScreenParameterProvider::class)

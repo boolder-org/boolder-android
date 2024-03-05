@@ -1,11 +1,9 @@
 package com.boolder.boolder.view.offlinephotos.composable
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,19 +28,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.boolder.boolder.R
-import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.offline.DOWNLOAD_TERMINATED_STATUSES
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS_DETAIL
 import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
+import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 
 @Composable
 fun OfflinePhotosAreaItem(
@@ -59,7 +57,7 @@ fun OfflinePhotosAreaItem(
         .fillMaxWidth()
         .height(56.dp)
         .clip(shape)
-        .border(width = 1.dp, color = Color.Gray, shape = shape)
+        .background(color = MaterialTheme.colorScheme.surface)
 
     when (status) {
         is OfflineAreaItemStatus.NotDownloaded -> OfflinePhotosAreaNotDownloadedItem(
@@ -123,7 +121,7 @@ private fun OfflinePhotosAreaDownloadingItem(
     onCancelDownload: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier,
         contentAlignment = Alignment.CenterStart
     ) {
@@ -157,7 +155,7 @@ private fun OfflinePhotosAreaDownloadingItem(
 
             val workInfo = workInfoList
                 ?.firstOrNull { it.state == WorkInfo.State.RUNNING }
-                ?: return@BoxWithConstraints
+                ?: return@Box
 
             val progress = workInfo.progress
                 .getFloat(WORK_DATA_PROGRESS, 0f)
@@ -168,7 +166,9 @@ private fun OfflinePhotosAreaDownloadingItem(
                         transformOrigin = TransformOrigin(0f, 0f)
                         scaleX = progress
                     }
-                    .background(color = Color.Gray.copy(alpha = .3f))
+                    .background(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .3f)
+                    )
             )
 
             val progressDetail = workInfo.progress
@@ -208,7 +208,8 @@ private fun OfflinePhotosAreaDownloadingItemContent(
         if (!progressDetail.isNullOrEmpty()) {
             Text(
                 text = "($progressDetail)",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -219,7 +220,7 @@ private fun OfflinePhotosAreaDownloadingItemContent(
                 .padding(8.dp),
             painter = painterResource(id = R.drawable.ic_cancel),
             contentDescription = null,
-            tint = Color.Gray
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -252,7 +253,8 @@ private fun OfflinePhotosAreaDownloadedItem(
 
         Text(
             text = "($folderSize)",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Icon(
@@ -262,7 +264,7 @@ private fun OfflinePhotosAreaDownloadedItem(
                 .padding(8.dp),
             painter = painterResource(id = R.drawable.ic_delete_forever),
             contentDescription = null,
-            tint = Color.Gray
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -276,12 +278,13 @@ private fun AreaName(
         modifier = modifier,
         text = areaName,
         style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis
     )
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun OfflinePhotosAreaItemPreview(
     @PreviewParameter(OfflinePhotosAreaItemPreviewParameterProvider::class)
@@ -290,7 +293,7 @@ private fun OfflinePhotosAreaItemPreview(
     BoolderTheme {
         OfflinePhotosAreaItem(
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             areaName = "Apremont",
             status = status,

@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.boolder.boolder.view.compose.BoolderTheme
@@ -80,7 +80,7 @@ private fun DegreesChart(
                             .background(color = color)
                     )
 
-                    Divider(color = Color.LightGray)
+                    HorizontalDivider(color = Color.LightGray)
                 }
             }
 
@@ -97,6 +97,10 @@ private fun DegreesChartGrid(maxDegreeCount: Int) {
     val thresholdsStep = 50
     val thresholdsCount = maxDegreeCount / thresholdsStep
 
+    val textColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val strokeColor = MaterialTheme.colorScheme.onSurfaceVariant
+        .copy(alpha = .7f)
+
     Row(
         modifier = Modifier.fillMaxHeight()
     ) {
@@ -110,7 +114,7 @@ private fun DegreesChartGrid(maxDegreeCount: Int) {
                     val y = thresholdValue / maxDegreeCount.toFloat() * size.height
 
                     drawLine(
-                        color = Color.LightGray,
+                        color = strokeColor,
                         strokeWidth = 1.dp.toPx(),
                         pathEffect = PathEffect.dashPathEffect(
                             intervals = floatArrayOf(4.dp.toPx(), 2.dp.toPx())
@@ -128,7 +132,7 @@ private fun DegreesChartGrid(maxDegreeCount: Int) {
                 .fillMaxHeight(),
             onDraw = {
                 drawLine(
-                    color = Color.LightGray,
+                    color = strokeColor,
                     strokeWidth = 1.dp.toPx(),
                     start = Offset(x = 0f, y = 0f),
                     end = Offset(x = 0f, y = size.height)
@@ -139,7 +143,7 @@ private fun DegreesChartGrid(maxDegreeCount: Int) {
                     val y = (maxDegreeCount - thresholdValue) / maxDegreeCount.toFloat() * size.height
 
                     drawLine(
-                        color = Color.LightGray,
+                        color = strokeColor,
                         strokeWidth = 1.dp.toPx(),
                         start = Offset(x = 0f, y = y),
                         end = Offset(x = 8.dp.toPx(), y = y)
@@ -151,7 +155,7 @@ private fun DegreesChartGrid(maxDegreeCount: Int) {
                         topLeft = Offset(x = 10.dp.toPx(), y = y - 8.sp.toPx()),
                         style = TextStyle.Default.copy(
                             fontSize = 12.sp,
-                            color = Color.Gray
+                            color = textColor
                         )
                     )
                 }
@@ -170,7 +174,7 @@ private fun DegreesLabels(degrees: Set<String>) {
                     .padding(4.dp),
                 text = it,
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Center
             )
         }
@@ -179,11 +183,12 @@ private fun DegreesLabels(degrees: Set<String>) {
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun GradeCountsChartPreview() {
     BoolderTheme {
         DegreeCountsChart(
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
             degreeCounts = mapOf(
                 "1" to 3,
                 "2" to 103,

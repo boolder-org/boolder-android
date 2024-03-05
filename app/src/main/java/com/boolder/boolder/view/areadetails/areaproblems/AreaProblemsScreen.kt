@@ -39,10 +39,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -81,7 +80,8 @@ internal fun AreaProblemsScreen(
                                 .heightIn(max = 48.dp)
                                 .focusRequester(focusRequester),
                             value = searchQuery,
-                            textStyle = MaterialTheme.typography.bodyLarge,
+                            textStyle = MaterialTheme.typography.bodyLarge
+                                .copy(color = MaterialTheme.colorScheme.onSurface),
                             onValueChange = {
                                 searchQuery = it
                                 onSearchQueryChanged(it)
@@ -94,7 +94,7 @@ internal fun AreaProblemsScreen(
                                     if (searchQuery.isBlank()) {
                                         Text(
                                             text = "Search",
-                                            color = Color.LightGray
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
 
@@ -140,7 +140,7 @@ internal fun AreaProblemsScreen(
                             Icon(
                                 painter = painterResource(id = iconRes),
                                 contentDescription = null,
-                                tint = Color.Black
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     )
@@ -228,7 +228,7 @@ private fun AreaProblemsScreenContent(
                 ProblemItem(
                     modifier = Modifier
                         .clip(shape = shape)
-                        .background(color = Color.White)
+                        .background(color = MaterialTheme.colorScheme.surface)
                         .clickable { onProblemClicked(problem) }
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     problem = problem,
@@ -239,7 +239,7 @@ private fun AreaProblemsScreenContent(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun AreaProblemsScreenPreview(
     @PreviewParameter(AreaProblemsScreenPreviewParameterProvider::class)

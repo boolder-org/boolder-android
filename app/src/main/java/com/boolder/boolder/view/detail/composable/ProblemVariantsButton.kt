@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,7 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Problem
@@ -84,7 +85,10 @@ private fun ProblemVariantsPillButton(
     Row(
         modifier = Modifier
             .clip(shape = CircleShape)
-            .background(color = Color.Gray.copy(alpha = .8f), shape = CircleShape)
+            .background(
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .8f),
+                shape = CircleShape
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 4.dp, vertical = 2.dp),
     ) {
@@ -115,15 +119,19 @@ private fun ProblemVariantItem(problem: Problem) {
         Text(
             modifier = Modifier.weight(1f),
             text = problem.name.orEmpty(),
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
             modifier = Modifier
-                .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    shape = CircleShape
+                )
                 .padding(horizontal = 8.dp, vertical = 2.dp),
             text = problem.grade.orEmpty(),
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -131,14 +139,14 @@ private fun ProblemVariantItem(problem: Problem) {
 /**
  * Use the preview interactive mode in order to interact with the menu
  */
-@Preview
+@PreviewLightDark
 @Composable
 private fun ProblemVariantsButtonPreview() {
     BoolderTheme {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.White)
+                .background(color = MaterialTheme.colorScheme.background)
         ) {
             ProblemVariantsButton(
                 modifier = Modifier.align(Alignment.TopEnd),

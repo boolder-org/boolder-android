@@ -21,11 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -97,7 +96,7 @@ private fun TrainAndBikeScreenContent(
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(id = R.string.top_areas_train_and_bike_intro),
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -134,6 +133,7 @@ private fun TrainStationPoiItem(
             modifier = Modifier.weight(1f),
             text = item.name,
             style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
 
@@ -159,23 +159,25 @@ private fun AreaBikeRouteItem(
             .heightIn(min = 48.dp)
             .padding(horizontal = 16.dp)
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = item.areaName
+            text = item.areaName,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
-            text = stringResource(id = R.string.poi_distance_in_min, item.bikingTime)
+            text = stringResource(id = R.string.poi_distance_in_min, item.bikingTime),
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun TrainAndBikeScreenPreview(
     @PreviewParameter(TrainAndBikeScreenPreviewParameterProvider::class)

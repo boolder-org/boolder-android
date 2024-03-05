@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -82,7 +82,7 @@ internal fun CircuitItem(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun CircuitItemPreview(
     @PreviewParameter(CircuitItemPreviewParameterProvider::class)
@@ -91,7 +91,7 @@ private fun CircuitItemPreview(
     BoolderTheme {
         CircuitItem(
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = MaterialTheme.colorScheme.surface)
                 .padding(16.dp),
             circuit = circuit
         )

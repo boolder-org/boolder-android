@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -69,20 +69,21 @@ private fun CircuitControlButton(
     Icon(
         modifier = Modifier
             .clip(shape = CircleShape)
-            .background(color = Color.White, shape = CircleShape)
+            .background(color = MaterialTheme.colorScheme.surface, shape = CircleShape)
             .clickable(onClick = onClick)
             .padding(8.dp),
         painter = painterResource(id = iconRes),
         contentDescription = contentDescription,
         tint = when (circuitColor) {
+            CircuitColor.BLACK,
             CircuitColor.WHITE,
-            CircuitColor.WHITEFORKIDS -> Color.Black
+            CircuitColor.WHITEFORKIDS -> MaterialTheme.colorScheme.onSurface
             else -> colorResource(id = circuitColor.colorRes)
         }
     )
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun CircuitControlsPreview(
     @PreviewParameter(CircuitControlsPreviewParameterProvider::class)

@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
@@ -83,7 +83,7 @@ fun MapControlsOverlay(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun MapControlsOverlayPreview() {
     BoolderTheme {

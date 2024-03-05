@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -49,8 +49,8 @@ import com.boolder.boolder.offline.OfflineAreaDownloader
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS
 import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
-import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.BoolderOrange
+import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 
 @Composable
@@ -99,12 +99,14 @@ internal fun AreaPhotosDownloadItem(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = param.text
+                text = param.text,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Icon(
                 painter = painterResource(id = param.iconRes),
-                contentDescription = null
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -218,19 +220,21 @@ private fun DownloadInfoDownloadingProgress(progress: Float) {
                 modifier = Modifier
                     .size(80.dp)
                     .graphicsLayer { rotationZ = rotationAngle },
-                progress = progress,
+                progress = { progress },
                 strokeWidth = 8.dp,
                 strokeCap = StrokeCap.Round
             )
 
             Text(
-                text = String.format("%.0f%%", progress * 100)
+                text = String.format("%.0f%%", progress * 100),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
         Text(
             text = stringResource(id = R.string.area_overview_download_in_progress),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -247,17 +251,19 @@ private fun DownloadInfoDownloaded(folderSize: String) {
         Icon(
             modifier = Modifier.size(48.dp),
             painter = painterResource(id = R.drawable.ic_download_done),
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
             text = stringResource(id = R.string.area_overview_downloaded_photos, folderSize),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun AreaPhotosDownloadItemPreview(
     @PreviewParameter(AreaPhotosDownloadItemPreviewParameterProvider::class)
@@ -265,7 +271,7 @@ private fun AreaPhotosDownloadItemPreview(
 ) {
     BoolderTheme {
         AreaPhotosDownloadItem(
-            modifier = Modifier.background(color = Color.White),
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
             areaId = 42,
             status = status,
             offlineAreaDownloader = dummyOfflineAreaDownloader()

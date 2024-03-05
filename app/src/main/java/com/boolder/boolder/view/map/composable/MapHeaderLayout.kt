@@ -16,16 +16,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedFilterChip
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
@@ -150,7 +149,6 @@ private fun FiltersRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MapFilterResetChip(
     onClick: () -> Unit,
@@ -162,7 +160,9 @@ private fun MapFilterResetChip(
             .size(FilterChipDefaults.Height),
         shape = CircleShape,
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.elevatedButtonColors(contentColor = Color.Black),
+        colors = ButtonDefaults.elevatedButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
         onClick = onClick,
         content = {
             Icon(
@@ -173,7 +173,6 @@ private fun MapFilterResetChip(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MapFilterChip(
     selected: Boolean,
@@ -187,8 +186,8 @@ private fun MapFilterChip(
         selected = selected,
         shape = CircleShape,
         colors = FilterChipDefaults.elevatedFilterChipColors(
-            labelColor = Color.Black,
-            iconColor = Color.Black
+            labelColor = MaterialTheme.colorScheme.onSurface,
+            iconColor = MaterialTheme.colorScheme.onSurface
         ),
         label = { Text(text = label) },
         leadingIcon = {
@@ -201,7 +200,7 @@ private fun MapFilterChip(
     )
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun MapHeaderLayoutPreview() {
     BoolderTheme {

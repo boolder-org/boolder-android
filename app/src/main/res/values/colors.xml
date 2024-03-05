@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primary">#FF65C466</color>
+    <color name="onPrimary">#FFFFFFFF</color>
+    <color name="secondary">#FF65C466</color>
+    <color name="onSecondary">#FF018786</color>
+    <color name="background">#FFEBEBEB</color>
+    <color name="onBackground">#FF4D4D4D</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="onSurface">#FF000000</color>
+    <color name="onSurfaceVariant">#FFA5A5A5</color>
+    <color name="outline">#FFE5E5E5</color>
+    <color name="secondaryContainer">#FF65C466</color>
+    <color name="onSecondaryContainer">#FFFFFFFF</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -8,15 +21,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary">#65C466</color>
     <color name="gray">#F2F2F2</color>
     <color name="gray_darker">#E5E5E5</color>
-    <color name="dark_gray">@android:color/darker_gray</color>
     <color name="picture_placeholder">#EAEAEA</color>
     <color name="icon_tint">#8E8D91</color>
     <color name="variant_chip">#CC8E8D91</color>
-
-    <color name="bottom_sheet_background">@color/white</color>
 
     <color name="circuit_color_yellow">#ffcc02</color>
     <color name="circuit_color_purple">#d783FF</color>
