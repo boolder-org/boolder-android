@@ -22,6 +22,8 @@ import com.boolder.boolder.utils.extension.composeColor
 import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.MapViewModel
+import com.boolder.boolder.view.map.filter.DummyFiltersEventHandler
+import com.boolder.boolder.view.map.filter.FiltersEventHandler
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 
@@ -31,14 +33,13 @@ fun MapControlsOverlay(
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
     popularState: MapViewModel.PopularFilterState,
+    projectsState: MapViewModel.ProjectsFilterState,
+    tickedState: MapViewModel.TickedFilterState,
     shouldShowFiltersBar: Boolean,
+    filtersEventHandler: FiltersEventHandler,
     onHideAreaName: () -> Unit,
     onAreaInfoClicked: () -> Unit,
     onSearchBarClicked: () -> Unit,
-    onCircuitFilterChipClicked: () -> Unit,
-    onGradeFilterChipClicked: () -> Unit,
-    onPopularFilterChipClicked: () -> Unit,
-    onResetFiltersClicked: () -> Unit,
     onCircuitStartClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -50,14 +51,13 @@ fun MapControlsOverlay(
             circuitState = circuitState,
             gradeState = gradeState,
             popularState = popularState,
+            projectsState = projectsState,
+            tickedState = tickedState,
             shouldShowFiltersBar = shouldShowFiltersBar,
+            filtersEventHandler = filtersEventHandler,
             onHideAreaName = onHideAreaName,
             onAreaInfoClicked = onAreaInfoClicked,
-            onSearchBarClicked = onSearchBarClicked,
-            onCircuitFilterChipClicked = onCircuitFilterChipClicked,
-            onGradeFilterChipClicked = onGradeFilterChipClicked,
-            onPopularFilterChipClicked = onPopularFilterChipClicked,
-            onResetFiltersClicked = onResetFiltersClicked,
+            onSearchBarClicked = onSearchBarClicked
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -102,14 +102,13 @@ private fun MapControlsOverlayPreview() {
                 grades = ALL_GRADES
             ),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
+            projectsState = MapViewModel.ProjectsFilterState(projectIds = emptyList()),
+            tickedState = MapViewModel.TickedFilterState(tickedProblemIds = emptyList()),
             shouldShowFiltersBar = true,
+            filtersEventHandler = DummyFiltersEventHandler,
             onHideAreaName = {},
             onAreaInfoClicked = {},
             onSearchBarClicked = {},
-            onCircuitFilterChipClicked = {},
-            onGradeFilterChipClicked = {},
-            onPopularFilterChipClicked = {},
-            onResetFiltersClicked = {},
             onCircuitStartClicked = {}
         )
     }

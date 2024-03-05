@@ -84,7 +84,13 @@
     <string name="apply">Apply</string>
     <string name="custom">Custom</string>
 
-    <string name="popular">Popular</string>
+    <string name="filter_popular">Popular</string>
+    <string name="filter_projects">Projects</string>
+    <string name="filter_ticked">Ticked</string>
+    <string name="filter_warning_no_projects_message">Add your first project to use this filter.</string>
+    <string name="filter_warning_no_projects_title">You don\'t have any projects yet</string>
+    <string name="filter_warning_no_ticks_message">Tick your first problem to use this filter.</string>
+    <string name="filter_warning_no_ticks_title">You don\'t have any ticks yet</string>
 
     <string name="area_overview_area_info">Area info</string>
     <string name="area_overview_problems">Problems</string>

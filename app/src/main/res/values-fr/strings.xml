@@ -81,7 +81,13 @@
     <string name="apply">Appliquer</string>
     <string name="custom">Personnalisé</string>
 
-    <string name="popular">Populaires</string>
+    <string name="filter_popular">Populaires</string>
+    <string name="filter_projects">Projets</string>
+    <string name="filter_ticked">Réussies</string>
+    <string name="filter_warning_no_projects_message">Enregistrez votre premier projet pour utiliser ce filtre.</string>
+    <string name="filter_warning_no_projects_title">Vous n\'avez pas encore de projet</string>
+    <string name="filter_warning_no_ticks_message">Enregistrez votre première voie réussie pour utiliser ce filtre.</string>
+    <string name="filter_warning_no_ticks_title">Vous n\'avez pas encore de voie réussie</string>
 
     <string name="area_overview_area_info">Infos secteur</string>
     <string name="area_overview_problems">Voies</string>
