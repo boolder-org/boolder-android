@@ -266,7 +266,9 @@ class MapViewModel(
                     gradeRangeButtonTitle = resources.getString(R.string.grades),
                     grades = ALL_GRADES
                 ),
-                popularFilterState = PopularFilterState(isEnabled = false)
+                popularFilterState = PopularFilterState(isEnabled = false),
+                projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
+                tickedFilterState = TickedFilterState(tickedProblemIds = emptyList())
             )
         }
     }

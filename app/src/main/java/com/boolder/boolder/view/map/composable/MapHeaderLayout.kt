@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
@@ -104,80 +107,89 @@ private fun FiltersRow(
     val isProjectsFilterActive = projectsState.projectIds.isNotEmpty()
     val isTickedFilterActive = tickedState.tickedProblemIds.isNotEmpty()
 
-    val showResetButton = isCircuitFilterActive || isGradeFilterActive || isPopularFilterActive
+    val showResetButton = isCircuitFilterActive
+        || isGradeFilterActive
+        || isPopularFilterActive
+        || isProjectsFilterActive
+        || isTickedFilterActive
 
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        state = lazyRowState,
-        horizontalArrangement = spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+    Row(
+        horizontalArrangement = spacedBy(8.dp)
     ) {
-        if (showResetButton) {
-            item(key = "reset_button") {
-                MapFilterResetChip(
-                    modifier = Modifier.animateItemPlacement(),
-                    onClick = filtersEventHandler::onResetFiltersButtonClicked
-                )
-            }
+        AnimatedVisibility(visible = showResetButton) {
+            MapFilterResetChip(
+                modifier = Modifier.padding(start = 16.dp),
+                onClick = filtersEventHandler::onResetFiltersButtonClicked
+            )
         }
 
-        if (showCircuitFilterChip) {
-            item(key = circuitState?.circuitId) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            state = lazyRowState,
+            horizontalArrangement = spacedBy(8.dp),
+            contentPadding = PaddingValues(
+                start = if (showResetButton) 0.dp else 16.dp,
+                end = 16.dp
+            )
+        ) {
+            if (showCircuitFilterChip) {
+                item(key = circuitState?.circuitId) {
+                    MapFilterChip(
+                        modifier = Modifier.animateItemPlacement(),
+                        selected = isCircuitFilterActive,
+                        label = circuitState?.color?.localizedName()
+                            ?: stringResource(id = R.string.circuits),
+                        iconRes = R.drawable.ic_route,
+                        onClick = filtersEventHandler::onCircuitFilterChipClicked
+                    )
+
+                    LaunchedEffect(key1 = circuitState) { lazyRowState.animateScrollToItem(index = 0) }
+                }
+            }
+
+            item(key = gradeState.gradeRangeButtonTitle) {
                 MapFilterChip(
                     modifier = Modifier.animateItemPlacement(),
-                    selected = isCircuitFilterActive,
-                    label = circuitState?.color?.localizedName()
-                        ?: stringResource(id = R.string.circuits),
-                    iconRes = R.drawable.ic_route,
-                    onClick = filtersEventHandler::onCircuitFilterChipClicked
+                    selected = isGradeFilterActive,
+                    label = gradeState.gradeRangeButtonTitle,
+                    iconRes = R.drawable.ic_signal_cellular_alt,
+                    onClick = filtersEventHandler::onGradeFilterChipClicked
                 )
+            }
 
-                LaunchedEffect(key1 = circuitState) { lazyRowState.animateScrollToItem(index = 0) }
+            item(key = "popular-filter") {
+                MapFilterChip(
+                    modifier = Modifier.animateItemPlacement(),
+                    selected = isPopularFilterActive,
+                    label = stringResource(id = R.string.filter_popular),
+                    iconRes = R.drawable.ic_favorite_border,
+                    onClick = filtersEventHandler::onPopularFilterChipClicked
+                )
+            }
+
+            item(key = "projects-filter") {
+                MapFilterChip(
+                    modifier = Modifier.animateItemPlacement(),
+                    selected = isProjectsFilterActive,
+                    label = stringResource(id = R.string.filter_projects),
+                    iconRes = R.drawable.ic_star_outline,
+                    onClick = filtersEventHandler::onProjectsFilterChipClicked
+                )
+            }
+
+            item(key = "ticked-filter") {
+                MapFilterChip(
+                    modifier = Modifier.animateItemPlacement(),
+                    selected = isTickedFilterActive,
+                    label = stringResource(id = R.string.filter_ticked),
+                    iconRes = R.drawable.ic_check_circle,
+                    onClick = filtersEventHandler::onTickedFilterChipClicked
+                )
             }
         }
 
-        item(key = gradeState.gradeRangeButtonTitle) {
-            MapFilterChip(
-                modifier = Modifier.animateItemPlacement(),
-                selected = isGradeFilterActive,
-                label = gradeState.gradeRangeButtonTitle,
-                iconRes = R.drawable.ic_signal_cellular_alt,
-                onClick = filtersEventHandler::onGradeFilterChipClicked
-            )
-        }
-
-        item(key = "popular-filter") {
-            MapFilterChip(
-                modifier = Modifier.animateItemPlacement(),
-                selected = isPopularFilterActive,
-                label = stringResource(id = R.string.filter_popular),
-                iconRes = R.drawable.ic_favorite_border,
-                onClick = filtersEventHandler::onPopularFilterChipClicked
-            )
-        }
-
-        item(key = "projects-filter") {
-            MapFilterChip(
-                modifier = Modifier.animateItemPlacement(),
-                selected = isProjectsFilterActive,
-                label = stringResource(id = R.string.filter_projects),
-                iconRes = R.drawable.ic_star_outline,
-                onClick = filtersEventHandler::onProjectsFilterChipClicked
-            )
-        }
-
-        item(key = "ticked-filter") {
-            MapFilterChip(
-                modifier = Modifier.animateItemPlacement(),
-                selected = isTickedFilterActive,
-                label = stringResource(id = R.string.filter_ticked),
-                iconRes = R.drawable.ic_check_circle,
-                onClick = filtersEventHandler::onTickedFilterChipClicked
-            )
-        }
+        LaunchedEffect(key1 = Unit) { lazyRowState.scrollToItem(index = 0) }
     }
-
-    LaunchedEffect(key1 = Unit) { lazyRowState.scrollToItem(index = 0) }
 }
 
 @Composable
@@ -233,15 +245,14 @@ private fun MapFilterChip(
 
 @PreviewLightDark
 @Composable
-private fun MapHeaderLayoutPreview() {
+private fun MapHeaderLayoutPreview(
+    @PreviewParameter(MapHeaderLayoutPreviewParameterProvider::class)
+    circuitState: MapViewModel.CircuitState?
+) {
     BoolderTheme {
         MapHeaderLayout(
             offlineAreaItem = dummyOfflineAreaItem(),
-            circuitState = MapViewModel.CircuitState(
-                circuitId = 42,
-                color = CircuitColor.BLUE,
-                showCircuitStartButton = true
-            ),
+            circuitState = circuitState,
             gradeState = MapViewModel.GradeState(
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),
                 grades = ALL_GRADES
@@ -256,4 +267,15 @@ private fun MapHeaderLayoutPreview() {
             onSearchBarClicked = {}
         )
     }
+}
+
+private class MapHeaderLayoutPreviewParameterProvider : PreviewParameterProvider<MapViewModel.CircuitState?> {
+    override val values = sequenceOf(
+        null,
+        MapViewModel.CircuitState(
+            circuitId = 42,
+            color = CircuitColor.BLUE,
+            showCircuitStartButton = true
+        )
+    )
 }
