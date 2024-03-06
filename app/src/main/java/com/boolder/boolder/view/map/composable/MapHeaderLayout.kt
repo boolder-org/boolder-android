@@ -5,13 +5,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -24,7 +28,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -113,14 +123,37 @@ private fun FiltersRow(
         || isProjectsFilterActive
         || isTickedFilterActive
 
-    Row(
-        horizontalArrangement = spacedBy(8.dp)
-    ) {
+    val separatorVisibilityThreshold = 15f
+    val listOffset by remember {
+        derivedStateOf {
+            (lazyRowState.firstVisibleItemIndex * 100f + lazyRowState.firstVisibleItemScrollOffset)
+                .coerceAtMost(separatorVisibilityThreshold)
+        }
+    }
+
+    Row {
         AnimatedVisibility(visible = showResetButton) {
-            MapFilterResetChip(
+            Row(
                 modifier = Modifier.padding(start = 16.dp),
-                onClick = filtersEventHandler::onResetFiltersButtonClicked
-            )
+                horizontalArrangement = spacedBy(8.dp)
+            ) {
+                MapFilterResetChip(onClick = filtersEventHandler::onResetFiltersButtonClicked)
+
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(48.dp)
+                        .graphicsLayer { alpha = listOffset / separatorVisibilityThreshold }
+                        .background(
+                            brush = Brush.verticalGradient(
+                                0f to Color.Transparent,
+                                .33f to MaterialTheme.colorScheme.surface,
+                                .66f to MaterialTheme.colorScheme.surface,
+                                1f to Color.Transparent
+                            )
+                        )
+                )
+            }
         }
 
         LazyRow(
