@@ -460,12 +460,18 @@ class BoolderMap @JvmOverloads constructor(
 
     fun applyFilters(
         grades: List<String>,
-        showPopular: Boolean
+        showPopular: Boolean,
+        projectIds: List<Int>,
+        tickedIds: List<Int>
     ) {
         val problemsLayer = getLayerAs<CircleLayer>(LAYER_PROBLEMS)
         val problemsTextLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_TEXT)
+
         val popularLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_NAMES)
         val popularAntiOverlapLayer = getLayerAs<SymbolLayer>(LAYER_PROBLEMS_NAMES_ANTI_OVERLAP)
+
+        val showProjects = projectIds.isNotEmpty()
+        val showTicked = tickedIds.isNotEmpty()
 
         val query = all {
             match {
@@ -476,6 +482,20 @@ class BoolderMap @JvmOverloads constructor(
             }
 
             if (showPopular) get("featured")
+
+            if (showProjects) {
+                inExpression {
+                    get("id")
+                    literal(projectIds)
+                }
+            }
+
+            if (showTicked) {
+                inExpression {
+                    get("id")
+                    literal(tickedIds)
+                }
+            }
         }
 
         problemsLayer?.filter(query)
@@ -483,7 +503,13 @@ class BoolderMap @JvmOverloads constructor(
 
         fun SymbolLayer.update() = apply {
             filter(query)
-            visibility(if (showPopular) Visibility.VISIBLE else Visibility.NONE)
+            visibility(
+                if (showPopular || showProjects || showTicked) {
+                    Visibility.VISIBLE
+                } else {
+                    Visibility.NONE
+                }
+            )
         }
 
         popularLayer?.update()

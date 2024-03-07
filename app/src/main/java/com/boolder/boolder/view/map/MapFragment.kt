@@ -51,6 +51,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -155,14 +156,13 @@ class MapFragment : Fragment(), BoolderMapListener {
                         circuitState = screenState.circuitState,
                         gradeState = screenState.gradeState,
                         popularState = screenState.popularFilterState,
+                        projectsState = screenState.projectsFilterState,
+                        tickedState = screenState.tickedFilterState,
                         shouldShowFiltersBar = screenState.shouldShowFiltersBar,
+                        filtersEventHandler = mapViewModel,
                         onHideAreaName = ::onAreaLeft,
                         onAreaInfoClicked = { navigateToAreaOverviewScreen(screenState.areaState?.area?.id) },
                         onSearchBarClicked = ::navigateToSearchScreen,
-                        onCircuitFilterChipClicked = mapViewModel::onCircuitFilterChipClicked,
-                        onGradeFilterChipClicked = mapViewModel::onGradeFilterChipClicked,
-                        onPopularFilterChipClicked = mapViewModel::onPopularFilterChipClicked,
-                        onResetFiltersClicked = mapViewModel::onResetFiltersButtonClicked,
                         onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked
                     )
                 }
@@ -172,18 +172,22 @@ class MapFragment : Fragment(), BoolderMapListener {
                 updateCircuit(screenState.circuitState?.circuitId?.toLong())
                 applyFilters(
                     grades = screenState.gradeState.grades,
-                    showPopular = screenState.popularFilterState.isEnabled
+                    showPopular = screenState.popularFilterState.isEnabled,
+                    projectIds = screenState.projectsFilterState.projectIds,
+                    tickedIds = screenState.tickedFilterState.tickedProblemIds
                 )
             }
         }
 
-        mapViewModel.eventFlow.launchAndCollectIn(owner = this) { event ->
+        mapViewModel.eventFlow.launchAndCollectIn(owner = viewLifecycleOwner) { event ->
             when (event) {
                 is MapViewModel.Event.ShowAvailableCircuits -> showCircuitFilterBottomSheet(event)
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
                 is MapViewModel.Event.ZoomOnCircuitStartProblem -> onProblemSelected(event.problemId, TopoOrigin.CIRCUIT)
                 is MapViewModel.Event.ZoomOnArea -> flyToArea(event.area)
+                is MapViewModel.Event.WarnNoSavedProjects -> showNoSavedProjectsDialog()
+                is MapViewModel.Event.WarnNoTickedProblems -> showNoTickedProblemsDialog()
             }
         }
 
@@ -484,6 +488,26 @@ class MapFragment : Fragment(), BoolderMapListener {
         val direction = MapFragmentDirections.showGradesFilter(gradeRange = event.currentGradeRange)
 
         navController.navigate(direction)
+    }
+
+    private fun showNoSavedProjectsDialog() {
+        val context = context ?: return
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.filter_warning_no_projects_title)
+            .setMessage(R.string.filter_warning_no_projects_message)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    private fun showNoTickedProblemsDialog() {
+        val context = context ?: return
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.filter_warning_no_ticks_title)
+            .setMessage(R.string.filter_warning_no_ticks_message)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     private fun zoomOnCircuit(event: MapViewModel.Event.ZoomOnCircuit) {

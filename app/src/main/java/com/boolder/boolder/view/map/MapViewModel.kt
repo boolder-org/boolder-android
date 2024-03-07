@@ -20,6 +20,7 @@ import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
 import com.boolder.boolder.offline.BoolderOfflineRepository
 import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.view.map.filter.FiltersEventHandler
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
@@ -38,7 +39,10 @@ class MapViewModel(
     private val topoDataAggregator: TopoDataAggregator,
     private val resources: Resources,
     private val boolderOfflineRepository: BoolderOfflineRepository
-) : ViewModel(), OfflineAreaDownloader, TickedProblemSaver {
+) : ViewModel(),
+    OfflineAreaDownloader,
+    TickedProblemSaver,
+    FiltersEventHandler {
 
     private val _screenStateFlow = MutableStateFlow(
         ScreenState(
@@ -49,6 +53,8 @@ class MapViewModel(
                 grades = ALL_GRADES
             ),
             popularFilterState = PopularFilterState(isEnabled = false),
+            projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
+            tickedFilterState = TickedFilterState(tickedProblemIds = emptyList()),
             shouldShowFiltersBar = false
         )
     )
@@ -250,7 +256,9 @@ class MapViewModel(
         _screenStateFlow.update { it.copy(shouldShowFiltersBar = shouldShowFiltersBar) }
     }
 
-    fun onResetFiltersButtonClicked() {
+    // region FiltersEventHandler
+
+    override fun onResetFiltersButtonClicked() {
         _screenStateFlow.update {
             it.copy(
                 circuitState = null,
@@ -258,12 +266,14 @@ class MapViewModel(
                     gradeRangeButtonTitle = resources.getString(R.string.grades),
                     grades = ALL_GRADES
                 ),
-                popularFilterState = PopularFilterState(isEnabled = false)
+                popularFilterState = PopularFilterState(isEnabled = false),
+                projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
+                tickedFilterState = TickedFilterState(tickedProblemIds = emptyList())
             )
         }
     }
 
-    fun onCircuitFilterChipClicked() {
+    override fun onCircuitFilterChipClicked() {
         viewModelScope.launch {
             val areaState = _screenStateFlow.value.areaState ?: return@launch
 
@@ -278,13 +288,13 @@ class MapViewModel(
         }
     }
 
-    fun onGradeFilterChipClicked() {
+    override fun onGradeFilterChipClicked() {
         viewModelScope.launch {
             _eventFlow.emit(Event.ShowGradeRanges(currentGradeRange = currentGradeRange))
         }
     }
 
-    fun onPopularFilterChipClicked() {
+    override fun onPopularFilterChipClicked() {
         val popularFilterValue = _screenStateFlow.value.popularFilterState.isEnabled
 
         _screenStateFlow.update {
@@ -293,6 +303,54 @@ class MapViewModel(
             )
         }
     }
+
+    override fun onProjectsFilterChipClicked() {
+        viewModelScope.launch {
+            val projectIds = _screenStateFlow.value.projectsFilterState.projectIds
+            val newProjectIds = if (projectIds.isNotEmpty()) {
+                emptyList()
+            } else {
+                tickedProblemRepository.getAllProjectIds()
+                    .also { if (it.isEmpty()) _eventFlow.emit(Event.WarnNoSavedProjects) }
+            }
+
+            _screenStateFlow.update {
+                it.copy(
+                    projectsFilterState = ProjectsFilterState(projectIds = newProjectIds),
+                    tickedFilterState = if (newProjectIds.isNotEmpty()) {
+                        TickedFilterState(tickedProblemIds = emptyList())
+                    } else {
+                        it.tickedFilterState
+                    }
+                )
+            }
+        }
+    }
+
+    override fun onTickedFilterChipClicked() {
+        viewModelScope.launch {
+            val tickedProblemIds = _screenStateFlow.value.tickedFilterState.tickedProblemIds
+            val newTickedProblemIds = if (tickedProblemIds.isNotEmpty()) {
+                emptyList()
+            } else {
+                tickedProblemRepository.getAllTickedProblemIds()
+                    .also { if (it.isEmpty()) _eventFlow.emit(Event.WarnNoTickedProblems) }
+            }
+
+            _screenStateFlow.update {
+                it.copy(
+                    tickedFilterState = TickedFilterState(tickedProblemIds = newTickedProblemIds),
+                    projectsFilterState = if (newTickedProblemIds.isNotEmpty()) {
+                        ProjectsFilterState(projectIds = emptyList())
+                    } else {
+                        it.projectsFilterState
+                    }
+                )
+            }
+        }
+    }
+
+    // endregion FiltersEventHandler
 
     fun onCircuitDepartureButtonClicked() {
         viewModelScope.launch {
@@ -414,6 +472,8 @@ class MapViewModel(
         val circuitState: CircuitState?,
         val gradeState: GradeState,
         val popularFilterState: PopularFilterState,
+        val projectsFilterState: ProjectsFilterState,
+        val tickedFilterState: TickedFilterState,
         val shouldShowFiltersBar: Boolean
     )
 
@@ -430,6 +490,10 @@ class MapViewModel(
 
     data class PopularFilterState(val isEnabled: Boolean)
 
+    data class ProjectsFilterState(val projectIds: List<Int>)
+
+    data class TickedFilterState(val tickedProblemIds: List<Int>)
+
     sealed interface Event {
         data class ShowAvailableCircuits(
             val selectedCircuit: Circuit?,
@@ -442,5 +506,8 @@ class MapViewModel(
 
         data class ZoomOnCircuitStartProblem(val problemId: Int) : Event
         data class ZoomOnArea(val area: Area) : Event
+
+        data object WarnNoSavedProjects : Event
+        data object WarnNoTickedProblems : Event
     }
 }

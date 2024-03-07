@@ -12,6 +12,9 @@ interface TickedProblemDao {
     @Query("SELECT * FROM ticked_problems")
     suspend fun getAllTickedProblems(): List<TickedProblemEntity>
 
+    @Query("SELECT problem_id FROM ticked_problems WHERE tick_status = :tickStatus")
+    suspend fun getSavedProblemIds(tickStatus: String): List<Int>
+
     @Query("SELECT * FROM ticked_problems WHERE problem_id = :problemId")
     suspend fun getTickedProblemByProblemId(problemId: Int): TickedProblemEntity?
 
