@@ -28,4 +28,8 @@ class TickedProblemRepository(
     suspend fun deleteTickedProblemByProblemId(problemId: Int) {
         tickedProblemDao.deleteTickedProblemByProblemId(problemId)
     }
+
+    suspend fun deleteAll() {
+        tickedProblemDao.deleteAll()
+    }
 }
