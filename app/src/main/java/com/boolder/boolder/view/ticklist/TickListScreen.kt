@@ -1,9 +1,11 @@
 package com.boolder.boolder.view.ticklist
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,14 +13,22 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +56,8 @@ import com.boolder.boolder.view.compose.ProblemIcon
 internal fun TickListScreen(
     screenState: TickListViewModel.ScreenState,
     onProblemClicked: (Problem) -> Unit,
+    onExportTickListClicked: () -> Unit,
+    onImportTickListClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -56,6 +68,40 @@ internal fun TickListScreen(
             TopAppBar(
                 title = {
                     Text(text = stringResource(id = R.string.tab_tick_list))
+                },
+                actions = {
+                    var showOverflowActions by remember { mutableStateOf(false) }
+
+                    IconButton(
+                        modifier = Modifier.clip(CircleShape),
+                        onClick = { showOverflowActions = !showOverflowActions },
+                        content = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_more_vert),
+                                contentDescription = stringResource(id = R.string.tick_list_action_export),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            if (showOverflowActions) {
+                                DropdownMenu(
+                                    expanded = true,
+                                    onDismissRequest = { showOverflowActions = false },
+                                    content = {
+                                        TickListOverflowActions(
+                                            onExportTickListClicked = {
+                                                showOverflowActions = false
+                                                onExportTickListClicked()
+                                            },
+                                            onImportTickListClicked = {
+                                                showOverflowActions = false
+                                                onImportTickListClicked()
+                                            }
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    )
                 }
             )
         },
@@ -183,6 +229,45 @@ private fun ProblemItem(
     }
 }
 
+@Composable
+private fun TickListOverflowActions(
+    onExportTickListClicked: () -> Unit,
+    onImportTickListClicked: () -> Unit
+) {
+    Column {
+        TickListOverflowActionItem(
+            text = stringResource(id = R.string.tick_list_action_export),
+            iconRes = R.drawable.ic_cloud_upload,
+            onClick = onExportTickListClicked
+        )
+
+        TickListOverflowActionItem(
+            text = stringResource(id = R.string.tick_list_action_import),
+            iconRes = R.drawable.ic_install_mobile,
+            onClick = onImportTickListClicked
+        )
+    }
+}
+
+@Composable
+private fun TickListOverflowActionItem(
+    text: String,
+    @DrawableRes iconRes: Int,
+    onClick: () -> Unit
+) {
+    DropdownMenuItem(
+        text = { Text(text = text) },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        onClick = onClick
+    )
+}
+
 @PreviewLightDark
 @Composable
 private fun TickListScreenPreview(
@@ -192,7 +277,9 @@ private fun TickListScreenPreview(
     BoolderTheme {
         TickListScreen(
             screenState = screenState,
-            onProblemClicked = {}
+            onProblemClicked = {},
+            onExportTickListClicked = {},
+            onImportTickListClicked = {}
         )
     }
 }
