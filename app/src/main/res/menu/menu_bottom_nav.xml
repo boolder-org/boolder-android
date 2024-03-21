@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_bookmark"
         android:title="@string/tab_tick_list" />
 
+    <item
+        android:id="@+id/contribute_fragment"
+        android:icon="@drawable/ic_group"
+        android:title="@string/tab_contribute" />
+
 </menu>

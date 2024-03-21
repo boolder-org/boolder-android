@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
             R.id.map_fragment,
             R.id.discover_fragment,
             R.id.tick_list_fragment,
+            R.id.contribute_fragment,
             R.id.dialog_circuit_filter,
             R.id.dialog_grades_filter
         )

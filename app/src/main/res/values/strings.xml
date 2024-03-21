@@ -4,6 +4,7 @@
     <string name="tab_map">Map</string>
     <string name="tab_discover">Discover</string>
     <string name="tab_tick_list">Tick List</string>
+    <string name="tab_contribute">Contribute</string>
 
     <string name="search_query_hint">Problem or area name</string>
     <string name="cd_find_my_position">Find my position</string>
@@ -129,6 +130,15 @@
     <string name="top_areas_train_and_bike_intro">Bike time from the station:</string>
 
     <string name="tick_list_empty_state_body">Your projects and ticks will appear here.</string>
+
+    <string name="contribute_title">Contribute to Boolder</string>
+    <string name="contribute_intro">Help us build the best collaborative guidebook for Fontainebleau!</string>
+    <string name="contribute_photo">Take a photo of a boulder</string>
+    <string name="contribute_location">Enter the GPS position</string>
+    <string name="contribute_line">Draw the route line</string>
+    <string name="contribute_report">Report errors</string>
+    <string name="contribute_cta">Start contributing</string>
+    <string name="contribute_learn_more">Learn more about Boolder</string>
 
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>
