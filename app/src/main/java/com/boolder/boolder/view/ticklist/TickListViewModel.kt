@@ -11,6 +11,7 @@ import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
 import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.TickedProblem
+import com.boolder.boolder.view.ticklist.model.ExportableTick
 import com.boolder.boolder.view.ticklist.model.ExportableTickList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -74,9 +75,15 @@ internal class TickListViewModel(
 
     fun onExportTickList() {
         viewModelScope.launch {
+            val exportableTickedProblems = tickedProblemRepository.getAllTickedProblemIds()
+                .map { ExportableTick(id = it) }
+
+            val exportableProjectIds = tickedProblemRepository.getAllProjectIds()
+                .map { ExportableTick(id = it) }
+
             val exportableTickList = ExportableTickList(
-                tickedProblemIds = tickedProblemRepository.getAllTickedProblemIds(),
-                projectIds = tickedProblemRepository.getAllProjectIds()
+                tickedProblemIds = exportableTickedProblems,
+                projectIds = exportableProjectIds
             )
 
             val json = Json.encodeToString(exportableTickList)
@@ -136,10 +143,10 @@ internal class TickListViewModel(
 
             exportableTickList.tickedProblemIds
                 .forEach {
-                    tickedProblemRepository.deleteTickedProblemByProblemId(it)
+                    tickedProblemRepository.deleteTickedProblemByProblemId(it.id)
                     tickedProblemRepository.insertTickedProblem(
                         TickedProblem(
-                            problemId = it,
+                            problemId = it.id,
                             tickStatus = TickStatus.SUCCEEDED
                         )
                     )
@@ -147,10 +154,10 @@ internal class TickListViewModel(
 
             exportableTickList.projectIds
                 .forEach {
-                    tickedProblemRepository.deleteTickedProblemByProblemId(it)
+                    tickedProblemRepository.deleteTickedProblemByProblemId(it.id)
                     tickedProblemRepository.insertTickedProblem(
                         TickedProblem(
-                            problemId = it,
+                            problemId = it.id,
                             tickStatus = TickStatus.PROJECT
                         )
                     )

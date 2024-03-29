@@ -5,6 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ExportableTickList(
-    @SerialName("ticks") val tickedProblemIds: List<Int>,
-    @SerialName("projects") val projectIds: List<Int>
+    @SerialName("ticks") val tickedProblemIds: List<ExportableTick>,
+    @SerialName("projects") val projectIds: List<ExportableTick>
+)
+
+@Serializable
+data class ExportableTick(
+    @SerialName("id") val id: Int
 )
