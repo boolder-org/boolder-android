@@ -151,8 +151,8 @@ class TickListFragment : Fragment() {
             .setIcon(icon)
             .setTitle(R.string.tick_list_dialog_importation_title)
             .setMessage(R.string.tick_list_dialog_importation_message)
-            .setPositiveButton(R.string.tick_list_dialog_importation_button_merge, dialogClickListener)
-            .setNegativeButton(R.string.tick_list_dialog_importation_button_replace, dialogClickListener)
+            .setPositiveButton(R.string.tick_list_dialog_importation_button_keep, dialogClickListener)
+            .setNegativeButton(R.string.tick_list_dialog_importation_button_delete, dialogClickListener)
             .setNeutralButton(R.string.tick_list_dialog_importation_button_cancel, dialogClickListener)
             .show()
     }

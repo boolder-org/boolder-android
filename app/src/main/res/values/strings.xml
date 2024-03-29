@@ -131,10 +131,10 @@
 
     <string name="tick_list_action_export">Export</string>
     <string name="tick_list_action_import">Import</string>
-    <string name="tick_list_dialog_importation_button_merge">Merge with the new ticks</string>
     <string name="tick_list_dialog_importation_button_cancel">Cancel</string>
-    <string name="tick_list_dialog_importation_button_replace">Replace all ticks</string>
-    <string name="tick_list_dialog_importation_message">Do you want to replace the previous tick list or merge with the new ticks?</string>
+    <string name="tick_list_dialog_importation_button_delete">Delete</string>
+    <string name="tick_list_dialog_importation_button_keep">Keep</string>
+    <string name="tick_list_dialog_importation_message">Do you want to keep or clear your current list?</string>
     <string name="tick_list_dialog_importation_title">Importation</string>
     <string name="tick_list_empty_state_body">Your projects and ticks will appear here.</string>
     <string name="tick_list_error_import_malformed_input">The file is malformed and can\'t be imported.</string>

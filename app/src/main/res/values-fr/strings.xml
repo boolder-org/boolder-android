@@ -128,10 +128,10 @@
 
     <string name="tick_list_action_export">Exporter</string>
     <string name="tick_list_action_import">Importer</string>
-    <string name="tick_list_dialog_importation_button_merge">Fusionner l\'import</string>
     <string name="tick_list_dialog_importation_button_cancel">Annuler</string>
-    <string name="tick_list_dialog_importation_button_replace">Tout remplacer</string>
-    <string name="tick_list_dialog_importation_message">Voulez-vous tout remplacer ou fusionner l\'import ?</string>
+    <string name="tick_list_dialog_importation_button_delete">Supprimer</string>
+    <string name="tick_list_dialog_importation_button_keep">Conserver</string>
+    <string name="tick_list_dialog_importation_message">Voulez-vous conserver ou supprimer votre liste actuelle ?</string>
     <string name="tick_list_dialog_importation_title">Importation</string>
     <string name="tick_list_empty_state_body">Vos projets et vos voies réussies apparaîtront ici.</string>
     <string name="tick_list_error_import_malformed_input">Le fichier est malformé et ne peut être importé.</string>
