@@ -134,8 +134,11 @@
     <string name="tick_list_dialog_importation_button_cancel">Cancel</string>
     <string name="tick_list_dialog_importation_button_delete">Delete</string>
     <string name="tick_list_dialog_importation_button_keep">Keep</string>
-    <string name="tick_list_dialog_importation_message">Do you want to keep or clear your current list?</string>
+    <string name="tick_list_dialog_importation_message">Do you want to keep or delete your current list?</string>
     <string name="tick_list_dialog_importation_title">Importation</string>
+    <string name="tick_list_dialog_overwriting_importation_message">Are you sure to import a new tick list and delete the current one?</string>
+    <string name="tick_list_dialog_overwriting_importation_no">No</string>
+    <string name="tick_list_dialog_overwriting_importation_yes">Yes</string>
     <string name="tick_list_empty_state_body">Your projects and ticks will appear here.</string>
     <string name="tick_list_error_import_malformed_input">The file is malformed and can\'t be imported.</string>
     <string name="tick_list_error_import_cant_be_read">The file can\'t be read.</string>

@@ -138,9 +138,8 @@ class TickListFragment : Fragment() {
                     exportableTickList = exportableTickList,
                     shouldReplaceAll = false
                 )
-                DialogInterface.BUTTON_NEGATIVE -> viewModel.proceedToTickListImportation(
-                    exportableTickList = exportableTickList,
-                    shouldReplaceAll = true
+                DialogInterface.BUTTON_NEGATIVE -> onShowOverwritingImportationConfirmationDialog(
+                    exportableTickList = exportableTickList
                 )
             }
 
@@ -154,6 +153,36 @@ class TickListFragment : Fragment() {
             .setPositiveButton(R.string.tick_list_dialog_importation_button_keep, dialogClickListener)
             .setNegativeButton(R.string.tick_list_dialog_importation_button_delete, dialogClickListener)
             .setNeutralButton(R.string.tick_list_dialog_importation_button_cancel, dialogClickListener)
+            .show()
+    }
+
+    private fun onShowOverwritingImportationConfirmationDialog(
+        exportableTickList: ExportableTickList
+    ) {
+        val context = context ?: return
+
+        val icon = AppCompatResources.getDrawable(context, R.drawable.ic_error_outline)
+            ?.mutate()
+
+        icon?.setTint(Color.rgb(255, 149, 0))
+
+        val dialogClickListener = DialogInterface.OnClickListener { dialog, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> viewModel.proceedToTickListImportation(
+                    exportableTickList = exportableTickList,
+                    shouldReplaceAll = true
+                )
+            }
+
+            dialog.dismiss()
+        }
+
+        MaterialAlertDialogBuilder(context)
+            .setIcon(icon)
+            .setTitle(R.string.tick_list_dialog_importation_title)
+            .setMessage(R.string.tick_list_dialog_overwriting_importation_message)
+            .setPositiveButton(R.string.tick_list_dialog_overwriting_importation_yes, dialogClickListener)
+            .setNegativeButton(R.string.tick_list_dialog_overwriting_importation_no, dialogClickListener)
             .show()
     }
 }
