@@ -23,4 +23,7 @@ interface TickedProblemDao {
 
     @Query("DELETE FROM ticked_problems WHERE problem_id = :problemId")
     suspend fun deleteTickedProblemByProblemId(problemId: Int)
+
+    @Query("DELETE FROM ticked_problems")
+    suspend fun deleteAll()
 }

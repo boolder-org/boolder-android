@@ -123,8 +123,7 @@ internal fun AreaProblemsScreen(
                     IconButton(
                         modifier = Modifier
                             .padding(8.dp)
-                            .clip(shape = CircleShape)
-                            .clickable(onClick = onBackPressed),
+                            .clip(shape = CircleShape),
                         onClick = {
                             isInSearchMode = !isInSearchMode
 

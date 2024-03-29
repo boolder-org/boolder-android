@@ -126,7 +126,19 @@
     <string name="top_areas_dry_fast_useful_link">Lien utile :</string>
     <string name="top_areas_train_and_bike_intro">Temps d\'accès en vélo depuis la gare :</string>
 
+    <string name="tick_list_action_export">Exporter</string>
+    <string name="tick_list_action_import">Importer</string>
+    <string name="tick_list_dialog_importation_button_cancel">Annuler</string>
+    <string name="tick_list_dialog_importation_button_delete">Supprimer</string>
+    <string name="tick_list_dialog_importation_button_keep">Conserver</string>
+    <string name="tick_list_dialog_importation_message">Voulez-vous conserver ou supprimer votre liste actuelle ?</string>
+    <string name="tick_list_dialog_importation_title">Importation</string>
+    <string name="tick_list_dialog_overwriting_importation_message">Êtes-vous sûr d\'importer une nouvelle liste et supprimer la liste courante ?</string>
+    <string name="tick_list_dialog_overwriting_importation_no">Non</string>
+    <string name="tick_list_dialog_overwriting_importation_yes">Oui</string>
     <string name="tick_list_empty_state_body">Vos projets et vos voies réussies apparaîtront ici.</string>
+    <string name="tick_list_error_import_malformed_input">Le fichier est malformé et ne peut être importé.</string>
+    <string name="tick_list_error_import_cant_be_read">Le fichier ne peut être lu.</string>
 
     <string name="contribute_title">Contribuer à Boolder</string>
     <string name="contribute_intro">Aidez nous à créer le meilleur topo collaboratif pour Fontainebleau !</string>
