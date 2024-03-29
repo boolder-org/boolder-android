@@ -183,6 +183,11 @@
         android:name="com.boolder.boolder.view.ticklist.TickListFragment"
         android:label="Tick list" />
 
+    <fragment
+        android:id="@+id/contribute_fragment"
+        android:name="com.boolder.boolder.view.contribute.ContributeFragment"
+        android:label="Contribute" />
+
     <dialog
         android:id="@+id/dialog_circuit_filter"
         android:name="com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment"

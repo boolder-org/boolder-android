@@ -78,7 +78,13 @@ object BoolderRippleTheme : RippleTheme {
 }
 
 @Stable
-val Color.Companion.BoolderOrange get() = Color(red = 255, 149, 0)
+val Color.Companion.BoolderOrange get() = Color(red = 255, green = 149, blue = 0)
 
 @Stable
-val Color.Companion.BoolderYellow get() = Color(red = 255, 204, 0)
+val Color.Companion.BoolderYellow get() = Color(red = 255, green = 204, blue = 0)
+
+@Stable
+val Color.Companion.BoolderTeal get() = Color(red = 48, green = 176, blue = 199)
+
+@Stable
+val Color.Companion.BoolderBlue get() = Color(red = 0, green = 122, blue = 255)
