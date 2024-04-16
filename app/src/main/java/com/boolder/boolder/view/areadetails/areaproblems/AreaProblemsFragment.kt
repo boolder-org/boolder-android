@@ -49,6 +49,6 @@ class AreaProblemsFragment : Fragment() {
             result = bundleOf(KEY_PROBLEM to problem)
         )
 
-        findNavController().popBackStack(destinationId = R.id.map_fragment, inclusive = false)
+        findNavController().navigate(resId = R.id.map_fragment)
     }
 }
