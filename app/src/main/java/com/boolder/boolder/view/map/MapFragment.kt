@@ -72,14 +72,9 @@ class MapFragment : Fragment(), BoolderMapListener {
     private val mapViewModel by viewModel<MapViewModel>()
     private val layerFactory by inject<MapboxStyleFactory>()
 
-    private lateinit var locationProvider: LocationProvider
-
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        locationProvider = LocationProvider(requireActivity())
-    }
+    private val locationProvider: LocationProvider
+        get() = (requireActivity() as LocationProvider.Owner).locationProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
