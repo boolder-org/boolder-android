@@ -13,6 +13,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -73,8 +75,17 @@ class MapFragment : Fragment(), BoolderMapListener {
     private val layerFactory by inject<MapboxStyleFactory>()
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
+    private lateinit var onBackPressedCallback: OnBackPressedCallback
     private val locationProvider: LocationProvider
         get() = (requireActivity() as LocationProvider.Owner).locationProvider
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        onBackPressedCallback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+            binding?.mapView?.unselectProblem(notifyListener = true)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -348,25 +359,21 @@ class MapFragment : Fragment(), BoolderMapListener {
         mapViewModel.onZoomLevelChanged(zoomLevel)
     }
 
-    private fun onNewTopo(nullableTopo: Topo?) {
-        nullableTopo?.let { topo ->
-            val binding = binding ?: return
-
-            binding.topoView.setTopo(topo)
-
-            val selectedProblem = topo.selectedCompleteProblem
-                ?.problemWithLine
-                ?.problem
-                ?: return@let
-
-            flyToProblem(problem = selectedProblem, origin = topo.origin)
-        }
-
-        if (nullableTopo == null) {
+    private fun onNewTopo(topo: Topo?) {
+        // If the topo is opened, the first back press closes it. The second back press is handled by the navigation
+        // framework.
+        onBackPressedCallback.isEnabled = topo != null
+        if (topo == null) {
             bottomSheetBehavior.state = STATE_HIDDEN
-        } else {
-            binding?.mapView?.post { bottomSheetBehavior.state = STATE_EXPANDED }
+            return
         }
+        val binding = binding ?: return
+        binding.topoView.setTopo(topo)
+        binding.mapView.post { bottomSheetBehavior.state = STATE_EXPANDED }
+
+        val selectedProblem = topo.selectedCompleteProblem?.problemWithLine?.problem ?: return
+
+        flyToProblem(problem = selectedProblem, origin = topo.origin)
     }
 
     private fun openGoogleMaps(url: String) {
