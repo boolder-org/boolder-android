@@ -83,7 +83,7 @@ class TickListFragment : Fragment() {
             bundleOf(KEY_PROBLEM to problem)
         )
 
-        findNavController().popBackStack(R.id.map_fragment, inclusive = false)
+        findNavController().navigate(resId = R.id.map_fragment)
     }
 
     private fun onTickListFileReadyToExport(exportFile: File) {

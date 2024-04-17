@@ -203,8 +203,7 @@ class BoolderMap @JvmOverloads constructor(
             if (features.isValue) {
                 val feature = features.value?.firstOrNull()?.feature
                     ?: run {
-                        unselectProblem()
-                        listener?.onTopoUnselected()
+                        unselectProblem(notifyListener = true)
                         return@queryRenderedFeatures
                     }
 
@@ -274,15 +273,15 @@ class BoolderMap @JvmOverloads constructor(
         previousSelectedFeatureId = featureId
     }
 
-    private fun unselectProblem() {
-        previousSelectedFeatureId?.let {
-            getMapboxMap().setFeatureState(
-                "problems",
-                BoolderMapConfig.problemsSourceLayerId,
-                it,
-                Value.fromJson("""{"selected": false}""").value!!
-            )
-        }
+    fun unselectProblem(notifyListener: Boolean = false) {
+        val previousSelectedFeatureId = previousSelectedFeatureId ?: return
+        getMapboxMap().setFeatureState(
+            "problems",
+            BoolderMapConfig.problemsSourceLayerId,
+            previousSelectedFeatureId,
+            Value.fromJson("""{"selected": false}""").value!!
+        )
+        if (notifyListener) listener?.onTopoUnselected()
     }
 
     fun updateCircuit(circuitId: Long?) {

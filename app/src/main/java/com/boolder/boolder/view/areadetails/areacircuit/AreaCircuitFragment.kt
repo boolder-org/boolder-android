@@ -52,7 +52,7 @@ class AreaCircuitFragment : Fragment() {
             bundleOf(KEY_PROBLEM to problem)
         )
 
-        findNavController().popBackStack(R.id.map_fragment, inclusive = false)
+        findNavController().navigate(resId = R.id.map_fragment)
     }
 
     private fun onSeeOnMapClicked() {
@@ -61,6 +61,6 @@ class AreaCircuitFragment : Fragment() {
             bundleOf(KEY_CIRCUIT_ID to args.circuitId)
         )
 
-        findNavController().popBackStack(R.id.map_fragment, inclusive = false)
+        findNavController().navigate(resId = R.id.map_fragment)
     }
 }

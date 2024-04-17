@@ -8,14 +8,20 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ActivityMainBinding
+import com.boolder.boolder.utils.LocationProvider
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), LocationProvider.Owner {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var _locationProvider: LocationProvider
+
+    override val locationProvider: LocationProvider
+        get() = _locationProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        _locationProvider = LocationProvider(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

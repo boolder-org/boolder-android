@@ -56,7 +56,7 @@ class AreaOverviewFragment : Fragment() {
             bundleOf(KEY_AREA_ID to args.areaId)
         )
 
-        findNavController().popBackStack(R.id.map_fragment, inclusive = false)
+        findNavController().navigate(resId = R.id.map_fragment)
     }
 
     private fun onAreaProblemsCountClicked() {
