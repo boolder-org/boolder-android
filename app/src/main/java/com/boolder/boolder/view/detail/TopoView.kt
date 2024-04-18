@@ -20,6 +20,7 @@ import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.FragmentActivity
 import coil.load
 import com.boolder.boolder.R
 import com.boolder.boolder.databinding.ViewTopoBinding
@@ -139,6 +140,16 @@ class TopoView(
         }
     }
 
+    private fun showFullScreenImage(imageUrl: String) {
+        val fragmentManager = (context as FragmentActivity).supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        val fullScreenFragment = TopoFullScreenFragment.newInstance(imageUrl)
+        fragmentTransaction.add(android.R.id.content, fullScreenFragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
     private fun updateCircuitControls(circuitInfo: CircuitInfo?) {
         binding.circuitControlsComposeView.setContent {
             circuitInfo ?: return@setContent
@@ -188,6 +199,9 @@ class TopoView(
                     binding.picture.setPadding(0)
                     binding.progressCircular.isVisible = false
                     onProblemPictureLoaded(topo)
+                    binding.picture.setOnClickListener {
+                        showFullScreenImage(topo.pictureUrl ?: "")
+                    }
                 },
                 onError = { _, _ -> loadErrorPicture() }
             )

@@ -118,4 +118,7 @@ dependencies {
 
     // Work manager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    
+    // Zoomy
+    implementation("io.github.imablanco:zoomy:1.0.0")
 }
