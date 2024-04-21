@@ -54,12 +54,14 @@ class TopoView(
         // Immediately set a footer content to avoid a bug on the bottom sheet not fully expanding
         // on the first time it is expanded
         binding.footerLayout.setContent {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(210.dp)
-                    .background(color = MaterialTheme.colorScheme.surface)
-            )
+            BoolderTheme {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(210.dp)
+                        .background(color = MaterialTheme.colorScheme.surface)
+                )
+            }
         }
     }
 
@@ -197,6 +199,8 @@ class TopoView(
     private fun loadErrorPicture() {
         binding.picture.setImageDrawable(
             ContextCompat.getDrawable(context, R.drawable.ic_placeholder)
+                ?.mutate()
+                ?.apply { setTint(ContextCompat.getColor(context, R.color.onBackground)) }
         )
         binding.picture.setPadding(200)
         binding.progressCircular.isVisible = false
