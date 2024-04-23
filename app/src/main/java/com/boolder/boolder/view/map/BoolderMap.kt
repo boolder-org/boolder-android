@@ -30,7 +30,7 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
-import com.mapbox.maps.QueriedFeature
+import com.mapbox.maps.QueriedRenderedFeature
 import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenBox
@@ -46,6 +46,7 @@ import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.getLayerAs
 import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
 import com.mapbox.maps.plugin.Plugin
+import com.mapbox.maps.plugin.PuckBearing
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.animation.easeTo
@@ -54,6 +55,8 @@ import com.mapbox.maps.plugin.attribution.AttributionPlugin
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.gestures
+import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
+import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 
 class BoolderMap @JvmOverloads constructor(
@@ -100,10 +103,10 @@ class BoolderMap @JvmOverloads constructor(
         }
         addClickEvent()
 
-        getMapboxMap().addOnCameraChangeListener {
+        mapboxMap.subscribeCameraChanged {
             val now = System.currentTimeMillis()
 
-            if (now - lastCameraCheckTimestamp < CAMERA_CHECK_THROTTLE_DELAY) return@addOnCameraChangeListener
+            if (now - lastCameraCheckTimestamp < CAMERA_CHECK_THROTTLE_DELAY) return@subscribeCameraChanged
 
             lastCameraCheckTimestamp = now
 
@@ -124,12 +127,15 @@ class BoolderMap @JvmOverloads constructor(
                 userTelemetryRequestState = false
             }
 
-        getMapboxMap().loadStyle(buildStyle)
+        mapboxMap.loadStyle(buildStyle)
+        location.locationPuck = createDefault2DPuck(withBearing = true)
+        location.puckBearingEnabled = true
+        location.puckBearing = PuckBearing.HEADING
     }
 
     private fun addClickEvent() {
-        getMapboxMap().addOnMapClickListener {
-            val event = getMapboxMap().pixelForCoordinate(it)
+        mapboxMap.addOnMapClickListener {
+            val event = mapboxMap.pixelForCoordinate(it)
             installRenderedFeatures(event.x, event.y)
             true
         }
@@ -140,7 +146,7 @@ class BoolderMap @JvmOverloads constructor(
         val geometry = RenderedQueryGeometry(
             ScreenCoordinate(x, y)
         )
-        getMapboxMap().apply {
+        mapboxMap.apply {
             queryAreaRenderedFeatures(geometry)
             queryClusterRenderedFeatures(geometry)
             queryPoisRenderedFeatures(geometry)
@@ -156,10 +162,10 @@ class BoolderMap @JvmOverloads constructor(
                 Expression.literal(15.0)
             )
         )
-        getMapboxMap().queryRenderedFeatures(
+        mapboxMap.queryRenderedFeatures(
             geometry,
             areaOption
-        ) { features: Expected<String, MutableList<QueriedFeature>> ->
+        ) { features: Expected<String, List<QueriedRenderedFeature>> ->
             buildCoordinateBounds(features)
         }
     }
@@ -167,10 +173,10 @@ class BoolderMap @JvmOverloads constructor(
     private fun queryClusterRenderedFeatures(geometry: RenderedQueryGeometry) {
         val clusterOption = RenderedQueryOptions(listOf("clusters"), null)
 
-        getMapboxMap().queryRenderedFeatures(
+        mapboxMap.queryRenderedFeatures(
             geometry,
             clusterOption
-        ) { features: Expected<String, MutableList<QueriedFeature>> ->
+        ) { features: Expected<String, List<QueriedRenderedFeature>> ->
             buildCoordinateBounds(features)
         }
     }
@@ -196,19 +202,19 @@ class BoolderMap @JvmOverloads constructor(
             null
         )
 
-        getMapboxMap().queryRenderedFeatures(
+        mapboxMap.queryRenderedFeatures(
             problemGeometry,
             problemsOption
-        ) { features: Expected<String, MutableList<QueriedFeature>> ->
+        ) { features: Expected<String, List<QueriedRenderedFeature>> ->
             if (features.isValue) {
-                val feature = features.value?.firstOrNull()?.feature
+                val feature = features.value?.firstOrNull()?.queriedFeature?.feature
                     ?: run {
                         unselectProblem()
                         listener?.onTopoUnselected()
                         return@queryRenderedFeatures
                     }
 
-                if (getMapboxMap().cameraState.zoom < 19.0) {
+                if (mapboxMap.cameraState.zoom < 19.0) {
                     zoomToBoulderProblemLevel(feature)
                     return@queryRenderedFeatures
                 }
@@ -237,13 +243,13 @@ class BoolderMap @JvmOverloads constructor(
         geometry: RenderedQueryGeometry,
     ) {
         val poisOption = RenderedQueryOptions(listOf("pois"), null)
-        getMapboxMap().queryRenderedFeatures(
+        mapboxMap.queryRenderedFeatures(
             geometry,
             poisOption
-        ) { features: Expected<String, MutableList<QueriedFeature>> ->
-            if (getMapboxMap().cameraState.zoom < 12) return@queryRenderedFeatures
+        ) { features: Expected<String, List<QueriedRenderedFeature>> ->
+            if (mapboxMap.cameraState.zoom < 12) return@queryRenderedFeatures
             if (features.isValue) {
-                features.value?.firstOrNull()?.feature?.let {
+                features.value?.firstOrNull()?.queriedFeature?.feature?.let {
                     if (it.hasProperty("name") &&
                         it.hasProperty("googleUrl")
                     ) {
@@ -261,26 +267,29 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     fun selectProblem(featureId: String) {
-        getMapboxMap().setFeatureState(
-            "problems",
-            BoolderMapConfig.problemsSourceLayerId,
-            featureId,
-            Value.fromJson("""{"selected": true}""").value!!
-        )
+        mapboxMap.setFeatureState(
+            sourceId = "problems",
+            sourceLayerId = BoolderMapConfig.problemsSourceLayerId,
+            featureId = featureId,
+            state = Value.fromJson("""{"selected": true}""").value!!,
+            callback = {
+                if (it.isError) return@setFeatureState
 
-        if (featureId != previousSelectedFeatureId) {
-            unselectProblem()
-        }
-        previousSelectedFeatureId = featureId
+                if (featureId != previousSelectedFeatureId) unselectProblem()
+
+                previousSelectedFeatureId = featureId
+            }
+        )
     }
 
     private fun unselectProblem() {
         previousSelectedFeatureId?.let {
-            getMapboxMap().setFeatureState(
-                "problems",
-                BoolderMapConfig.problemsSourceLayerId,
-                it,
-                Value.fromJson("""{"selected": false}""").value!!
+            mapboxMap.setFeatureState(
+                sourceId = "problems",
+                sourceLayerId = BoolderMapConfig.problemsSourceLayerId,
+                featureId = it,
+                state = Value.fromJson("""{"selected": false}""").value!!,
+                callback = {}
             )
         }
     }
@@ -340,10 +349,10 @@ class BoolderMap @JvmOverloads constructor(
 
     // 3A. Build bounds around coordinate
     private fun buildCoordinateBounds(
-        features: Expected<String, MutableList<QueriedFeature>>
+        features: Expected<String, List<QueriedRenderedFeature>>
     ) {
         if (features.isValue) {
-            features.value?.firstOrNull()?.feature?.let {
+            features.value?.firstOrNull()?.queriedFeature?.feature?.let {
                 if (it.hasProperty("southWestLon") &&
                     it.hasProperty("southWestLat") &&
                     it.hasProperty("northEastLon") &&
@@ -378,27 +387,29 @@ class BoolderMap @JvmOverloads constructor(
         coordinates: CoordinateBounds,
         areaId: Int?
     ) {
-        val cameraOptions = getMapboxMap().cameraForCoordinateBounds(
-            coordinates,
-            EdgeInsets(60.0, 8.0, 8.0, 8.0),
-            0.0,
-            0.0
+        val cameraOptions = mapboxMap.cameraForCoordinateBounds(
+            bounds = coordinates,
+            boundsPadding = EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            bearing = 0.0,
+            pitch = 0.0
         )
 
-        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions {
-            duration(500L)
+        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-            areaId ?: return@mapAnimationOptions
+        mapboxMap.flyTo(
+            cameraOptions = cameraOptions,
+            animationOptions = mapAnimationOption,
+            animatorListener = animationEndListener {
+                areaId ?: return@animationEndListener
 
-            animatorListener(animationEndListener { listener?.onAreaVisited(areaId) })
-        }
-
-        getMapboxMap().flyTo(cameraOptions, mapAnimationOption)
+                listener?.onAreaVisited(areaId)
+            }
+        )
     }
 
     private fun zoomToCircuitBounds(circuitCoordinates: CoordinateBounds) {
         val defaultMarginPixels = 24.0 * resources.displayMetrics.density
-        val cameraOptions = getMapboxMap().cameraForCoordinateBounds(
+        val cameraOptions = mapboxMap.cameraForCoordinateBounds(
             circuitCoordinates,
             EdgeInsets(
                 140.0 * resources.displayMetrics.density + insets.top,
@@ -414,7 +425,7 @@ class BoolderMap @JvmOverloads constructor(
             duration(500L)
         }
 
-        getMapboxMap().flyTo(cameraOptions, mapAnimationOption)
+        mapboxMap.flyTo(cameraOptions, mapAnimationOption)
     }
 
 
@@ -427,7 +438,7 @@ class BoolderMap @JvmOverloads constructor(
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        getMapboxMap().easeTo(cameraOptions, mapAnimationOption)
+        mapboxMap.easeTo(cameraOptions, mapAnimationOption)
     }
 
     private fun focusOnBoulderProblem(feature: Feature) {
@@ -438,7 +449,7 @@ class BoolderMap @JvmOverloads constructor(
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        getMapboxMap().easeTo(cameraOptions, mapAnimationOption)
+        mapboxMap.easeTo(cameraOptions, mapAnimationOption)
     }
 
     fun applyInsets(insets: Insets) {
@@ -456,7 +467,7 @@ class BoolderMap @JvmOverloads constructor(
     }
 
     private inline fun <reified T : Layer> getLayerAs(layerId: String): T? =
-        getMapboxMap().getStyle()?.getLayerAs(layerId)
+        mapboxMap.style?.getLayerAs(layerId)
 
     fun applyFilters(
         grades: List<String>,
@@ -524,7 +535,7 @@ class BoolderMap @JvmOverloads constructor(
         val top = (height / 2 - halfSquareSize).toDouble()
         val bottom = (height / 2 + halfSquareSize).toDouble()
 
-        getMapboxMap().queryRenderedFeatures(
+        mapboxMap.queryRenderedFeatures(
             geometry = RenderedQueryGeometry(
                 listOf(
                     ScreenCoordinate(left, top),
@@ -541,7 +552,7 @@ class BoolderMap @JvmOverloads constructor(
                 }
             )
         ) { queriedFeature ->
-            queriedFeature.value?.firstOrNull()?.feature?.properties()?.get("areaId")
+            queriedFeature.value?.firstOrNull()?.queriedFeature?.feature?.properties()?.get("areaId")
                 ?.let { areaId -> listener?.onAreaVisited(areaId.asInt) }
                 ?: listener?.onAreaLeft()
         }
