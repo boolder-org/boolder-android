@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -74,7 +73,8 @@ fun MapControlsOverlay(
                     text = stringResource(id = R.string.circuit_start),
                     style = MaterialTheme.typography.labelLarge,
                     color = when (val circuitColor = circuitState.color) {
-                        CircuitColor.WHITE -> Color.Black
+                        CircuitColor.WHITE,
+                        CircuitColor.BLACK -> MaterialTheme.colorScheme.onSurface
                         else -> circuitColor.composeColor()
                     }
                 )
