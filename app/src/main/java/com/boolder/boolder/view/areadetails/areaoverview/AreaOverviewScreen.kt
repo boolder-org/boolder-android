@@ -100,7 +100,11 @@ internal fun AreaOverviewScreen(
             )
         },
         floatingActionButton = {
-            if (displayShowOnMapButton) SeeOnMapButton(onClick = onSeeOnMapClicked)
+            if (screenState is AreaOverviewViewModel.ScreenState.UnknownArea || !displayShowOnMapButton) {
+                return@Scaffold
+            }
+
+            SeeOnMapButton(onClick = onSeeOnMapClicked)
         },
         floatingActionButtonPosition = FabPosition.Center,
         content = {
@@ -115,6 +119,7 @@ internal fun AreaOverviewScreen(
                     onCircuitClicked = onCircuitClicked,
                     onPoiClicked = onPoiClicked
                 )
+                is AreaOverviewViewModel.ScreenState.UnknownArea -> AreaOverviewScreenUnknownArea()
             }
         }
     )
@@ -338,6 +343,22 @@ private fun GradeCountsItem(
     }
 }
 
+@Composable
+private fun AreaOverviewScreenUnknownArea() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = R.string.area_overview_error_cannot_display_area),
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 @PreviewLightDark
 @Composable
 private fun AreaOverviewScreenPreview(
@@ -395,6 +416,7 @@ private class AreaOverviewScreenPreviewParameterProvider : PreviewParameterProvi
                 )
             ),
             offlineAreaItemStatus = OfflineAreaItemStatus.NotDownloaded
-        )
+        ),
+        AreaOverviewViewModel.ScreenState.UnknownArea
     )
 }

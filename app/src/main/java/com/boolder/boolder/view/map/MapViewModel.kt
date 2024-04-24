@@ -144,7 +144,7 @@ class MapViewModel(
 
     fun onAreaSelected(areaId: Int) {
         viewModelScope.launch {
-            val area = areaRepository.getAreaById(areaId)
+            val area = areaRepository.getAreaById(areaId) ?: return@launch
 
             _eventFlow.emit(Event.ZoomOnArea(area))
         }
@@ -205,7 +205,8 @@ class MapViewModel(
 
             if (currentAreaState?.area?.id == areaId) return@launch
 
-            val area = areaRepository.getAreaById(areaId)
+            val area = areaRepository.getAreaById(areaId) ?: return@launch
+
             val offlineStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
 
             val newAreaState = OfflineAreaItem(

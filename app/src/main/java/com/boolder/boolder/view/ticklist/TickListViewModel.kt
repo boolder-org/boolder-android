@@ -53,10 +53,11 @@ internal class TickListViewModel(
                 val problemEntity = problemRepository.problemById(it.problemId)
                     ?: return@mapNotNull null
 
-                val areaName = areaRepository.getAreaById(problemEntity.areaId).name
+                val area = areaRepository.getAreaById(problemEntity.areaId)
+                    ?: return@mapNotNull null
 
                 problemEntity.convert(
-                    areaName = areaName,
+                    areaName = area.name,
                     tickStatus = it.tickStatus
                 )
             }

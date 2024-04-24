@@ -29,8 +29,11 @@ class AreaOverviewViewModel(
     init {
         viewModelScope.launch {
             val areaId = savedStateHandle.get<Int>("area_id") ?: return@launch
+            val area = areaRepository.getAreaById(areaId) ?: run {
+                _screenState.value = ScreenState.UnknownArea
+                return@launch
+            }
 
-            val area = areaRepository.getAreaById(areaId)
             val circuits = circuitRepository.getAvailableCircuits(areaId)
             val accessesFromPoi = areaRepository.getAccessesFromPoiByAreaId(areaId)
 
@@ -91,5 +94,7 @@ class AreaOverviewViewModel(
             val accessesFromPoi: List<AccessFromPoi>,
             val offlineAreaItemStatus: OfflineAreaItemStatus
         ) : ScreenState
+
+        data object UnknownArea : ScreenState
     }
 }

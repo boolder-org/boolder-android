@@ -14,7 +14,7 @@ interface AreaDao {
     suspend fun areasByName(name: String): List<AreasEntity>
 
     @Query("SELECT * FROM areas WHERE id = :id")
-    suspend fun getAreaById(id: Int): AreasEntity
+    suspend fun getAreaById(id: Int): AreasEntity?
 
     @Query("SELECT * FROM areas ORDER BY name COLLATE UNICODE")
     suspend fun getAllAreas(): List<AreasEntity>
