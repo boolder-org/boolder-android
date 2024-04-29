@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -40,7 +41,9 @@ import androidx.work.WorkManager
 import com.boolder.boolder.R
 import com.boolder.boolder.offline.WORK_DATA_PROGRESS
 import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
+import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
@@ -95,12 +98,26 @@ internal fun AreaName(
             AreaOfflineStatusInfo(item = offlineAreaItem)
         }
 
-        Icon(
-            modifier = Modifier.iconActionModifier(onClick = onAreaInfoClicked),
-            painter = painterResource(id = R.drawable.ic_outline_info),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
-        )
+        Box {
+            Icon(
+                modifier = Modifier.iconActionModifier(onClick = onAreaInfoClicked),
+                painter = painterResource(id = R.drawable.ic_outline_info),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            if (offlineAreaItem?.area?.warning != null) {
+                Icon(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .size(16.dp)
+                        .align(Alignment.TopEnd),
+                    painter = painterResource(id = R.drawable.ic_round_warning),
+                    contentDescription = null,
+                    tint = Color.BoolderOrange
+                )
+            }
+        }
     }
 }
 
@@ -177,21 +194,32 @@ private fun IconDownloaded(
 @Composable
 private fun AreaNamePreview(
     @PreviewParameter(AreaNamePreviewParameterProvider::class)
-    offlineAreaItemStatus: OfflineAreaItemStatus
+    offlineAreaItem: OfflineAreaItem
 ) {
     BoolderTheme {
         AreaName(
-            offlineAreaItem = dummyOfflineAreaItem(status = offlineAreaItemStatus),
+            offlineAreaItem = offlineAreaItem,
             onHideAreaName = {},
             onAreaInfoClicked = {}
         )
     }
 }
 
-class AreaNamePreviewParameterProvider : PreviewParameterProvider<OfflineAreaItemStatus> {
-    override val values = sequenceOf(
+class AreaNamePreviewParameterProvider : PreviewParameterProvider<OfflineAreaItem> {
+
+    override val values = listOf(
         OfflineAreaItemStatus.NotDownloaded,
         OfflineAreaItemStatus.Downloading(areaId = 0),
         OfflineAreaItemStatus.Downloaded(folderSize = "50 MB")
     )
+        .flatMap {
+            listOf(
+                dummyOfflineAreaItem(
+                    area = dummyArea(warning = null),
+                    status = it
+                ),
+                dummyOfflineAreaItem(status = it)
+            )
+        }
+        .asSequence()
 }
