@@ -17,8 +17,8 @@ class AreaRepository(
     suspend fun areasByName(name: String): List<AreasEntity> =
         areaDao.areasByName(name)
 
-    suspend fun getAreaById(id: Int): Area =
-        areaDao.getAreaById(id).convert()
+    suspend fun getAreaById(id: Int): Area? =
+        areaDao.getAreaById(id)?.convert()
 
     suspend fun getAllAreas(): List<Area> =
         areaDao.getAllAreas().map { it.convert() }

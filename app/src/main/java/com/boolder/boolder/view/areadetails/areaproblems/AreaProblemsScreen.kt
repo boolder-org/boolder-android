@@ -41,6 +41,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -120,6 +121,8 @@ internal fun AreaProblemsScreen(
                     )
                 },
                 actions = {
+                    if (screenState is AreaProblemsViewModel.ScreenState.UnknownArea) return@TopAppBar
+
                     IconButton(
                         modifier = Modifier
                             .padding(8.dp)
@@ -155,6 +158,7 @@ internal fun AreaProblemsScreen(
                     contentPadding = it,
                     onProblemClicked = onProblemClicked
                 )
+                is AreaProblemsViewModel.ScreenState.UnknownArea -> AreaProblemsScreenUnknownArea()
             }
         }
     )
@@ -238,6 +242,22 @@ private fun AreaProblemsScreenContent(
     }
 }
 
+@Composable
+private fun AreaProblemsScreenUnknownArea() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = R.string.area_problems_error_cannot_display_area),
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 @PreviewLightDark
 @Composable
 private fun AreaProblemsScreenPreview(
@@ -271,7 +291,8 @@ private class AreaProblemsScreenPreviewParameterProvider : PreviewParameterProvi
                     featured = true
                 )
             }
-        )
+        ),
+        AreaProblemsViewModel.ScreenState.UnknownArea
     )
 
 }

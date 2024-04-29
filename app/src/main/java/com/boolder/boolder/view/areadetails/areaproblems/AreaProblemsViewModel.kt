@@ -26,8 +26,8 @@ internal class AreaProblemsViewModel(
         .debounce(500L)
         .map { query ->
             val areaId = savedStateHandle.get<Int>("area_id") ?: -1
+            val area = areaRepository.getAreaById(areaId) ?: return@map ScreenState.UnknownArea
 
-            val area = areaRepository.getAreaById(areaId)
             val allProblems = problemRepository.problemsForArea(areaId, query)
             val allPopularProblems = allProblems.filter { it.featured }
 
@@ -50,5 +50,7 @@ internal class AreaProblemsViewModel(
             val problems: List<Problem>,
             val popularProblems: List<Problem>
         ) : ScreenState
+
+        data object UnknownArea : ScreenState
     }
 }
