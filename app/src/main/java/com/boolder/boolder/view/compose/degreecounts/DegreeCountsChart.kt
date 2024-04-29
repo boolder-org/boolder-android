@@ -174,7 +174,7 @@ private fun DegreesLabels(degrees: Set<String>) {
                     .padding(4.dp),
                 text = it,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
         }
