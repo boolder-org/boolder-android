@@ -64,7 +64,6 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Double.max
 
-
 class MapFragment : Fragment(), BoolderMapListener {
 
     private var binding: FragmentMapBinding? = null
@@ -248,6 +247,10 @@ class MapFragment : Fragment(), BoolderMapListener {
 
             mapViewModel.onGradeRangeSelected(gradeRange)
         }
+
+        arguments?.getString("problem_id")?.toIntOrNull()?.let { problemId ->
+            mapViewModel.fetchTopo(problemId = problemId, origin = TopoOrigin.DEEP_LINK)
+        }
     }
 
     override fun onResume() {
@@ -427,7 +430,9 @@ class MapFragment : Fragment(), BoolderMapListener {
         val zoomLevel = binding.mapView.mapboxMap.cameraState.zoom
 
         val cameraOptions = CameraOptions.Builder().run {
-            if (origin in arrayOf(TopoOrigin.SEARCH, TopoOrigin.CIRCUIT)) center(point)
+            if (origin in arrayOf(TopoOrigin.SEARCH, TopoOrigin.CIRCUIT, TopoOrigin.DEEP_LINK)) {
+                center(point)
+            }
 
             padding(EdgeInsets(40.0, 0.0, binding.mapView.height / 2.0, 0.0))
             zoom(if (zoomLevel <= 19.0) 20.0 else zoomLevel)
