@@ -200,12 +200,23 @@ private fun AreaOverviewScreenContent(
                         }
 
                         screenState.area.warning?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Color.BoolderOrange,
-                                textAlign = TextAlign.Justify
-                            )
+                            Row(
+                                horizontalArrangement = spacedBy(16.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Icon(
+                                    painterResource(id = R.drawable.ic_round_warning),
+                                    contentDescription = null,
+                                    tint = Color.BoolderOrange
+                                )
+
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.BoolderOrange,
+                                    textAlign = TextAlign.Justify
+                                )
+                            }
                         }
                     }
                 }
