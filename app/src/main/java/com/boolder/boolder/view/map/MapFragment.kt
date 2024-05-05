@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.map
 
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -75,6 +77,12 @@ class MapFragment : Fragment(), BoolderMapListener {
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
+        override fun handleOnBackPressed() {
+            if (bottomSheetBehavior.state != STATE_HIDDEN) onTopoUnselected()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         locationProvider = LocationProvider(requireActivity())
@@ -116,7 +124,10 @@ class MapFragment : Fragment(), BoolderMapListener {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
                         STATE_EXPANDED -> mapViewModel.onProblemTopoVisibilityChanged(isVisible = true)
-                        STATE_HIDDEN -> mapViewModel.onProblemTopoVisibilityChanged(isVisible = false)
+                        STATE_HIDDEN -> {
+                            mapViewModel.onProblemTopoVisibilityChanged(isVisible = false)
+                            onBackPressedCallback.isEnabled = false
+                        }
                         else -> Unit
                     }
                 }
@@ -302,6 +313,11 @@ class MapFragment : Fragment(), BoolderMapListener {
         super.onDestroyView()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+    }
+
     private fun onGPSLocation(location: Location) {
         val binding = binding ?: return
 
@@ -373,6 +389,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         if (nullableTopo == null) {
             bottomSheetBehavior.state = STATE_HIDDEN
         } else {
+            onBackPressedCallback.isEnabled = true
             binding?.mapView?.post { bottomSheetBehavior.state = STATE_EXPANDED }
         }
     }
