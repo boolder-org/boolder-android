@@ -10,6 +10,13 @@
         android:name="com.boolder.boolder.view.map.MapFragment"
         android:label="Map fragment"
         tools:layout="@layout/fragment_map">
+        <deepLink
+            app:action="android.intent.action.VIEW"
+            app:uri="https://www.boolder.com/en/p/{problem_id}" />
+        <deepLink
+            app:action="android.intent.action.VIEW"
+            app:uri="https://www.boolder.com/fr/p/{problem_id}" />
+
         <action
             android:id="@+id/navigate_to_search"
             app:destination="@+id/search_fragment"

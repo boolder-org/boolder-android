@@ -53,5 +53,6 @@ enum class TopoOrigin {
     MAP,
     SEARCH,
     TOPO,
-    CIRCUIT
+    CIRCUIT,
+    DEEP_LINK
 }
