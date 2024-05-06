@@ -1,19 +1,14 @@
 package com.boolder.boolder.view.map
 
 import android.content.Context
-import android.content.Intent
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
@@ -52,9 +47,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
@@ -342,22 +335,13 @@ class MapFragment : Fragment(), BoolderMapListener {
         mapViewModel.onTopoUnselected()
     }
 
-    override fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?) {
-        val context = context ?: return
-        val binding = binding ?: return
+    override fun onPoiSelected(poiName: String, googleMapsUrl: String) {
+        val direction = MapFragmentDirections.showPoi(
+            poiName = poiName,
+            googleMapsUrl = googleMapsUrl
+        )
 
-        val view = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_pois, binding.root, false)
-        val bottomSheet = BottomSheetDialog(context, R.style.BottomSheetDialogTheme)
-
-        view.apply {
-            findViewById<TextView>(R.id.pois_title).text = poisName
-            findViewById<Button>(R.id.open).setOnClickListener {
-                openGoogleMaps(stringProperty)
-            }
-            findViewById<Button>(R.id.close).setOnClickListener { bottomSheet.dismiss() }
-        }
-        bottomSheet.setContentView(view)
-        bottomSheet.show()
+        findNavController().navigate(direction)
     }
 
     override fun onAreaVisited(areaId: Int) {
@@ -391,17 +375,6 @@ class MapFragment : Fragment(), BoolderMapListener {
         } else {
             onBackPressedCallback.isEnabled = true
             binding?.mapView?.post { bottomSheetBehavior.state = STATE_EXPANDED }
-        }
-    }
-
-    private fun openGoogleMaps(url: String) {
-
-        val sendIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        try {
-            startActivity(shareIntent)
-        } catch (e: Exception) {
-            Log.i("MAP", "No apps can handle this kind of intent")
         }
     }
 
