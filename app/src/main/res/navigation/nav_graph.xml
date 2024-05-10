@@ -33,6 +33,9 @@
         <action
             android:id="@+id/show_grades_filter"
             app:destination="@+id/dialog_grades_filter" />
+        <action
+            android:id="@+id/show_poi"
+            app:destination="@+id/dialog_poi" />
     </fragment>
 
     <fragment
@@ -211,6 +214,18 @@
         <argument
             android:name="grade_range"
             app:argType="com.boolder.boolder.domain.model.GradeRange" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/dialog_poi"
+        android:name="com.boolder.boolder.view.map.poi.PoiBottomSheetDialogFragment"
+        android:label="POI bottom sheet">
+        <argument
+            android:name="poi_name"
+            app:argType="string" />
+        <argument
+            android:name="google_maps_url"
+            app:argType="string" />
     </dialog>
 
 </navigation>

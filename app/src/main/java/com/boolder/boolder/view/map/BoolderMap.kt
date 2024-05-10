@@ -24,7 +24,6 @@ import com.boolder.boolder.view.map.animator.animationEndListener
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Feature
-import com.mapbox.geojson.Geometry
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
@@ -74,7 +73,7 @@ class BoolderMap @JvmOverloads constructor(
     interface BoolderMapListener {
         fun onProblemSelected(problemId: Int, origin: TopoOrigin)
         fun onTopoUnselected()
-        fun onPoisSelected(poisName: String, stringProperty: String, geometry: Geometry?)
+        fun onPoiSelected(poiName: String, googleMapsUrl: String)
 
         fun onAreaVisited(areaId: Int)
         fun onAreaLeft()
@@ -250,13 +249,10 @@ class BoolderMap @JvmOverloads constructor(
             if (mapboxMap.cameraState.zoom < 12) return@queryRenderedFeatures
             if (features.isValue) {
                 features.value?.firstOrNull()?.queriedFeature?.feature?.let {
-                    if (it.hasProperty("name") &&
-                        it.hasProperty("googleUrl")
-                    ) {
-                        listener?.onPoisSelected(
-                            it.getStringProperty("name"),
-                            it.getStringProperty("googleUrl"),
-                            it.geometry()
+                    if (it.hasProperty("name") && it.hasProperty("googleUrl")) {
+                        listener?.onPoiSelected(
+                            poiName = it.getStringProperty("name"),
+                            googleMapsUrl = it.getStringProperty("googleUrl")
                         )
                     }
                 }
