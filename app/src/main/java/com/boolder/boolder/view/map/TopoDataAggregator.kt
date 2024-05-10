@@ -110,6 +110,7 @@ class TopoDataAggregator(
                 it.id != mainProblem.id
                     && it.parentId == null
                     && it.id != mainProblem.parentId
+                    && lineRepository.loadByProblemId(it.id)?.topoId == topoId // todo: clean up once we handle ordering of multiple lines
             }
 
         val tickStatuses = problemsOnSameTopo.map { problemEntity ->
