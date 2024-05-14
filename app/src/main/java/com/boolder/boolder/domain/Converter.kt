@@ -11,7 +11,7 @@ import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.TickedProblem
-import java.util.Locale
+import com.boolder.boolder.utils.getLanguage
 
 fun ProblemEntity.convert(
     areaName: String? = null,
@@ -63,9 +63,11 @@ fun LineEntity.convert(): Line {
 }
 
 fun AreasEntity.convert(): Area {
-    val language = Locale.getDefault().language
-    val description = if (language == "fr") descriptionFr else descriptionEn
-    val warning = if (language == "fr") warningFr else warningEn
+    val (description, warning) = when (getLanguage()) {
+        "fr" -> descriptionFr to warningFr
+        else -> descriptionEn to warningEn
+    }
+
     val rawTags = tags?.split(",") ?: emptyList()
     val tags = rawTags.mapNotNull {
         when (it) {

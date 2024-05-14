@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.view.compose.BoolderTheme
-import java.util.Locale
 
 class ContributeFragment : Fragment() {
 
@@ -30,11 +30,11 @@ class ContributeFragment : Fragment() {
         }
 
     private fun onStartContributingClicked() {
-        openWebUrl("https://www.boolder.com/${getUrlLocale()}/contribute?dismiss_banner=true")
+        openWebUrl("https://www.boolder.com/${getLanguage()}/contribute?dismiss_banner=true")
     }
 
     private fun onLearnMoreClicked() {
-        openWebUrl("https://www.boolder.com/${getUrlLocale()}/about")
+        openWebUrl("https://www.boolder.com/${getLanguage()}/about")
     }
 
     private fun openWebUrl(url: String) {
@@ -42,7 +42,4 @@ class ContributeFragment : Fragment() {
 
         startActivity(intent)
     }
-
-    private fun getUrlLocale(): String =
-        if (Locale.getDefault().language == "fr") "fr" else "en"
 }

@@ -42,10 +42,10 @@ import com.boolder.boolder.R
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Steepness
+import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.utils.previewgenerator.dummyProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.BoolderYellow
-import java.util.Locale
 
 @Composable
 fun TopoFooter(
@@ -63,7 +63,7 @@ fun TopoFooter(
         verticalArrangement = spacedBy(8.dp)
     ) {
         TopoFooterTitleRow(
-            problemName = if (Locale.getDefault().language == "fr") {
+            problemName = if (getLanguage() == "fr") {
                 problem.name.orEmpty()
             } else {
                 problem.nameEn.orEmpty()
