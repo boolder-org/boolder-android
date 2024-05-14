@@ -6,23 +6,22 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.json.Json
 
 @Parcelize
-class Line(
+data class Line(
     val id: Int,
     val problemId: Int,
     val topoId: Int,
     val coordinates: String?
 ) : Parcelable {
 
-    fun coordinatesParsed(): List<Coordinates> {
-        val joke = coordinates?.contains("null") == true
-        val isNotEmpty = !coordinates.isNullOrBlank()
-        return if (isNotEmpty && !joke) {
-            Json.decodeFromString(coordinates!!) as List<Coordinates>
-        } else emptyList()
-    }
-
     fun points(): List<PointD> {
         // Convert point to Double to avoid loose digit
-        return coordinatesParsed().map { PointD(it.x, it.y) }
+        return decodedCoordinates().map { PointD(it.x, it.y) }
+    }
+
+    private fun decodedCoordinates(): List<Coordinates> {
+        if (coordinates.isNullOrBlank()) return emptyList()
+        if ("null" in coordinates) return emptyList()
+
+        return Json.decodeFromString(coordinates) as List<Coordinates>
     }
 }

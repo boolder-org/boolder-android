@@ -36,6 +36,9 @@
         <action
             android:id="@+id/show_poi"
             app:destination="@+id/dialog_poi" />
+        <action
+            android:id="@+id/show_problem_photo_full_screen"
+            app:destination="@+id/full_screen_photo_fragment" />
     </fragment>
 
     <fragment
@@ -197,6 +200,18 @@
         android:id="@+id/contribute_fragment"
         android:name="com.boolder.boolder.view.contribute.ContributeFragment"
         android:label="Contribute" />
+
+    <fragment
+        android:id="@+id/full_screen_photo_fragment"
+        android:name="com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoFragment"
+        android:label="Full screen photo">
+        <argument
+            android:name="problem_id"
+            app:argType="integer" />
+        <argument
+            android:name="photo_uri"
+            app:argType="string" />
+    </fragment>
 
     <dialog
         android:id="@+id/dialog_circuit_filter"

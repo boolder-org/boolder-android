@@ -129,7 +129,27 @@ class MapFragment : Fragment(), BoolderMapListener {
             })
         }
 
-        binding.mapView.setup(this, layerFactory.buildStyle())
+        binding.mapView.apply {
+            setup(this@MapFragment, layerFactory.buildStyle())
+
+            mapboxMap.subscribeMapLoaded {
+                val cameraOptions = mapViewModel.cameraState?.let { cameraState ->
+                    CameraOptions.Builder()
+                        .center(cameraState.center)
+                        .padding(cameraState.padding)
+                        .zoom(cameraState.zoom)
+                        .build()
+                } ?: CameraOptions.Builder()
+                    .center(Point.fromLngLat(2.5968216, 48.3925623))
+                    .zoom(10.2)
+                    .build()
+
+                mapboxMap.setCamera(cameraOptions)
+                postDelayed(1_000L) { detectArea() }
+
+                mapViewModel.cameraState = null
+            }
+        }
 
         binding.fabLocation.setOnClickListener {
             locationProvider.askForPosition()
@@ -143,6 +163,7 @@ class MapFragment : Fragment(), BoolderMapListener {
             onCircuitProblemSelected = {
                 mapViewModel.fetchTopo(problemId = it, origin = TopoOrigin.CIRCUIT)
             }
+            onShowProblemPhotoFullScreen = ::navigateToFullScreenProblemPhoto
             tickedProblemSaver = mapViewModel
         }
 
@@ -257,39 +278,10 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        val cameraOptions = mapViewModel.mapState?.let { mapState ->
-            val center = Point.fromLngLat(
-                mapState.centerLongitude,
-                mapState.centerLatitude
-            )
-
-            CameraOptions.Builder()
-                .center(center)
-                .zoom(mapState.zoom)
-                .build()
-        } ?: CameraOptions.Builder()
-            .center(Point.fromLngLat(2.5968216, 48.3925623))
-            .zoom(10.2)
-            .build()
-
-        binding?.mapView?.apply {
-            mapboxMap.setCamera(cameraOptions)
-            postDelayed(1_000L) { detectArea() }
-        }
-        mapViewModel.mapState = null
-    }
-
     override fun onPause() {
-        val cameraState = binding?.mapView?.mapboxMap?.cameraState ?: return
-
-        mapViewModel.mapState = MapState(
-            centerLongitude = cameraState.center.longitude(),
-            centerLatitude = cameraState.center.latitude(),
-            zoom = cameraState.zoom
-        )
+        binding?.let {
+            mapViewModel.cameraState = it.mapView.mapboxMap.cameraState
+        }
 
         super.onPause()
     }
@@ -298,6 +290,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         binding?.topoView?.apply {
             onSelectProblemOnMap = null
             onCircuitProblemSelected = null
+            onShowProblemPhotoFullScreen = null
             tickedProblemSaver = null
         }
 
@@ -459,6 +452,15 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun navigateToSearchScreen() {
         onTopoUnselected()
         findNavController().navigate(MapFragmentDirections.navigateToSearch())
+    }
+
+    private fun navigateToFullScreenProblemPhoto(problemId: Int, photoUri: String) {
+        val direction = MapFragmentDirections.showProblemPhotoFullScreen(
+            problemId = problemId,
+            photoUri = photoUri
+        )
+
+        findNavController().navigate(direction)
     }
 
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {

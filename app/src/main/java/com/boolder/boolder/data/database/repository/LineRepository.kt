@@ -7,10 +7,6 @@ class LineRepository(
     private val lineDao: LineDao
 ) {
 
-    suspend fun getAll(): List<LineEntity> {
-        return lineDao.getAll()
-    }
-
     suspend fun loadAllByTopoIds(topoId: Int): List<LineEntity> {
         return lineDao.loadByTopoId(topoId)
     }
