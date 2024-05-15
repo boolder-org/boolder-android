@@ -147,7 +147,7 @@
 
     <string name="contribute_title">Contribute to Boolder</string>
     <string name="contribute_intro">Help us build the best collaborative guidebook for Fontainebleau!</string>
-    <string name="contribute_photo">Take a photo of a boulder</string>
+    <string name="contribute_photo">Take photos of missing boulders</string>
     <string name="contribute_report">Report errors</string>
     <string name="contribute_cta">Start contributing</string>
     <string name="contribute_learn_more">Learn more about Boolder</string>

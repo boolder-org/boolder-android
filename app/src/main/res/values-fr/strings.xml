@@ -144,7 +144,7 @@
 
     <string name="contribute_title">Contribuer à Boolder</string>
     <string name="contribute_intro">Aidez nous à créer le meilleur topo collaboratif pour Fontainebleau !</string>
-    <string name="contribute_photo">Prenez le bloc en photo</string>
+    <string name="contribute_photo">Prenez les blocs manquants en photo</string>
     <string name="contribute_report">Signalez des erreurs</string>
     <string name="contribute_cta">Commencer à contribuer</string>
     <string name="contribute_learn_more">En savoir plus sur Boolder</string>
