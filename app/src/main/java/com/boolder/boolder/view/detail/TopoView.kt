@@ -29,13 +29,13 @@ import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.toUiProblem
+import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.detail.composable.CircuitControls
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
 import com.boolder.boolder.view.detail.composable.TopoFooter
 import com.boolder.boolder.view.detail.uimodel.UiProblem
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
-import java.util.Locale
 
 class TopoView(
     context: Context,
@@ -240,7 +240,7 @@ class TopoView(
             action = Intent.ACTION_SEND
             putExtra(
                 Intent.EXTRA_TEXT,
-                "https://www.boolder.com/${Locale.getDefault().language}/p/$problemId"
+                "https://www.boolder.com/${getLanguage()}/p/$problemId"
             )
             type = "text/plain"
         }

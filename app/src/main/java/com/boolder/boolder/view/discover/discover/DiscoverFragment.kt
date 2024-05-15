@@ -10,9 +10,9 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.view.compose.BoolderTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Locale
 
 class DiscoverFragment : Fragment() {
 
@@ -54,7 +54,7 @@ class DiscoverFragment : Fragment() {
     }
 
     private fun openBeginnerGuideArticle() {
-        openWebUrl("https://www.boolder.com/${getUrlLocale()}/articles/beginners-guide")
+        openWebUrl("https://www.boolder.com/${getLanguage()}/articles/beginners-guide")
     }
 
     private fun onAreaClicked(areaId: Int) {
@@ -71,7 +71,7 @@ class DiscoverFragment : Fragment() {
     }
 
     private fun onOpenContributeWebPage() {
-        openWebUrl("https://www.boolder.com/${getUrlLocale()}/contribute")
+        openWebUrl("https://www.boolder.com/${getLanguage()}/contribute")
     }
 
     private fun openWebUrl(url: String) {
@@ -79,7 +79,4 @@ class DiscoverFragment : Fragment() {
 
         startActivity(intent)
     }
-
-    private fun getUrlLocale(): String =
-        if (Locale.getDefault().language == "fr") "fr" else "en"
 }
