@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.map
 
+import android.net.Uri
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.circuitColorSafe
 import com.boolder.boolder.data.database.repository.LineRepository
@@ -22,7 +23,12 @@ class TopoDataAggregator(
     private val fileExplorer: FileExplorer
 ) {
 
-    suspend fun aggregate(problemId: Int, origin: TopoOrigin): Topo {
+    suspend fun aggregate(
+        problemId: Int,
+        origin: TopoOrigin,
+        previousPhotoUri: String?,
+        previousPhotoWasProperlyLoaded: Boolean
+    ): Topo {
         val mainProblem = problemRepository.loadById(problemId) ?: return EMPTY_TOPO
 
         val mainProblemTickStatus = tickedProblemRepository
@@ -32,11 +38,13 @@ class TopoDataAggregator(
         val mainLine = lineRepository.loadByProblemId(problemId)
         val topoId = mainLine?.topoId
 
-        val imageFile = topoId?.let {
-            fileExplorer.getTopoImageFile(areaId = mainProblem.areaId, topoId = it)
-        }
+        val imageFileUri = topoId
+            ?.let { fileExplorer.getTopoImageFile(areaId = mainProblem.areaId, topoId = it) }
+            ?.let(Uri::fromFile)
 
-        val topoPictureUrl = topoId?.let { topoRepository.getTopoPictureById(it) }
+        val photoUrl = topoId?.let { topoRepository.getTopoPictureById(it) }
+
+        val photoUri = (imageFileUri ?: photoUrl).toString()
 
         val mainProblemAndLine = ProblemWithLine(
             problem = mainProblem.convert(tickStatus = mainProblemTickStatus),
@@ -56,9 +64,11 @@ class TopoDataAggregator(
 
         val (circuitPreviousProblemId, circuitNextProblemId) = getCircuitPreviousAndNextProblemIds(mainProblem)
 
+        val hasValidPhoto = previousPhotoUri != null && previousPhotoWasProperlyLoaded
+        val canShowProblemStarts = hasValidPhoto && previousPhotoUri == photoUri
+
         return Topo(
-            pictureUrl = topoPictureUrl,
-            imageFile = imageFile,
+            photoUri = photoUri,
             selectedCompleteProblem = mainCompleteProblem,
             otherCompleteProblems = otherCompleteProblems,
             circuitInfo = CircuitInfo(
@@ -66,7 +76,8 @@ class TopoDataAggregator(
                 previousProblemId = circuitPreviousProblemId,
                 nextProblemId = circuitNextProblemId
             ),
-            origin = origin
+            origin = origin,
+            canShowProblemStarts = canShowProblemStarts
         )
     }
 
@@ -176,8 +187,7 @@ class TopoDataAggregator(
 
     companion object {
         private val EMPTY_TOPO = Topo(
-            pictureUrl = null,
-            imageFile = null,
+            photoUri = null,
             selectedCompleteProblem = null,
             otherCompleteProblems = emptyList(),
             circuitInfo = null,

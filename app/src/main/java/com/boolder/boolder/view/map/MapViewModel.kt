@@ -14,12 +14,15 @@ import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
+import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.TickedProblem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
 import com.boolder.boolder.offline.BoolderOfflineRepository
 import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.view.detail.TopoView
+import com.boolder.boolder.view.detail.VariantSelector
 import com.boolder.boolder.view.map.filter.FiltersEventHandler
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
@@ -42,6 +45,7 @@ class MapViewModel(
     private val boolderOfflineRepository: BoolderOfflineRepository
 ) : ViewModel(),
     OfflineAreaDownloader,
+    TopoView.TopoCallbacks,
     TickedProblemSaver,
     FiltersEventHandler {
 
@@ -80,9 +84,13 @@ class MapViewModel(
 
     fun fetchTopo(problemId: Int, origin: TopoOrigin) {
         viewModelScope.launch {
+            val currentTopo = _topoStateFlow.value
+
             _topoStateFlow.value = topoDataAggregator.aggregate(
                 problemId = problemId,
-                origin = origin
+                origin = origin,
+                previousPhotoUri = currentTopo?.photoUri,
+                previousPhotoWasProperlyLoaded = currentTopo?.canShowProblemStarts == true
             )
 
             if (origin != TopoOrigin.CIRCUIT) {
@@ -104,40 +112,6 @@ class MapViewModel(
                         color = circuit.color,
                         showCircuitStartButton = false
                     )
-                )
-            }
-        }
-    }
-
-    fun updateCircuitControlsForProblem(problemId: String) {
-        val currentTopoState = _topoStateFlow.value ?: return
-
-        val intProblemId = try {
-            problemId.toInt()
-        } catch (e: NumberFormatException) {
-            return
-        }
-
-        viewModelScope.launch {
-            val selectedProblem = currentTopoState.otherCompleteProblems
-                .find { it.problemWithLine.problem.id == intProblemId }
-                ?: return@launch
-
-            val otherProblems = buildList {
-                currentTopoState.selectedCompleteProblem?.let(::add)
-                currentTopoState.otherCompleteProblems.forEach { completeProblem ->
-                    if (completeProblem != selectedProblem) add(completeProblem)
-                }
-            }
-
-            val circuitInfo = topoDataAggregator.updateCircuitControlsForProblem(intProblemId)
-
-            _topoStateFlow.update {
-                currentTopoState.copy(
-                    selectedCompleteProblem = selectedProblem,
-                    otherCompleteProblems = otherProblems,
-                    circuitInfo = circuitInfo,
-                    origin = TopoOrigin.TOPO
                 )
             }
         }
@@ -422,6 +396,75 @@ class MapViewModel(
 
     // endregion OfflineAreaDownloader
 
+    // region TopoCallbacks
+
+    override fun onProblemPhotoLoaded() {
+        _topoStateFlow.update { it?.copy(canShowProblemStarts = true) }
+    }
+
+    override fun onProblemStartClicked(problemId: Int) {
+        viewModelScope.launch { _eventFlow.emit(Event.SelectProblemOnMap(problemId = problemId)) }
+
+        val currentTopoState = _topoStateFlow.value ?: return
+
+        viewModelScope.launch {
+            val selectedProblem = currentTopoState.otherCompleteProblems
+                .find { it.problemWithLine.problem.id == problemId }
+                ?: return@launch
+
+            val otherProblems = buildList {
+                currentTopoState.selectedCompleteProblem?.let(::add)
+                currentTopoState.otherCompleteProblems.forEach { completeProblem ->
+                    if (completeProblem != selectedProblem) add(completeProblem)
+                }
+            }
+
+            val circuitInfo = topoDataAggregator.updateCircuitControlsForProblem(problemId)
+
+            _topoStateFlow.update {
+                currentTopoState.copy(
+                    selectedCompleteProblem = selectedProblem,
+                    otherCompleteProblems = otherProblems,
+                    circuitInfo = circuitInfo,
+                    origin = TopoOrigin.TOPO
+                )
+            }
+        }
+    }
+
+    override fun onVariantSelected(variant: ProblemWithLine) {
+        val currentTopo = _topoStateFlow.value ?: return
+        val selectedProblemAsList = currentTopo.selectedCompleteProblem
+            ?.let(::listOf)
+            ?: emptyList()
+
+        val completeProblems = currentTopo.otherCompleteProblems + selectedProblemAsList
+
+        val (selectedProblem, newCompleteProblems) = VariantSelector.selectVariantInProblemStarts(
+            selectedVariant = variant,
+            completeProblems = completeProblems
+        )
+
+        _topoStateFlow.update {
+            it?.copy(
+                selectedCompleteProblem = selectedProblem,
+                otherCompleteProblems = newCompleteProblems
+            )
+        }
+    }
+
+    override fun onCircuitProblemSelected(problemId: Int) {
+        fetchTopo(problemId = problemId, origin = TopoOrigin.CIRCUIT)
+    }
+
+    override fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String) {
+        viewModelScope.launch {
+            _eventFlow.emit(Event.ShowProblemPhotoFullScreen(problemId, photoUri))
+        }
+    }
+
+    // endregion TopoCallbacks
+
     // region TickedProblemSaver
 
     override fun onSaveProblem(problemId: Int, tickStatus: TickStatus) {
@@ -497,12 +540,19 @@ class MapViewModel(
     data class TickedFilterState(val tickedProblemIds: List<Int>)
 
     sealed interface Event {
+        data class SelectProblemOnMap(val problemId: Int) : Event
+
         data class ShowAvailableCircuits(
             val selectedCircuit: Circuit?,
             val availableCircuits: List<Circuit>
         ) : Event
 
         data class ShowGradeRanges(val currentGradeRange: GradeRange) : Event
+
+        data class ShowProblemPhotoFullScreen(
+            val problemId: Int,
+            val photoUri: String
+        ) : Event
 
         data class ZoomOnCircuit(val circuit: Circuit) : Event
 
