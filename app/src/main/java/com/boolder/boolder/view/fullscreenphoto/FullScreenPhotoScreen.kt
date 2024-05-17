@@ -9,17 +9,24 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -40,6 +48,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.toUiProblem
@@ -53,39 +62,59 @@ import kotlin.math.roundToInt
 @Composable
 internal fun FullScreenPhotoScreen(
     screenState: FullScreenPhotoViewModel.ScreenState,
+    scrollOffset: Float,
     onCloseClicked: () -> Unit,
+    onDragStateChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
+    val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val radiusSize = (1f - scrollOffset) * 24.dp
+
+    Column(
+        modifier = modifier.clip(
+            shape = RoundedCornerShape(topStart = radiusSize, topEnd = radiusSize)
+        )
     ) {
-        when (screenState) {
-            is FullScreenPhotoViewModel.ScreenState.Loading -> LoadingScreen(
-                modifier = modifier.background(color = MaterialTheme.colorScheme.background)
-            )
-
-            is FullScreenPhotoViewModel.ScreenState.Content -> FullScreenPhotoScreenContent(
-                screenState = screenState
-            )
-
-            is FullScreenPhotoViewModel.ScreenState.Error -> FullScreenPhotoScreenError()
-        }
-
-        IconButton(
+        Box(
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(8.dp),
-            onClick = onCloseClicked
+                .fillMaxWidth()
+                .height(topInset * scrollOffset + 8.dp)
+                .background(color = MaterialTheme.colorScheme.background)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(color = MaterialTheme.colorScheme.background)
+                .navigationBarsPadding(),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground
-            )
+            when (screenState) {
+                is FullScreenPhotoViewModel.ScreenState.Loading -> LoadingScreen(
+                    modifier = Modifier.background(color = MaterialTheme.colorScheme.background)
+                )
+
+                is FullScreenPhotoViewModel.ScreenState.Content -> FullScreenPhotoScreenContent(
+                    screenState = screenState,
+                    onDragStateChanged = onDragStateChanged
+                )
+
+                is FullScreenPhotoViewModel.ScreenState.Error -> FullScreenPhotoScreenError()
+            }
+
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 8.dp),
+                onClick = onCloseClicked
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
     }
 }
@@ -93,7 +122,8 @@ internal fun FullScreenPhotoScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FullScreenPhotoScreenContent(
-    screenState: FullScreenPhotoViewModel.ScreenState.Content
+    screenState: FullScreenPhotoViewModel.ScreenState.Content,
+    onDragStateChanged: (Boolean) -> Unit
 ) {
     val widthPx = with(LocalDensity.current) {
         (LocalConfiguration.current.screenWidthDp * density).roundToInt()
@@ -116,6 +146,12 @@ private fun FullScreenPhotoScreenContent(
         targetValue = targetScaleFactor,
         label = "photo_scale_animation"
     )
+
+    val canDragParentContainer by remember { derivedStateOf { scaleFactor == 1f } }
+
+    LaunchedEffect(key1 = canDragParentContainer) {
+        onDragStateChanged(canDragParentContainer)
+    }
 
     AsyncImage(
         modifier = Modifier
@@ -165,6 +201,7 @@ private fun FullScreenPhotoScreenContent(
             },
         uiProblems = listOf(uiProblem),
         selectedProblem = uiProblem.completeProblem,
+        drawnElementsScaleFactor = 1f / scaleFactor,
         onProblemStartClicked = {},
         onVariantSelected = {}
     )
@@ -188,7 +225,9 @@ private fun FullScreenPhotoScreenPreview(
     BoolderTheme {
         FullScreenPhotoScreen(
             screenState = screenState,
-            onCloseClicked = {}
+            scrollOffset = 1f,
+            onCloseClicked = {},
+            onDragStateChanged = {}
         )
     }
 }

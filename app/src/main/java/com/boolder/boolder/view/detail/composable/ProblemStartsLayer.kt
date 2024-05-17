@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,21 +41,21 @@ internal fun ProblemStartsLayer(
     selectedProblem: CompleteProblem?,
     onProblemStartClicked: (CompleteProblem) -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    drawnElementsScaleFactor: Float = 1f
 ) {
     Box(modifier = modifier) {
         uiProblems.forEach { uiProblem ->
             uiProblem.problemStart?.let { problemStart ->
-                val shadowRadius = 2.dp
-
                 MarkerShadow(
                     problemStart = problemStart,
-                    shadowRadius = shadowRadius
+                    scaleFactor = drawnElementsScaleFactor
                 )
 
                 if (uiProblem.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id) {
                     ProblemStartMarker(
                         uiProblem = uiProblem,
+                        scaleFactor = drawnElementsScaleFactor,
                         modifier = Modifier.clickable {
                             onProblemStartClicked(uiProblem.completeProblem)
                         }
@@ -67,7 +67,8 @@ internal fun ProblemStartsLayer(
         if (selectedProblem != null) {
             ProblemLine(
                 line = selectedProblem.problemWithLine.line,
-                color = selectedProblem.problemWithLine.problem.circuitColorSafe.composeColor()
+                color = selectedProblem.problemWithLine.problem.circuitColorSafe.composeColor(),
+                scaleFactor = drawnElementsScaleFactor
             )
 
             uiProblems
@@ -75,6 +76,7 @@ internal fun ProblemStartsLayer(
                 ?.let {
                     ProblemStartMarker(
                         uiProblem = it,
+                        scaleFactor = drawnElementsScaleFactor,
                         modifier = Modifier
                     )
                 }
@@ -91,12 +93,13 @@ internal fun ProblemStartsLayer(
 @Composable
 private fun ProblemStartMarker(
     uiProblem: UiProblem,
+    scaleFactor: Float,
     modifier: Modifier
 ) {
     val problemStart = uiProblem.problemStart ?: return
 
     val markerHalfSizePx = with(LocalDensity.current) {
-        (problemStart.dpSize.dp / 2).toPx().roundToInt()
+        (problemStart.dpSize.dp / 2).toPx()
     }
 
     Box(
@@ -104,9 +107,15 @@ private fun ProblemStartMarker(
             .size(problemStart.dpSize.dp)
             .offset {
                 IntOffset(
-                    x = problemStart.x - markerHalfSizePx,
-                    y = problemStart.y - markerHalfSizePx
+                    x = problemStart.x,
+                    y = problemStart.y
                 )
+            }
+            .graphicsLayer {
+                scaleX = scaleFactor
+                scaleY = scaleFactor
+                translationX = -markerHalfSizePx
+                translationY = -markerHalfSizePx
             }
             .background(
                 color = colorResource(id = problemStart.colorRes),
@@ -127,24 +136,30 @@ private fun ProblemStartMarker(
 @Composable
 private fun MarkerShadow(
     problemStart: ProblemStart,
-    shadowRadius: Dp
+    scaleFactor: Float
 ) {
+    val shadowRadius = 2.dp
     val markerHalfSizePx = with(LocalDensity.current) {
-        (problemStart.dpSize.dp / 2).toPx().roundToInt()
+        (problemStart.dpSize.dp / 2).toPx()
     }
 
     Box(
         modifier = Modifier
             .size(problemStart.dpSize.dp + shadowRadius * 2)
             .offset {
-                val shadowRadiusPx = shadowRadius
-                    .toPx()
-                    .roundToInt()
-
                 IntOffset(
-                    x = problemStart.x - markerHalfSizePx - shadowRadiusPx,
-                    y = problemStart.y - markerHalfSizePx - shadowRadiusPx
+                    x = problemStart.x,
+                    y = problemStart.y
                 )
+            }
+            .graphicsLayer {
+                val shadowRadiusPx = shadowRadius.toPx()
+                val scaledTranslation = -markerHalfSizePx - shadowRadiusPx
+
+                scaleX = scaleFactor
+                scaleY = scaleFactor
+                translationX = scaledTranslation
+                translationY = scaledTranslation
             }
             .blur(
                 radius = shadowRadius,

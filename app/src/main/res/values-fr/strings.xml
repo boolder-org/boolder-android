@@ -151,7 +151,7 @@
     <string name="contribute_cta">Commencer à contribuer</string>
     <string name="contribute_learn_more">En savoir plus sur Boolder</string>
 
-    <string name="full_screen_photo_error">Ce bloc ne peut être affiché</string>
+    <string name="full_screen_photo_error">Cette photo ne peut être affichée</string>
 
     <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
     <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>

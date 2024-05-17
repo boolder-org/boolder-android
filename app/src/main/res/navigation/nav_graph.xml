@@ -201,7 +201,7 @@
         android:name="com.boolder.boolder.view.contribute.ContributeFragment"
         android:label="Contribute" />
 
-    <fragment
+    <dialog
         android:id="@+id/full_screen_photo_fragment"
         android:name="com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoFragment"
         android:label="Full screen photo">
@@ -211,7 +211,7 @@
         <argument
             android:name="photo_uri"
             app:argType="string" />
-    </fragment>
+    </dialog>
 
     <dialog
         android:id="@+id/dialog_circuit_filter"
