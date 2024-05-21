@@ -36,9 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.boolder.boolder.R
-import com.boolder.boolder.view.compose.BoolderBlue
 import com.boolder.boolder.view.compose.BoolderOrange
-import com.boolder.boolder.view.compose.BoolderTeal
 import com.boolder.boolder.view.compose.BoolderTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,16 +116,6 @@ private fun ContributeSteps() {
                 textRes = R.string.contribute_photo,
                 iconRes = R.drawable.ic_camera_alt,
                 iconTint = MaterialTheme.colorScheme.primary
-            )
-            ContributeItem(
-                textRes = R.string.contribute_location,
-                iconRes = R.drawable.ic_location_on,
-                iconTint = Color.BoolderBlue
-            )
-            ContributeItem(
-                textRes = R.string.contribute_line,
-                iconRes = R.drawable.ic_route,
-                iconTint = Color.BoolderTeal
             )
             ContributeItem(
                 textRes = R.string.contribute_report,
