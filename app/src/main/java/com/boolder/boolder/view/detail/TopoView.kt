@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
@@ -48,6 +49,7 @@ class TopoView(
 
     var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
     var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
+    var onShowProblemPhotoFullScreen: ((problemId: Int, photoUri: String) -> Unit)? = null
     var tickedProblemSaver: TickedProblemSaver? = null
 
     init {
@@ -178,16 +180,29 @@ class TopoView(
 
     private fun loadTopoImage(topo: Topo) {
         binding.progressCircular.isVisible = true
+        binding.picture.setOnClickListener(null)
 
-        val imageData = topo.imageFile ?: topo.pictureUrl
+        val imageUri = topo.imageFile?.let { Uri.fromFile(it) }
+            ?: topo.pictureUrl?.toUri()
 
-        binding.picture.load(imageData) {
+        binding.picture.load(imageUri) {
             crossfade(true)
             error(R.drawable.ic_placeholder)
 
             listener(
                 onSuccess = { _, _ ->
                     binding.picture.setPadding(0)
+                    binding.picture.setOnClickListener {
+                        imageUri ?: return@setOnClickListener
+
+                        val problemId = topo.selectedCompleteProblem
+                            ?.problemWithLine
+                            ?.problem
+                            ?.id
+                            ?: return@setOnClickListener
+
+                        onShowProblemPhotoFullScreen?.invoke(problemId, imageUri.toString())
+                    }
                     binding.progressCircular.isVisible = false
                     onProblemPictureLoaded(topo)
                 },

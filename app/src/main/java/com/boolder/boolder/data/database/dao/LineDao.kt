@@ -7,9 +7,6 @@ import com.boolder.boolder.data.database.entity.LineEntity
 @Dao
 interface LineDao {
 
-    @Query("SELECT * FROM lines")
-    suspend fun getAll(): List<LineEntity>
-
     @Query("SELECT * FROM lines WHERE topo_id = :topoId")
     suspend fun loadByTopoId(topoId: Int): List<LineEntity>
 

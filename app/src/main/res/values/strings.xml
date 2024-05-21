@@ -152,6 +152,8 @@
     <string name="contribute_cta">Start contributing</string>
     <string name="contribute_learn_more">Learn more about Boolder</string>
 
+    <string name="full_screen_photo_error">This photo can\'t be displayed</string>
+
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>
 

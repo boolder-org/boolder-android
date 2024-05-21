@@ -39,7 +39,8 @@ import com.boolder.boolder.view.detail.PointD
 internal fun ProblemLine(
     line: Line?,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scaleFactor: Float = 1f
 ) {
     val points = line?.points() ?: return
 
@@ -83,7 +84,7 @@ internal fun ProblemLine(
                     path = path,
                     color = internalColor,
                     style = Stroke(
-                        width = 4.dp.toPx(),
+                        width = (4.dp * scaleFactor).toPx(),
                         cap = StrokeCap.Round,
                         join = StrokeJoin.Round,
                         pathEffect = PathEffect.dashPathEffect(

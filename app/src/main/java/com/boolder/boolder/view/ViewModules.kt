@@ -12,6 +12,7 @@ import com.boolder.boolder.view.discover.driesfast.DriesFastViewModel
 import com.boolder.boolder.view.discover.levels.LevelsViewModel
 import com.boolder.boolder.view.discover.levels.beginner.BeginnerLevelsViewModel
 import com.boolder.boolder.view.discover.trainandbike.TrainAndBikeViewModel
+import com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoViewModel
 import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.TopoDataAggregator
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
@@ -51,4 +52,6 @@ val viewModelModule = module {
     viewModelOf(::TrainAndBikeViewModel)
 
     viewModelOf(::TickListViewModel)
+
+    viewModelOf(::FullScreenPhotoViewModel)
 }

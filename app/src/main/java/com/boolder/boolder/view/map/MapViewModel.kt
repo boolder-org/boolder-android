@@ -24,6 +24,7 @@ import com.boolder.boolder.view.map.filter.FiltersEventHandler
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
+import com.mapbox.maps.CameraState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -75,7 +76,7 @@ class MapViewModel(
     private var lastZoomValue = 0.0
     private var isProblemTopoShown = false
 
-    var mapState: MapState? = null
+    var cameraState: CameraState? = null
 
     fun fetchTopo(problemId: Int, origin: TopoOrigin) {
         viewModelScope.launch {
