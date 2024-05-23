@@ -50,8 +50,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.MapInitOptions
+import com.mapbox.maps.coroutine.mapLoadedEvents
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.locationcomponent.location
@@ -76,6 +77,9 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
     }
 
+    private lateinit var mapView: BoolderMap
+    private var pendingMapAction: (() -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         locationProvider = LocationProvider(requireActivity())
@@ -85,10 +89,36 @@ class MapFragment : Fragment(), BoolderMapListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View =
-        FragmentMapBinding.inflate(inflater, container, false)
-            .also { binding = it }
-            .root
+    ): View {
+        val fragmentMapBinding = FragmentMapBinding.inflate(inflater, container, false)
+
+        val cameraOptions = mapViewModel.cameraState?.let { cameraState ->
+            CameraOptions.Builder()
+                .center(cameraState.center)
+                .padding(cameraState.padding)
+                .zoom(cameraState.zoom)
+                .build()
+        } ?: CameraOptions.Builder()
+            .center(Point.fromLngLat(2.5968216, 48.3925623))
+            .zoom(10.2)
+            .build()
+
+        mapViewModel.cameraState = null
+
+        mapView = BoolderMap(
+            context = inflater.context,
+            mapInitOptions = MapInitOptions(
+                context = inflater.context,
+                cameraOptions = cameraOptions
+            )
+        )
+
+        fragmentMapBinding.mapContainer.addView(mapView)
+
+        binding = fragmentMapBinding
+
+        return fragmentMapBinding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val binding = binding ?: return
@@ -96,7 +126,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            binding.mapView.applyInsets(systemInsets)
+            mapView.applyInsets(systemInsets)
             binding.fabLocation.updateLayoutParams<MarginLayoutParams> {
                 val bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_map_controls)
                 val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.height_bottom_nav_bar)
@@ -129,25 +159,13 @@ class MapFragment : Fragment(), BoolderMapListener {
             })
         }
 
-        binding.mapView.apply {
+        mapView.apply {
             setup(this@MapFragment, layerFactory.buildStyle())
 
-            mapboxMap.subscribeMapLoaded {
-                val cameraOptions = mapViewModel.cameraState?.let { cameraState ->
-                    CameraOptions.Builder()
-                        .center(cameraState.center)
-                        .padding(cameraState.padding)
-                        .zoom(cameraState.zoom)
-                        .build()
-                } ?: CameraOptions.Builder()
-                    .center(Point.fromLngLat(2.5968216, 48.3925623))
-                    .zoom(10.2)
-                    .build()
-
-                mapboxMap.setCamera(cameraOptions)
-                postDelayed(1_000L) { detectArea() }
-
-                mapViewModel.cameraState = null
+            mapboxMap.mapLoadedEvents.launchAndCollectIn(viewLifecycleOwner) {
+                pendingMapAction?.invoke()
+                    ?: postDelayed(1_000L) { detectArea() }
+                pendingMapAction = null
             }
         }
 
@@ -157,7 +175,7 @@ class MapFragment : Fragment(), BoolderMapListener {
 
         binding.topoView.apply {
             onSelectProblemOnMap = { problemId ->
-                binding.mapView.selectProblem(problemId)
+                mapView.selectProblem(problemId)
                 mapViewModel.updateCircuitControlsForProblem(problemId)
             }
             onCircuitProblemSelected = {
@@ -192,7 +210,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 }
             }
 
-            binding.mapView.apply {
+            mapView.apply {
                 updateCircuit(screenState.circuitState?.circuitId?.toLong())
                 applyFilters(
                     grades = screenState.gradeState.grades,
@@ -219,15 +237,15 @@ class MapFragment : Fragment(), BoolderMapListener {
             /* requestKey = */ SearchFragment.REQUEST_KEY,
             /* lifecycleOwner = */ this
         ) { _, bundle ->
-            when {
-                bundle.containsKey("AREA") -> binding.root.postDelayed(500L) {
-                    flyToArea(requireNotNull(bundle.getParcelable("AREA")))
-                }
+            pendingMapAction = {
+                when {
+                    bundle.containsKey("AREA") -> flyToArea(requireNotNull(bundle.getParcelable("AREA")))
 
-                bundle.containsKey("PROBLEM") -> onProblemSelected(
-                    problemId = requireNotNull(bundle.getParcelable<Problem>("PROBLEM")).id,
-                    origin = TopoOrigin.SEARCH
-                )
+                    bundle.containsKey("PROBLEM") -> onProblemSelected(
+                        problemId = requireNotNull(bundle.getParcelable<Problem>("PROBLEM")).id,
+                        origin = TopoOrigin.SEARCH
+                    )
+                }
             }
         }
 
@@ -235,21 +253,19 @@ class MapFragment : Fragment(), BoolderMapListener {
             REQUEST_KEY_AREA_DETAILS,
             this
         ) { _, bundle ->
-            when {
-                bundle.containsKey(KEY_PROBLEM) -> onProblemSelected(
-                    problemId = requireNotNull(bundle.getParcelable<Problem>(KEY_PROBLEM)).id,
-                    origin = TopoOrigin.SEARCH
-                )
-
-                bundle.containsKey(KEY_CIRCUIT_ID) -> binding.mapView.postDelayed(300L) {
-                    mapViewModel.onCircuitSelected(
-                        requireNotNull(bundle.getInt(KEY_CIRCUIT_ID))
+            pendingMapAction = {
+                when {
+                    bundle.containsKey(KEY_PROBLEM) -> onProblemSelected(
+                        problemId = requireNotNull(bundle.getParcelable<Problem>(KEY_PROBLEM)).id,
+                        origin = TopoOrigin.SEARCH
                     )
-                }
 
-                bundle.containsKey(KEY_AREA_ID) -> binding.mapView.postDelayed(300L) {
-                    mapViewModel.onAreaSelected(
-                        requireNotNull(bundle.getInt(KEY_AREA_ID))
+                    bundle.containsKey(KEY_CIRCUIT_ID) -> mapViewModel.onCircuitSelected(
+                        circuitId = requireNotNull(bundle.getInt(KEY_CIRCUIT_ID))
+                    )
+
+                    bundle.containsKey(KEY_AREA_ID) -> mapViewModel.onAreaSelected(
+                        areaId = requireNotNull(bundle.getInt(KEY_AREA_ID))
                     )
                 }
             }
@@ -279,19 +295,21 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     override fun onPause() {
-        binding?.let {
-            mapViewModel.cameraState = it.mapView.mapboxMap.cameraState
-        }
+        mapViewModel.cameraState = mapView.mapboxMap.cameraState
 
         super.onPause()
     }
 
     override fun onDestroyView() {
-        binding?.topoView?.apply {
-            onSelectProblemOnMap = null
-            onCircuitProblemSelected = null
-            onShowProblemPhotoFullScreen = null
-            tickedProblemSaver = null
+        binding?.let {
+            it.topoView.apply {
+                onSelectProblemOnMap = null
+                onCircuitProblemSelected = null
+                onShowProblemPhotoFullScreen = null
+                tickedProblemSaver = null
+            }
+
+            it.mapContainer.removeView(mapView)
         }
 
         binding = null
@@ -305,14 +323,12 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     private fun onGPSLocation(location: Location) {
-        val binding = binding ?: return
-
         val point = Point.fromLngLat(location.longitude, location.latitude)
-        val zoomLevel = max(binding.mapView.mapboxMap.cameraState.zoom, 17.0)
+        val zoomLevel = max(mapView.mapboxMap.cameraState.zoom, 17.0)
 
-        binding.mapView.mapboxMap
+        mapView.mapboxMap
             .setCamera(CameraOptions.Builder().center(point).zoom(zoomLevel).bearing(location.bearing.toDouble()).build())
-        binding.mapView.location.updateSettings {
+        mapView.location.updateSettings {
             enabled = true
             pulsingEnabled = true
         }
@@ -367,31 +383,29 @@ class MapFragment : Fragment(), BoolderMapListener {
             bottomSheetBehavior.state = STATE_HIDDEN
         } else {
             onBackPressedCallback.isEnabled = true
-            binding?.mapView?.post { bottomSheetBehavior.state = STATE_EXPANDED }
+            mapView.post { bottomSheetBehavior.state = STATE_EXPANDED }
         }
     }
 
     private fun flyToArea(area: Area) {
-        val binding = binding ?: return
-
         val southWest = Point.fromLngLat(
             area.southWestLon.toDouble(),
             area.southWestLat.toDouble()
         )
-        val northEst = Point.fromLngLat(
+        val northEast = Point.fromLngLat(
             area.northEastLon.toDouble(),
             area.northEastLat.toDouble()
         )
-        val coordinates = CoordinateBounds(southWest, northEst)
 
-        val cameraOptions = binding.mapView.mapboxMap.cameraForCoordinateBounds(
-            coordinates,
-            EdgeInsets(60.0, 8.0, 8.0, 8.0),
-            0.0,
-            0.0
+        val cameraOptions = mapView.mapboxMap.cameraForCoordinates(
+            coordinates = listOf(southWest, northEast),
+            camera = CameraOptions.Builder().build(),
+            coordinatesPadding = EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            maxZoom = null,
+            offset = null
         )
 
-        binding.mapView.camera.flyTo(
+        mapView.camera.flyTo(
             cameraOptions = cameraOptions,
             animationOptions = defaultMapAnimationOptions {},
             animatorListener = animationEndListener { delayedVisitToArea(area.id) }
@@ -401,28 +415,26 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     private fun flyToProblem(problem: Problem, origin: TopoOrigin) {
-        val binding = binding ?: return
-
-        binding.mapView.selectProblem(problem.id.toString())
+        mapView.selectProblem(problem.id.toString())
 
         val point = Point.fromLngLat(
             problem.longitude.toDouble(),
             problem.latitude.toDouble()
         )
 
-        val zoomLevel = binding.mapView.mapboxMap.cameraState.zoom
+        val zoomLevel = mapView.mapboxMap.cameraState.zoom
 
         val cameraOptions = CameraOptions.Builder().run {
             if (origin in arrayOf(TopoOrigin.SEARCH, TopoOrigin.CIRCUIT, TopoOrigin.DEEP_LINK)) {
                 center(point)
             }
 
-            padding(EdgeInsets(40.0, 0.0, binding.mapView.height / 2.0, 0.0))
+            padding(EdgeInsets(40.0, 0.0, mapView.height / 2.0, 0.0))
             zoom(if (zoomLevel <= 19.0) 20.0 else zoomLevel)
             build()
         }
 
-        binding.mapView.camera.flyTo(
+        mapView.camera.flyTo(
             cameraOptions = cameraOptions,
             animationOptions = defaultMapAnimationOptions {},
             animatorListener = animationEndListener { delayedVisitToArea(problem.areaId) }
@@ -430,7 +442,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     private fun delayedVisitToArea(areaId: Int) {
-        binding?.mapView?.postDelayed(500L) { onAreaVisited(areaId) }
+        mapView.postDelayed(500L) { onAreaVisited(areaId) }
     }
 
     private fun defaultMapAnimationOptions(block: MapAnimationOptions.Builder.() -> Unit) =
@@ -506,9 +518,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     private fun zoomOnCircuit(event: MapViewModel.Event.ZoomOnCircuit) {
-        val binding = binding ?: return
-
         onTopoUnselected()
-        binding.mapView.onCircuitSelected(event.circuit)
+        mapView.onCircuitSelected(event.circuit)
     }
 }

@@ -5,7 +5,6 @@ import com.boolder.boolder.data.database.entity.CircuitEntity
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CoordinateBounds
 
 class CircuitRepository(
     private val circuitDao: CircuitDao
@@ -35,7 +34,7 @@ class CircuitRepository(
         averageGrade = averageGrade,
         isBeginnerFriendly = beginnerFriendly,
         isDangerous = dangerous,
-        coordinateBounds = CoordinateBounds(
+        coordinateBounds = listOf(
             Point.fromLngLat(southWestLng, southWestLat),
             Point.fromLngLat(northEastLng, northEastLat)
         )

@@ -3,7 +3,6 @@ package com.boolder.boolder.utils.previewgenerator
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CoordinateBounds
 
 fun dummyCircuit(
     id: Int = 0,
@@ -15,7 +14,7 @@ fun dummyCircuit(
     averageGrade = averageGrade,
     isBeginnerFriendly = false,
     isDangerous = false,
-    coordinateBounds = CoordinateBounds(
+    coordinateBounds = listOf(
         Point.fromLngLat(0.0, 0.0),
         Point.fromLngLat(0.0, 0.0)
     )

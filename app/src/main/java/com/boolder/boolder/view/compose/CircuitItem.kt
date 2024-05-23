@@ -27,7 +27,6 @@ import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.utils.extension.composeColor
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CoordinateBounds
 
 @Composable
 internal fun CircuitItem(
@@ -108,7 +107,7 @@ private class CircuitItemPreviewParameterProvider : PreviewParameterProvider<Cir
                 averageGrade = "${index + 1}a",
                 isBeginnerFriendly = index == 0,
                 isDangerous = index == 8,
-                coordinateBounds = CoordinateBounds(
+                coordinateBounds = listOf(
                     Point.fromLngLat(0.0, 0.0),
                     Point.fromLngLat(0.0, 0.0)
                 )

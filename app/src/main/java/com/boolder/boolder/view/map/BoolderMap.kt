@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
@@ -28,6 +29,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.QueriedRenderedFeature
 import com.mapbox.maps.RenderedQueryGeometry
@@ -58,11 +60,11 @@ import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 
-class BoolderMap @JvmOverloads constructor(
+@SuppressLint("ViewConstructor")
+class BoolderMap(
     context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0
-) : MapView(context, attrs, defStyle) {
+    mapInitOptions: MapInitOptions
+) : MapView(context, mapInitOptions) {
 
     companion object {
         private const val TAG = "Boolder Map"
@@ -362,7 +364,6 @@ class BoolderMap @JvmOverloads constructor(
                         it.getStringProperty("northEastLon").toDouble(),
                         it.getStringProperty("northEastLat").toDouble()
                     )
-                    val coordinateBound = CoordinateBounds(southWest, northEst)
 
                     val areaId = if (it.hasProperty("areaId")) {
                         it.getStringProperty("areaId").toInt()
@@ -370,7 +371,10 @@ class BoolderMap @JvmOverloads constructor(
                         null
                     }
 
-                    zoomToAreaBounds(coordinates = coordinateBound, areaId = areaId)
+                    zoomToAreaBounds(
+                        coordinates = listOf(southWest, northEst),
+                        areaId = areaId
+                    )
                 }
             } ?: unselectProblem()
         } else {
@@ -380,14 +384,15 @@ class BoolderMap @JvmOverloads constructor(
 
     // Triggered when user click on a Area or Cluster on Map
     private fun zoomToAreaBounds(
-        coordinates: CoordinateBounds,
+        coordinates: List<Point>,
         areaId: Int?
     ) {
-        val cameraOptions = mapboxMap.cameraForCoordinateBounds(
-            bounds = coordinates,
-            boundsPadding = EdgeInsets(60.0, 8.0, 8.0, 8.0),
-            bearing = 0.0,
-            pitch = 0.0
+        val cameraOptions = mapboxMap.cameraForCoordinates(
+            coordinates = coordinates,
+            camera = CameraOptions.Builder().build(),
+            coordinatesPadding = EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            maxZoom = null,
+            offset = null
         )
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
@@ -403,18 +408,19 @@ class BoolderMap @JvmOverloads constructor(
         )
     }
 
-    private fun zoomToCircuitBounds(circuitCoordinates: CoordinateBounds) {
+    private fun zoomToCircuitBounds(circuitCoordinates: List<Point>) {
         val defaultMarginPixels = 24.0 * resources.displayMetrics.density
-        val cameraOptions = mapboxMap.cameraForCoordinateBounds(
-            circuitCoordinates,
-            EdgeInsets(
+        val cameraOptions = mapboxMap.cameraForCoordinates(
+            coordinates = circuitCoordinates,
+            camera = CameraOptions.Builder().build(),
+            coordinatesPadding = EdgeInsets(
                 140.0 * resources.displayMetrics.density + insets.top,
                 defaultMarginPixels,
                 88.0 * resources.displayMetrics.density + insets.bottom,
                 defaultMarginPixels
             ),
-            0.0,
-            0.0
+            maxZoom = null,
+            offset = null
         ).coerceZoomAtLeast(15.0)
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions {
