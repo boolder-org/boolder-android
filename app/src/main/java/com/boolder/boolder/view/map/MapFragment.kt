@@ -118,8 +118,8 @@ class MapFragment : Fragment(), BoolderMapListener {
                     when (newState) {
                         STATE_EXPANDED -> mapViewModel.onProblemTopoVisibilityChanged(isVisible = true)
                         STATE_HIDDEN -> {
+                            binding.mapView.onBottomSheetHidden()
                             mapViewModel.onProblemTopoVisibilityChanged(isVisible = false)
-                            binding.mapView.unselectProblem()
                             onBackPressedCallback.isEnabled = false
                         }
                         else -> Unit

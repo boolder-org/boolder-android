@@ -182,16 +182,17 @@ class BoolderMap @JvmOverloads constructor(
 
     private fun queryProblemRenderedFeatures(geometry: RenderedQueryGeometry) {
 
-        val tapSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30f, resources.displayMetrics)
+        val tapSize =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30f, resources.displayMetrics)
         val problemGeometry = RenderedQueryGeometry(
             ScreenBox(
                 ScreenCoordinate(
-                    geometry.screenCoordinate.x - tapSize/2,
-                    geometry.screenCoordinate.y - tapSize/2
+                    geometry.screenCoordinate.x - tapSize / 2,
+                    geometry.screenCoordinate.y - tapSize / 2
                 ),
                 ScreenCoordinate(
-                    geometry.screenCoordinate.x + tapSize/2,
-                    geometry.screenCoordinate.y + tapSize/2
+                    geometry.screenCoordinate.x + tapSize / 2,
+                    geometry.screenCoordinate.y + tapSize / 2
                 )
             )
         )
@@ -278,7 +279,7 @@ class BoolderMap @JvmOverloads constructor(
         )
     }
 
-    fun unselectProblem() {
+    private fun unselectProblem() {
         previousSelectedFeatureId?.let {
             mapboxMap.setFeatureState(
                 sourceId = "problems",
@@ -428,7 +429,7 @@ class BoolderMap @JvmOverloads constructor(
     private fun zoomToBoulderProblemLevel(feature: Feature) {
         val cameraOptions = CameraOptions.Builder()
             .center(feature.geometry() as Point)
-            .padding(EdgeInsets(0.0, 0.0,0.0, 0.0))
+            .padding(EdgeInsets(0.0, 0.0, 0.0, 0.0))
             .zoom(19.0)
             .build()
 
@@ -548,9 +549,16 @@ class BoolderMap @JvmOverloads constructor(
                 }
             )
         ) { queriedFeature ->
-            queriedFeature.value?.firstOrNull()?.queriedFeature?.feature?.properties()?.get("areaId")
+            queriedFeature.value?.firstOrNull()?.queriedFeature?.feature?.properties()
+                ?.get("areaId")
                 ?.let { areaId -> listener?.onAreaVisited(areaId.asInt) }
                 ?: listener?.onAreaLeft()
         }
+    }
+
+    fun onBottomSheetHidden() {
+        unselectProblem()
+        listener?.onTopoUnselected()
+
     }
 }
