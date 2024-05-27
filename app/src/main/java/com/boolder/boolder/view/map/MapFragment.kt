@@ -25,6 +25,7 @@ import com.boolder.boolder.databinding.FragmentMapBinding
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationProvider
@@ -38,10 +39,9 @@ import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.MapControlsOverlay
-import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT_ID
-import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
+import com.boolder.boolder.view.map.filter.steepness.SteepnessFilterBottomSheetDialogFragment.Companion.RESULT_STEEPNESS
 import com.boolder.boolder.view.search.SearchFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -197,6 +197,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                         offlineAreaItem = screenState.areaState,
                         circuitState = screenState.circuitState,
                         gradeState = screenState.gradeState,
+                        steepnessState = screenState.steepnessFilterState,
                         popularState = screenState.popularFilterState,
                         projectsState = screenState.projectsFilterState,
                         tickedState = screenState.tickedFilterState,
@@ -214,6 +215,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 updateCircuit(screenState.circuitState?.circuitId?.toLong())
                 applyFilters(
                     grades = screenState.gradeState.grades,
+                    steepness = screenState.steepnessFilterState.steepness,
                     showPopular = screenState.popularFilterState.isEnabled,
                     projectIds = screenState.projectsFilterState.projectIds,
                     tickedIds = screenState.tickedFilterState.tickedProblemIds
@@ -225,6 +227,7 @@ class MapFragment : Fragment(), BoolderMapListener {
             when (event) {
                 is MapViewModel.Event.ShowAvailableCircuits -> showCircuitFilterBottomSheet(event)
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
+                is MapViewModel.Event.ShowSteepnessTypes -> showSteepnessFilterBottomSheet()
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
                 is MapViewModel.Event.ZoomOnCircuitStartProblem -> onProblemSelected(event.problemId, TopoOrigin.CIRCUIT)
                 is MapViewModel.Event.ZoomOnArea -> flyToArea(event.area)
@@ -250,8 +253,8 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
 
         parentFragmentManager.setFragmentResultListener(
-            REQUEST_KEY_AREA_DETAILS,
-            this
+            /* requestKey = */ REQUEST_KEY_AREA_DETAILS,
+            /* lifecycleOwner = */ this
         ) { _, bundle ->
             pendingMapAction = {
                 when {
@@ -272,21 +275,10 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
 
         parentFragmentManager.setFragmentResultListener(
-            /* requestKey = */ CircuitFilterBottomSheetDialogFragment.REQUEST_KEY,
+            /* requestKey = */ FILTER_REQUEST,
             /* lifecycleOwner = */ this
         ) { _, bundle ->
-            val circuitId = bundle.getInt(RESULT_CIRCUIT_ID)
-
-            mapViewModel.onCircuitSelected(circuitId)
-        }
-
-        parentFragmentManager.setFragmentResultListener(
-            /* requestKey = */ GradesFilterBottomSheetDialogFragment.REQUEST_KEY,
-            /* lifecycleOwner = */ this
-        ) { _, bundle ->
-            val gradeRange = requireNotNull(bundle.getParcelable<GradeRange>(RESULT_GRADE_RANGE))
-
-            mapViewModel.onGradeRangeSelected(gradeRange)
+            onFilterRequestResult(bundle)
         }
 
         arguments?.getString("problem_id")?.toIntOrNull()?.let { problemId ->
@@ -497,6 +489,16 @@ class MapFragment : Fragment(), BoolderMapListener {
         navController.navigate(direction)
     }
 
+    private fun showSteepnessFilterBottomSheet() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.dialog_steepness_filter) return
+
+        val direction = MapFragmentDirections.showSteepnessFilter()
+
+        navController.navigate(direction)
+    }
+
     private fun showNoSavedProjectsDialog() {
         val context = context ?: return
 
@@ -520,5 +522,32 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun zoomOnCircuit(event: MapViewModel.Event.ZoomOnCircuit) {
         onTopoUnselected()
         mapView.onCircuitSelected(event.circuit)
+    }
+
+    private fun onFilterRequestResult(bundle: Bundle) {
+        when {
+            bundle.containsKey(RESULT_CIRCUIT_ID) -> {
+                val circuitId = bundle.getInt(RESULT_CIRCUIT_ID)
+
+                mapViewModel.onCircuitSelected(circuitId)
+            }
+
+            bundle.containsKey(RESULT_GRADE_RANGE) -> {
+                val gradeRange = requireNotNull(bundle.getParcelable<GradeRange>(RESULT_GRADE_RANGE))
+
+                mapViewModel.onGradeRangeSelected(gradeRange)
+            }
+
+            bundle.containsKey(RESULT_STEEPNESS) -> {
+                val steepnessIndex = requireNotNull(bundle.getInt(RESULT_STEEPNESS))
+                val steepness = Steepness.entries.getOrNull(steepnessIndex)
+
+                mapViewModel.onSteepnessSelected(steepness)
+            }
+        }
+    }
+
+    companion object {
+        const val FILTER_REQUEST = "filter_request"
     }
 }

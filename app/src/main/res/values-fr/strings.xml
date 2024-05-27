@@ -48,6 +48,7 @@
         <item quantity="other">%d variantes</item>
     </plurals>
 
+    <string name="steepness">Inclinaison</string>
     <string name="stepness_wall">Mur vertical</string>
     <string name="stepness_slab">Dalle</string>
     <string name="stepness_overhang">Dévers</string>

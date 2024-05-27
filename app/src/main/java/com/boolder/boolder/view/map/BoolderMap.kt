@@ -12,6 +12,7 @@ import androidx.core.view.updateMargins
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoolderMapConfig
 import com.boolder.boolder.domain.model.Circuit
+import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUITS
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_CIRCUIT_PROBLEMS
@@ -473,6 +474,7 @@ class BoolderMap(
 
     fun applyFilters(
         grades: List<String>,
+        steepness: Steepness?,
         showPopular: Boolean,
         projectIds: List<Int>,
         tickedIds: List<Int>
@@ -492,6 +494,15 @@ class BoolderMap(
                 literal(grades)
                 literal(true)
                 literal(false)
+            }
+
+            steepness?.let {
+                match {
+                    get("steepness")
+                    literal(it.databaseValue)
+                    literal(true)
+                    literal(false)
+                }
             }
 
             if (showPopular) get("featured")

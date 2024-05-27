@@ -51,6 +51,7 @@
         <item quantity="other">%d variants</item>
     </plurals>
 
+    <string name="steepness">Steepness</string>
     <string name="stepness_wall">Wall</string>
     <string name="stepness_slab">Slab</string>
     <string name="stepness_overhang">Overhang</string>

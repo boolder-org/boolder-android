@@ -14,6 +14,7 @@ import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
+import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.TickedProblem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
@@ -53,6 +54,7 @@ class MapViewModel(
                 gradeRangeButtonTitle = resources.getString(R.string.grades),
                 grades = ALL_GRADES
             ),
+            steepnessFilterState = SteepnessFilterState(steepness = null),
             popularFilterState = PopularFilterState(isEnabled = false),
             projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
             tickedFilterState = TickedFilterState(tickedProblemIds = emptyList()),
@@ -199,6 +201,10 @@ class MapViewModel(
         _screenStateFlow.update { it.copy(gradeState = newGradeState) }
     }
 
+    fun onSteepnessSelected(steepness: Steepness?) {
+        _screenStateFlow.update { it.copy(steepnessFilterState = SteepnessFilterState(steepness)) }
+    }
+
     fun onAreaVisited(areaId: Int) {
         viewModelScope.launch {
             val currentAreaState = _screenStateFlow.value.areaState
@@ -268,6 +274,7 @@ class MapViewModel(
                     gradeRangeButtonTitle = resources.getString(R.string.grades),
                     grades = ALL_GRADES
                 ),
+                steepnessFilterState = SteepnessFilterState(steepness = null),
                 popularFilterState = PopularFilterState(isEnabled = false),
                 projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
                 tickedFilterState = TickedFilterState(tickedProblemIds = emptyList())
@@ -288,6 +295,10 @@ class MapViewModel(
 
             _eventFlow.emit(event)
         }
+    }
+
+    override fun onSteepnessFilterChipClicked() {
+        viewModelScope.launch { _eventFlow.emit(Event.ShowSteepnessTypes) }
     }
 
     override fun onGradeFilterChipClicked() {
@@ -473,6 +484,7 @@ class MapViewModel(
         val areaState: OfflineAreaItem?,
         val circuitState: CircuitState?,
         val gradeState: GradeState,
+        val steepnessFilterState: SteepnessFilterState,
         val popularFilterState: PopularFilterState,
         val projectsFilterState: ProjectsFilterState,
         val tickedFilterState: TickedFilterState,
@@ -490,6 +502,8 @@ class MapViewModel(
         val grades: List<String>
     )
 
+    data class SteepnessFilterState(val steepness: Steepness?)
+
     data class PopularFilterState(val isEnabled: Boolean)
 
     data class ProjectsFilterState(val projectIds: List<Int>)
@@ -503,6 +517,8 @@ class MapViewModel(
         ) : Event
 
         data class ShowGradeRanges(val currentGradeRange: GradeRange) : Event
+
+        data object ShowSteepnessTypes : Event
 
         data class ZoomOnCircuit(val circuit: Circuit) : Event
 

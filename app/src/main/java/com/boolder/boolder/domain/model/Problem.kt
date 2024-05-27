@@ -19,7 +19,7 @@ data class Problem(
     val circuitId: Int?,
     val circuitNumber: String?,
     val circuitColor: String?,
-    val steepness: String,
+    val steepness: Steepness?,
     val sitStart: Boolean,
     val areaId: Int,
     val bleauInfoId: String?,

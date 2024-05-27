@@ -14,6 +14,7 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
+import com.boolder.boolder.view.map.MapFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class GradesFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
@@ -55,14 +56,13 @@ class GradesFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragmen
 
     private fun onGradeRangeValidated(gradeRange: GradeRange) {
         setFragmentResult(
-            requestKey = REQUEST_KEY,
+            requestKey = MapFragment.FILTER_REQUEST,
             result = bundleOf(RESULT_GRADE_RANGE to gradeRange)
         )
         findNavController().popBackStack()
     }
 
     companion object {
-        const val REQUEST_KEY = "grade_range_selection"
         const val RESULT_GRADE_RANGE = "result_grade_range"
     }
 }

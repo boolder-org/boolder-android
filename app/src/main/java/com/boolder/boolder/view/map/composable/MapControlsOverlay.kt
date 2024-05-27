@@ -31,6 +31,7 @@ fun MapControlsOverlay(
     offlineAreaItem: OfflineAreaItem?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
+    steepnessState: MapViewModel.SteepnessFilterState,
     popularState: MapViewModel.PopularFilterState,
     projectsState: MapViewModel.ProjectsFilterState,
     tickedState: MapViewModel.TickedFilterState,
@@ -49,6 +50,7 @@ fun MapControlsOverlay(
             offlineAreaItem = offlineAreaItem,
             circuitState = circuitState,
             gradeState = gradeState,
+            steepnessState = steepnessState,
             popularState = popularState,
             projectsState = projectsState,
             tickedState = tickedState,
@@ -101,6 +103,7 @@ private fun MapControlsOverlayPreview() {
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),
                 grades = ALL_GRADES
             ),
+            steepnessState = MapViewModel.SteepnessFilterState(null),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
             projectsState = MapViewModel.ProjectsFilterState(projectIds = emptyList()),
             tickedState = MapViewModel.TickedFilterState(tickedProblemIds = emptyList()),
