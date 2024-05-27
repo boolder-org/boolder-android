@@ -29,7 +29,10 @@ import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
+import com.boolder.boolder.utils.extension.containsCameraState
+import com.boolder.boolder.utils.extension.getCameraOptions
 import com.boolder.boolder.utils.extension.launchAndCollectIn
+import com.boolder.boolder.utils.extension.putCameraState
 import com.boolder.boolder.view.areadetails.KEY_AREA_ID
 import com.boolder.boolder.view.areadetails.KEY_CIRCUIT_ID
 import com.boolder.boolder.view.areadetails.KEY_PROBLEM
@@ -315,6 +318,20 @@ class MapFragment : Fragment(), BoolderMapListener {
         binding = null
 
         super.onDestroyView()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putCameraState(mapView.mapboxMap.cameraState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        if (savedInstanceState?.containsCameraState() == true) {
+            mapView.mapboxMap.setCamera(savedInstanceState.getCameraOptions())
+        }
     }
 
     override fun onAttach(context: Context) {
