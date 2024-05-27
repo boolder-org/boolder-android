@@ -119,6 +119,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                         STATE_EXPANDED -> mapViewModel.onProblemTopoVisibilityChanged(isVisible = true)
                         STATE_HIDDEN -> {
                             mapViewModel.onProblemTopoVisibilityChanged(isVisible = false)
+                            binding.mapView.unselectProblem()
                             onBackPressedCallback.isEnabled = false
                         }
                         else -> Unit
@@ -159,6 +160,7 @@ class MapFragment : Fragment(), BoolderMapListener {
             onSelectProblemOnMap = { problemId ->
                 binding.mapView.selectProblem(problemId)
                 mapViewModel.updateCircuitControlsForProblem(problemId)
+                bottomSheetBehavior.state = STATE_EXPANDED
             }
             onCircuitProblemSelected = {
                 mapViewModel.fetchTopo(problemId = it, origin = TopoOrigin.CIRCUIT)

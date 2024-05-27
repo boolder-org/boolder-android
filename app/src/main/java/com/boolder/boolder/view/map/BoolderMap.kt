@@ -278,7 +278,7 @@ class BoolderMap @JvmOverloads constructor(
         )
     }
 
-    private fun unselectProblem() {
+    fun unselectProblem() {
         previousSelectedFeatureId?.let {
             mapboxMap.setFeatureState(
                 sourceId = "problems",
