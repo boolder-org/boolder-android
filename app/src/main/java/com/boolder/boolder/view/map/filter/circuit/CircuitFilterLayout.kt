@@ -39,7 +39,6 @@ import com.boolder.boolder.view.compose.BoolderRippleTheme
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.CircuitItem
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CoordinateBounds
 
 @Composable
 fun CircuitFilterLayout(
@@ -195,7 +194,7 @@ private class CircuitFilterLayoutPreviewParameterProvider : PreviewParameterProv
                 averageGrade = "${index + 1}a",
                 isBeginnerFriendly = index == 0,
                 isDangerous = index == 8,
-                coordinateBounds = CoordinateBounds(
+                coordinateBounds = listOf(
                     Point.fromLngLat(0.0, 0.0),
                     Point.fromLngLat(0.0, 0.0)
                 )
