@@ -554,8 +554,4 @@ class BoolderMap @JvmOverloads constructor(
         }
     }
 
-    fun onBottomSheetHidden() {
-        unselectProblem()
-        listener?.onTopoUnselected()
-    }
 }
