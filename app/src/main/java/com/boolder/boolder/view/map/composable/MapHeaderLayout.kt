@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
@@ -163,7 +164,7 @@ private fun FiltersRow(
 
         val steepnessLabel = steepnessState.steepness
             ?.let { stringResource(it.textRes) }
-            ?: stringResource(id = R.string.steepness)
+            ?: stringResource(id = R.string.steepness_type)
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
@@ -199,16 +200,6 @@ private fun FiltersRow(
                 )
             }
 
-            item(key = steepnessLabel) {
-                MapFilterChip(
-                    modifier = Modifier.animateItemPlacement(),
-                    selected = isSteepnessFilterActive,
-                    label = steepnessLabel,
-                    iconRes = steepnessState.steepness?.iconRes ?: R.drawable.ic_steepness_slab,
-                    onClick = filtersEventHandler::onSteepnessFilterChipClicked
-                )
-            }
-
             item(key = "popular-filter") {
                 MapFilterChip(
                     modifier = Modifier.animateItemPlacement(),
@@ -216,6 +207,17 @@ private fun FiltersRow(
                     label = stringResource(id = R.string.filter_popular),
                     iconRes = R.drawable.ic_favorite_border,
                     onClick = filtersEventHandler::onPopularFilterChipClicked
+                )
+            }
+
+            item(key = steepnessLabel) {
+                MapFilterChip(
+                    modifier = Modifier.animateItemPlacement(),
+                    selected = isSteepnessFilterActive,
+                    label = steepnessLabel,
+                    iconRes = steepnessState.steepness?.iconRes ?: R.drawable.ic_steepness_slab,
+                    iconPadding = 2.dp,
+                    onClick = filtersEventHandler::onSteepnessFilterChipClicked
                 )
             }
 
@@ -274,7 +276,8 @@ private fun MapFilterChip(
     label: String,
     @DrawableRes iconRes: Int,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    iconPadding: Dp = 0.dp,
 ) {
     ElevatedFilterChip(
         modifier = modifier,
@@ -287,7 +290,9 @@ private fun MapFilterChip(
         label = { Text(text = label) },
         leadingIcon = {
             Icon(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(iconPadding),
                 painter = painterResource(id = iconRes),
                 contentDescription = null
             )

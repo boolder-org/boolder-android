@@ -10,27 +10,27 @@ enum class Steepness(
     val databaseValue: String
 ) {
     SLAB(
-        textRes = R.string.stepness_slab,
+        textRes = R.string.steepness_slab,
         iconRes = R.drawable.ic_steepness_slab,
         databaseValue = "slab"
     ),
     OVERHANG(
-        textRes = R.string.stepness_overhang,
+        textRes = R.string.steepness_overhang,
         iconRes = R.drawable.ic_steepness_overhang,
         databaseValue = "overhang"
     ),
     ROOF(
-        textRes = R.string.stepness_roof,
+        textRes = R.string.steepness_roof,
         iconRes = R.drawable.ic_steepness_roof,
         databaseValue = "roof"
     ),
     WALL(
-        textRes = R.string.stepness_wall,
+        textRes = R.string.steepness_wall,
         iconRes = R.drawable.ic_steepness_wall,
         databaseValue = "wall"
     ),
     TRAVERSE(
-        textRes = R.string.stepness_traverse,
+        textRes = R.string.steepness_traverse,
         iconRes = R.drawable.ic_steepness_traverse_left_right,
         databaseValue = "traverse"
     );

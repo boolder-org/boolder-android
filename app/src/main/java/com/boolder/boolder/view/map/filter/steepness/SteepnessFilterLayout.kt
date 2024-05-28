@@ -53,7 +53,7 @@ fun SteepnessFilterLayout(
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
-            text = stringResource(id = R.string.steepness),
+            text = stringResource(id = R.string.steepness_type),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
