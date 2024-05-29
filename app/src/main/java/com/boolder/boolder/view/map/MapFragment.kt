@@ -455,24 +455,36 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun navigateToAreaOverviewScreen(areaId: Int?) {
         areaId ?: return
 
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.area_overview_fragment) return
+
         val direction = MapFragmentDirections.navigateToAreaOverviewScreen(areaId = areaId)
 
         onTopoUnselected()
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     private fun navigateToSearchScreen() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.search_fragment) return
+
         onTopoUnselected()
-        findNavController().navigate(MapFragmentDirections.navigateToSearch())
+        navController.navigate(MapFragmentDirections.navigateToSearch())
     }
 
     private fun navigateToFullScreenProblemPhoto(problemId: Int, photoUri: String) {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.full_screen_photo_fragment) return
+
         val direction = MapFragmentDirections.showProblemPhotoFullScreen(
             problemId = problemId,
             photoUri = photoUri
         )
 
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {

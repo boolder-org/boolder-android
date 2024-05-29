@@ -10,6 +10,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import com.boolder.boolder.R
 import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.view.compose.BoolderTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -40,6 +41,15 @@ class DiscoverFragment : Fragment() {
         }
 
     private fun onDiscoverHeaderItemClicked(item: DiscoverHeaderItem) {
+        val navController = findNavController()
+        val targetDestinationIds = arrayOf(
+            R.id.levels_fragment,
+            R.id.dries_fast_fragment,
+            R.id.train_and_bike_fragment
+        )
+
+        if (navController.currentDestination?.id in targetDestinationIds) return
+
         val direction = when (item) {
             DiscoverHeaderItem.BEGINNER_GUIDE -> {
                 openBeginnerGuideArticle()
@@ -50,7 +60,7 @@ class DiscoverFragment : Fragment() {
             DiscoverHeaderItem.TRAIN_AND_BIKE -> DiscoverFragmentDirections.navigateToTrainAndBikeScreen()
         }
 
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     private fun openBeginnerGuideArticle() {
@@ -58,12 +68,16 @@ class DiscoverFragment : Fragment() {
     }
 
     private fun onAreaClicked(areaId: Int) {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.area_overview_fragment) return
+
         val direction = DiscoverFragmentDirections.navigateToAreaOverviewScreen(
             areaId = areaId,
             displayShowOnMapButton = true
         )
 
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     private fun onOpenPlayStorePage() {

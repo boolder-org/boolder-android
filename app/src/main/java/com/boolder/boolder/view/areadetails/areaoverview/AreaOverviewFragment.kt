@@ -60,15 +60,23 @@ class AreaOverviewFragment : Fragment() {
     }
 
     private fun onAreaProblemsCountClicked() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.area_problems_fragment) return
+
         val direction = AreaOverviewFragmentDirections.navigateToAreaProblemsScreen(areaId = args.areaId)
 
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     private fun onCircuitClicked(circuitId: Int) {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.area_circuit_fragment) return
+
         val direction = AreaOverviewFragmentDirections.navigateToAreaCircuitScreen(circuitId = circuitId)
 
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     private fun onPoiClicked(googleMapsUrl: String) {
