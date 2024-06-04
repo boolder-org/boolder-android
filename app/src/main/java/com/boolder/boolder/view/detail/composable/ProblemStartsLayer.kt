@@ -39,7 +39,7 @@ import kotlin.math.roundToInt
 internal fun ProblemStartsLayer(
     uiProblems: List<UiProblem>,
     selectedProblem: CompleteProblem?,
-    onProblemStartClicked: (CompleteProblem) -> Unit,
+    onProblemStartClicked: (Int) -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier,
     drawnElementsScaleFactor: Float = 1f
@@ -57,7 +57,7 @@ internal fun ProblemStartsLayer(
                         uiProblem = uiProblem,
                         scaleFactor = drawnElementsScaleFactor,
                         modifier = Modifier.clickable {
-                            onProblemStartClicked(uiProblem.completeProblem)
+                            onProblemStartClicked(uiProblem.completeProblem.problemWithLine.problem.id)
                         }
                     )
                 }

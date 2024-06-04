@@ -5,236 +5,64 @@ import android.content.Intent
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
-import android.view.LayoutInflater
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.Insets
-import androidx.core.net.toUri
-import androidx.core.view.isVisible
-import androidx.core.view.setPadding
-import androidx.core.view.updateLayoutParams
-import coil.load
-import com.boolder.boolder.R
-import com.boolder.boolder.databinding.ViewTopoBinding
-import com.boolder.boolder.domain.model.CircuitInfo
-import com.boolder.boolder.domain.model.CompleteProblem
-import com.boolder.boolder.domain.model.Problem
+import android.widget.FrameLayout
+import androidx.compose.ui.platform.ComposeView
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
-import com.boolder.boolder.domain.model.toUiProblem
 import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.detail.composable.CircuitControls
-import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
-import com.boolder.boolder.view.detail.composable.TopoFooter
-import com.boolder.boolder.view.detail.uimodel.UiProblem
+import com.boolder.boolder.view.detail.composable.TopoLayout
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
 
 class TopoView(
     context: Context,
     attrs: AttributeSet?
-) : ConstraintLayout(context, attrs) {
+) : FrameLayout(context, attrs) {
 
-    private val binding = ViewTopoBinding.inflate(LayoutInflater.from(context), this)
+    private val composeView = ComposeView(context).apply {
+        setContent {
+            BoolderTheme {
+                TopoLayout(
+                    topo = null,
+                    onProblemPhotoLoaded = {},
+                    onProblemStartClicked = {},
+                    onShowPhotoFullScreen = { _, _ -> },
+                    onVariantSelected = {},
+                    onCircuitProblemSelected = {},
+                    onBleauInfoClicked = {},
+                    onShareClicked = {},
+                    onSaveProblem = { _, _ -> },
+                    onUnsaveProblem = {}
+                )
+            }
+        }
+    }
 
-    private var uiProblems: List<UiProblem> = emptyList()
-
-    var onSelectProblemOnMap: ((problemId: String) -> Unit)? = null
-    var onCircuitProblemSelected: ((problemId: Int) -> Unit)? = null
-    var onShowProblemPhotoFullScreen: ((problemId: Int, photoUri: String) -> Unit)? = null
+    var topoCallbacks: TopoCallbacks? = null
     var tickedProblemSaver: TickedProblemSaver? = null
 
     init {
-        // Immediately set a footer content to avoid a bug on the bottom sheet not fully expanding
-        // on the first time it is expanded
-        binding.footerLayout.setContent {
-            BoolderTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(210.dp)
-                        .background(color = MaterialTheme.colorScheme.surface)
-                )
-            }
-        }
+        addView(composeView)
     }
 
     fun setTopo(topo: Topo) {
-        setUiProblems(
-            uiProblems = emptyList(),
-            selectedProblem = null
-        )
-
-        loadTopoImage(topo)
-
-        updateCircuitControls(circuitInfo = topo.circuitInfo)
-
-        topo.selectedCompleteProblem?.let { updateFooter(it.problemWithLine.problem) }
-    }
-
-    fun applyInsets(insets: Insets) {
-        binding.bottomInsetSpace.updateLayoutParams { height = insets.bottom }
-    }
-
-    private fun onProblemPictureLoaded(topo: Topo) {
-        val selectedProblem = topo.selectedCompleteProblem ?: return
-
-        val containerWidth = binding.picture.measuredWidth
-        val containerHeight = binding.picture.measuredHeight
-
-        val initialUiProblem = selectedProblem.toUiProblem(
-            containerWidthPx = containerWidth,
-            containerHeightPx = containerHeight
-        )
-
-        val otherUiProblems = topo.otherCompleteProblems.map {
-            it.toUiProblem(
-                containerWidthPx = containerWidth,
-                containerHeightPx = containerHeight
-            )
-        }
-
-        this.uiProblems = otherUiProblems + initialUiProblem
-
-        setUiProblems(
-            uiProblems = uiProblems,
-            selectedProblem = selectedProblem
-        )
-    }
-
-    private fun onProblemStartClicked(completeProblem: CompleteProblem) {
-        val problem = completeProblem.problemWithLine.problem
-
-        updateFooter(problem)
-        setUiProblems(
-            uiProblems = uiProblems,
-            selectedProblem = completeProblem
-        )
-        onSelectProblemOnMap?.invoke(problem.id.toString())
-    }
-
-    private fun onVariantSelected(variant: ProblemWithLine) {
-        val (selectedProblem, newUiProblems) = VariantSelector.selectVariantInProblemStarts(
-            selectedVariant = variant,
-            uiProblems = uiProblems,
-            containerWidth = binding.picture.measuredWidth,
-            containerHeight = binding.picture.measuredHeight
-        )
-
-        uiProblems = newUiProblems
-
-        selectedProblem?.let { updateFooter(it.problemWithLine.problem) }
-
-        setUiProblems(
-            uiProblems = uiProblems,
-            selectedProblem = selectedProblem
-        )
-
-        selectedProblem?.problemWithLine?.problem?.id?.toString()?.let { selectedProblemId ->
-            onSelectProblemOnMap?.invoke(selectedProblemId)
-        }
-    }
-
-    private fun updateCircuitControls(circuitInfo: CircuitInfo?) {
-        binding.circuitControlsComposeView.setContent {
-            circuitInfo ?: return@setContent
-
+        composeView.setContent {
             BoolderTheme {
-                CircuitControls(
-                    circuitInfo = circuitInfo,
-                    onPreviousProblemClicked = {
-                        circuitInfo.previousProblemId?.let { onCircuitProblemSelected?.invoke(it) }
+                TopoLayout(
+                    topo = topo,
+                    onProblemPhotoLoaded = { topoCallbacks?.onProblemPhotoLoaded() },
+                    onProblemStartClicked = { topoCallbacks?.onProblemStartClicked(it) },
+                    onShowPhotoFullScreen = { problemId, photoUri ->
+                        topoCallbacks?.onShowProblemPhotoFullScreen(problemId, photoUri)
                     },
-                    onNextProblemClicked = {
-                        circuitInfo.nextProblemId?.let { onCircuitProblemSelected?.invoke(it) }
-                    }
-                )
-            }
-        }
-    }
-
-    private fun updateFooter(problem: Problem) {
-        binding.footerLayout.setContent {
-            BoolderTheme {
-                TopoFooter(
-                    modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
-                    problem = problem,
+                    onVariantSelected = { topoCallbacks?.onVariantSelected(it) },
+                    onCircuitProblemSelected = { topoCallbacks?.onCircuitProblemSelected(it) },
                     onBleauInfoClicked = ::onBleauInfoClicked,
                     onShareClicked = ::onShareClicked,
-                    onSaveProblem = { problemId, tickType ->
-                        tickedProblemSaver?.onSaveProblem(problemId, tickType)
+                    onSaveProblem = { problemId, tickStatus ->
+                        tickedProblemSaver?.onSaveProblem(problemId, tickStatus)
                     },
                     onUnsaveProblem = { tickedProblemSaver?.onUnsaveProblem(it) }
-                )
-            }
-        }
-    }
-
-    private fun loadTopoImage(topo: Topo) {
-        binding.progressCircular.isVisible = true
-        binding.picture.setOnClickListener(null)
-
-        val imageUri = topo.imageFile?.let { Uri.fromFile(it) }
-            ?: topo.pictureUrl?.toUri()
-
-        binding.picture.load(imageUri) {
-            crossfade(true)
-            error(R.drawable.ic_placeholder)
-
-            listener(
-                onSuccess = { _, _ ->
-                    binding.picture.setPadding(0)
-                    binding.picture.setOnClickListener {
-                        imageUri ?: return@setOnClickListener
-
-                        val problemId = topo.selectedCompleteProblem
-                            ?.problemWithLine
-                            ?.problem
-                            ?.id
-                            ?: return@setOnClickListener
-
-                        onShowProblemPhotoFullScreen?.invoke(problemId, imageUri.toString())
-                    }
-                    binding.progressCircular.isVisible = false
-                    onProblemPictureLoaded(topo)
-                },
-                onError = { _, _ -> loadErrorPicture() }
-            )
-        }
-    }
-
-    private fun loadErrorPicture() {
-        binding.picture.setImageDrawable(
-            ContextCompat.getDrawable(context, R.drawable.ic_placeholder)
-                ?.mutate()
-                ?.apply { setTint(ContextCompat.getColor(context, R.color.onBackground)) }
-        )
-        binding.picture.setPadding(200)
-        binding.progressCircular.isVisible = false
-    }
-
-    private fun setUiProblems(
-        uiProblems: List<UiProblem>,
-        selectedProblem: CompleteProblem?
-    ) {
-        binding.problemStartsComposeView.setContent {
-            BoolderTheme {
-                ProblemStartsLayer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(4f / 3f),
-                    uiProblems = uiProblems,
-                    selectedProblem = selectedProblem,
-                    onProblemStartClicked = ::onProblemStartClicked,
-                    onVariantSelected = ::onVariantSelected
                 )
             }
         }
@@ -266,5 +94,13 @@ class TopoView(
         } catch (e: Exception) {
             Log.i("Bottom Sheet", "No apps can handle this kind of intent")
         }
+    }
+
+    interface TopoCallbacks {
+        fun onProblemPhotoLoaded()
+        fun onProblemStartClicked(problemId: Int)
+        fun onVariantSelected(variant: ProblemWithLine)
+        fun onCircuitProblemSelected(problemId: Int)
+        fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String)
     }
 }

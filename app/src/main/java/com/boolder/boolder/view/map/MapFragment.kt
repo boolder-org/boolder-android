@@ -136,7 +136,6 @@ class MapFragment : Fragment(), BoolderMapListener {
 
                 updateMargins(bottom = bottomMargin + systemInsets.bottom + bottomNavHeight)
             }
-            binding.topoView.applyInsets(systemInsets)
 
             insets
         }
@@ -177,14 +176,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
 
         binding.topoView.apply {
-            onSelectProblemOnMap = { problemId ->
-                mapView.selectProblem(problemId)
-                mapViewModel.updateCircuitControlsForProblem(problemId)
-            }
-            onCircuitProblemSelected = {
-                mapViewModel.fetchTopo(problemId = it, origin = TopoOrigin.CIRCUIT)
-            }
-            onShowProblemPhotoFullScreen = ::navigateToFullScreenProblemPhoto
+            topoCallbacks = mapViewModel
             tickedProblemSaver = mapViewModel
         }
 
@@ -226,10 +218,22 @@ class MapFragment : Fragment(), BoolderMapListener {
 
         mapViewModel.eventFlow.launchAndCollectIn(owner = viewLifecycleOwner) { event ->
             when (event) {
+                is MapViewModel.Event.SelectProblemOnMap -> mapView.selectProblem(event.problemId.toString())
                 is MapViewModel.Event.ShowAvailableCircuits -> showCircuitFilterBottomSheet(event)
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
+
+                is MapViewModel.Event.ShowProblemPhotoFullScreen -> navigateToFullScreenProblemPhoto(
+                    problemId = event.problemId,
+                    photoUri = event.photoUri
+                )
+
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
-                is MapViewModel.Event.ZoomOnCircuitStartProblem -> onProblemSelected(event.problemId, TopoOrigin.CIRCUIT)
+
+                is MapViewModel.Event.ZoomOnCircuitStartProblem -> onProblemSelected(
+                    problemId = event.problemId,
+                    origin = TopoOrigin.CIRCUIT
+                )
+
                 is MapViewModel.Event.ZoomOnArea -> flyToArea(event.area)
                 is MapViewModel.Event.WarnNoSavedProjects -> showNoSavedProjectsDialog()
                 is MapViewModel.Event.WarnNoTickedProblems -> showNoTickedProblemsDialog()
@@ -306,9 +310,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     override fun onDestroyView() {
         binding?.let {
             it.topoView.apply {
-                onSelectProblemOnMap = null
-                onCircuitProblemSelected = null
-                onShowProblemPhotoFullScreen = null
+                topoCallbacks = null
                 tickedProblemSaver = null
             }
 

@@ -89,7 +89,6 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.5.6")
 
     // Coil
-    implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Jetpack compose
