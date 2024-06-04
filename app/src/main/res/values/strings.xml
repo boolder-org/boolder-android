@@ -51,11 +51,12 @@
         <item quantity="other">%d variants</item>
     </plurals>
 
-    <string name="stepness_wall">Wall</string>
-    <string name="stepness_slab">Slab</string>
-    <string name="stepness_overhang">Overhang</string>
-    <string name="stepness_roof">Roof</string>
-    <string name="stepness_traverse">Traverse</string>
+    <string name="steepness_type">Type</string>
+    <string name="steepness_wall">Wall</string>
+    <string name="steepness_slab">Slab</string>
+    <string name="steepness_overhang">Overhang</string>
+    <string name="steepness_roof">Roof</string>
+    <string name="steepness_traverse">Traverse</string>
 
     <string name="topo_action_project_add">Add to projects</string>
     <string name="topo_action_project_remove">Remove from projects</string>

@@ -2,13 +2,14 @@ package com.boolder.boolder.utils.previewgenerator
 
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Steepness
 
 fun dummyProblem(
     id: Int = 1000,
     name: String = "The dummy problem",
     circuitNumber: String? = "10",
     circuitColor: String? = "RED",
-    steepness: String = "wall",
+    steepness: Steepness? = Steepness.WALL,
     sitStart: Boolean = true,
     featured: Boolean = false,
     areaName: String? = null,

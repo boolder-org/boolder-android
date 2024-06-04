@@ -72,7 +72,7 @@ fun TopoFooter(
         )
 
         TopoProblemSteepness(
-            steepness = Steepness.fromTextValue(problem.steepness),
+            steepness = problem.steepness,
             isSitStart = problem.sitStart,
             tickStatus = problem.tickStatus
         )
@@ -302,17 +302,17 @@ private class TopoFooterPreviewParameterProvider : PreviewParameterProvider<Prob
         dummyProblem(tickStatus = TickStatus.PROJECT),
         dummyProblem(tickStatus = TickStatus.SUCCEEDED),
         dummyProblem(
-            steepness = "",
+            steepness = null,
             sitStart = false,
             tickStatus = null
         ),
         dummyProblem(
-            steepness = "",
+            steepness = null,
             sitStart = false,
             tickStatus = TickStatus.PROJECT
         ),
         dummyProblem(
-            steepness = "",
+            steepness = null,
             sitStart = false,
             tickStatus = TickStatus.SUCCEEDED
         )

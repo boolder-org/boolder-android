@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.map.filter.circuit
+package com.boolder.boolder.view.map.filter.steepness
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,14 +8,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
 import com.boolder.boolder.view.map.MapFragment
 
-class CircuitFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
-
-    private val args by navArgs<CircuitFilterBottomSheetDialogFragmentArgs>()
+class SteepnessFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,23 +22,23 @@ class CircuitFilterBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragme
         ComposeView(inflater.context).apply {
             setContent {
                 BoolderTheme {
-                    CircuitFilterLayout(
-                        availableCircuits = args.availableCircuits.toList(),
-                        onCircuitSelected = ::onCircuitSelected
+                    SteepnessFilterLayout(
+                        onSteepnessClicked = ::onSteepnessClicked,
+                        onSteepnessReset = { onSteepnessClicked(-1) }
                     )
                 }
             }
         }
 
-    private fun onCircuitSelected(circuitId: Int) {
+    private fun onSteepnessClicked(steepnessIndex: Int) {
         setFragmentResult(
             requestKey = MapFragment.FILTER_REQUEST,
-            result = bundleOf(RESULT_CIRCUIT_ID to circuitId)
+            result = bundleOf(RESULT_STEEPNESS to steepnessIndex)
         )
         findNavController().popBackStack()
     }
 
     companion object {
-        const val RESULT_CIRCUIT_ID = "result_circuit_id"
+        const val RESULT_STEEPNESS = "steepness_filter_result"
     }
 }

@@ -48,11 +48,12 @@
         <item quantity="other">%d variantes</item>
     </plurals>
 
-    <string name="stepness_wall">Mur vertical</string>
-    <string name="stepness_slab">Dalle</string>
-    <string name="stepness_overhang">Dévers</string>
-    <string name="stepness_roof">Toit</string>
-    <string name="stepness_traverse">Traversée</string>
+    <string name="steepness_type">Type</string>
+    <string name="steepness_wall">Mur vertical</string>
+    <string name="steepness_slab">Dalle</string>
+    <string name="steepness_overhang">Dévers</string>
+    <string name="steepness_roof">Toit</string>
+    <string name="steepness_traverse">Traversée</string>
 
     <string name="topo_action_project_add">Ajouter en projet</string>
     <string name="topo_action_project_remove">Retirer des projets</string>

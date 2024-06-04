@@ -10,6 +10,7 @@ import com.boolder.boolder.data.userdatabase.entity.TickedProblemEntity
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.TickedProblem
 import com.boolder.boolder.utils.getLanguage
 
@@ -27,7 +28,7 @@ fun ProblemEntity.convert(
         circuitId = circuitId,
         circuitNumber = circuitNumber,
         circuitColor = circuitColor,
-        steepness = steepness,
+        steepness = Steepness.fromDatabaseValue(steepness),
         sitStart = sitStart,
         areaId = areaId,
         bleauInfoId = bleauInfoId,
@@ -48,7 +49,7 @@ fun ProblemWithAreaName.convert() = Problem(
     circuitId = problemEntity.circuitId,
     circuitNumber = problemEntity.circuitNumber,
     circuitColor = problemEntity.circuitColor,
-    steepness = problemEntity.steepness,
+    steepness = Steepness.fromDatabaseValue(problemEntity.steepness),
     sitStart = problemEntity.sitStart,
     areaId = problemEntity.areaId,
     bleauInfoId = problemEntity.bleauInfoId,
