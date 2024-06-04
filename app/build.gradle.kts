@@ -16,8 +16,8 @@ android {
         applicationId = "com.boolder.boolder"
         minSdk = 21
         targetSdk = 34
-        versionCode = 31 // bump when new version
-        versionName = "1.24.1" // bump when new version
+        versionCode = 32 // bump when new version
+        versionName = "1.25.0" // bump when new version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
