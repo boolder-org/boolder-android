@@ -1,4 +1,4 @@
-package com.boolder.boolder.view.map
+package com.boolder.boolder.domain
 
 import android.net.Uri
 import com.boolder.boolder.data.database.entity.ProblemEntity
@@ -7,7 +7,6 @@ import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.network.repository.TopoRepository
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
-import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
@@ -20,7 +19,8 @@ class TopoDataAggregator(
     private val problemRepository: ProblemRepository,
     private val lineRepository: LineRepository,
     private val tickedProblemRepository: TickedProblemRepository,
-    private val fileExplorer: FileExplorer
+    private val fileExplorer: FileExplorer,
+    private val circuitProblemsRetriever: CircuitProblemsRetriever
 ) {
 
     suspend fun aggregate(
@@ -62,7 +62,8 @@ class TopoDataAggregator(
             }
             ?: emptyList()
 
-        val (circuitPreviousProblemId, circuitNextProblemId) = getCircuitPreviousAndNextProblemIds(mainProblem)
+        val (circuitPreviousProblemId, circuitNextProblemId) = circuitProblemsRetriever
+            .getCircuitPreviousAndNextProblemIds(mainProblem)
 
         val hasValidPhoto = previousPhotoUri != null && previousPhotoWasProperlyLoaded
         val canShowProblemStarts = hasValidPhoto && previousPhotoUri == photoUri
@@ -140,34 +141,11 @@ class TopoDataAggregator(
         return otherProblemsWithLines.map { getCompleteProblem(it) }
     }
 
-    private suspend fun getCircuitPreviousAndNextProblemIds(
-        currentProblem: ProblemEntity
-    ): Pair<Int?, Int?> {
-        val circuitId = currentProblem.circuitId ?: return null to null
-
-        val currentCircuitNumber = try {
-            currentProblem.circuitNumber?.toInt()
-        } catch (e: Exception) {
-            null
-        } ?: return null to null
-
-        val previousProblemId = problemRepository.problemIdByCircuitAndNumber(
-            circuitId = circuitId,
-            circuitProblemNumber = currentCircuitNumber - 1
-        )
-
-        val nextProblemId = problemRepository.problemIdByCircuitAndNumber(
-            circuitId = circuitId,
-            circuitProblemNumber = currentCircuitNumber + 1
-        )
-
-        return previousProblemId to nextProblemId
-    }
-
     suspend fun updateCircuitControlsForProblem(problemId: Int): CircuitInfo? {
         val problem = problemRepository.problemById(problemId) ?: return null
 
-        val (previousProblemId, nextProblemId) = getCircuitPreviousAndNextProblemIds(problem)
+        val (previousProblemId, nextProblemId) = circuitProblemsRetriever
+            .getCircuitPreviousAndNextProblemIds(problem)
 
         return CircuitInfo(
             color = problem.circuitColorSafe,

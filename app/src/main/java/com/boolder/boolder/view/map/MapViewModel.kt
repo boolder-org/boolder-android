@@ -6,9 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
-import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
+import com.boolder.boolder.domain.CircuitProblemsRetriever
+import com.boolder.boolder.domain.TopoDataAggregator
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.domain.model.Circuit
@@ -38,11 +39,11 @@ import kotlinx.coroutines.launch
 class MapViewModel(
     private val areaRepository: AreaRepository,
     private val circuitRepository: CircuitRepository,
-    private val problemRepository: ProblemRepository,
     private val tickedProblemRepository: TickedProblemRepository,
     private val topoDataAggregator: TopoDataAggregator,
     private val resources: Resources,
-    private val boolderOfflineRepository: BoolderOfflineRepository
+    private val boolderOfflineRepository: BoolderOfflineRepository,
+    private val circuitProblemsRetriever: CircuitProblemsRetriever
 ) : ViewModel(),
     OfflineAreaDownloader,
     TopoView.TopoCallbacks,
@@ -332,10 +333,8 @@ class MapViewModel(
         viewModelScope.launch {
             val circuitId = _screenStateFlow.value.circuitState?.circuitId ?: return@launch
 
-            val problemId = problemRepository.problemIdByCircuitAndNumber(
-                circuitId = circuitId,
-                circuitProblemNumber = 1
-            ) ?: return@launch
+            val problemId = circuitProblemsRetriever.getCircuitStartProblemId(circuitId)
+                ?: return@launch
 
             _eventFlow.emit(Event.ZoomOnCircuitStartProblem(problemId))
         }

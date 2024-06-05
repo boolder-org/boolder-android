@@ -38,7 +38,7 @@ interface ProblemDao {
     )
     suspend fun problemIdByCircuitAndNumber(
         circuitId: Int,
-        circuitProblemNumber: Int
+        circuitProblemNumber: String
     ): Int?
 
     @Query("""

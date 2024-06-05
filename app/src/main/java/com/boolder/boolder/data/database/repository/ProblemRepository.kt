@@ -29,7 +29,7 @@ class ProblemRepository(
 
     suspend fun problemIdByCircuitAndNumber(
         circuitId: Int,
-        circuitProblemNumber: Int
+        circuitProblemNumber: String
     ): Int? =
         problemDao.problemIdByCircuitAndNumber(circuitId, circuitProblemNumber)
 
