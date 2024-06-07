@@ -30,9 +30,11 @@ import com.boolder.boolder.domain.model.TopoOrigin
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.containsCameraState
+import com.boolder.boolder.utils.extension.fontainebleauCameraOptions
 import com.boolder.boolder.utils.extension.getCameraOptions
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.extension.putCameraState
+import com.boolder.boolder.utils.extension.toCameraOptions
 import com.boolder.boolder.view.areadetails.KEY_AREA_ID
 import com.boolder.boolder.view.areadetails.KEY_CIRCUIT_ID
 import com.boolder.boolder.view.areadetails.KEY_PROBLEM
@@ -95,16 +97,9 @@ class MapFragment : Fragment(), BoolderMapListener {
     ): View {
         val fragmentMapBinding = FragmentMapBinding.inflate(inflater, container, false)
 
-        val cameraOptions = mapViewModel.cameraState?.let { cameraState ->
-            CameraOptions.Builder()
-                .center(cameraState.center)
-                .padding(cameraState.padding)
-                .zoom(cameraState.zoom)
-                .build()
-        } ?: CameraOptions.Builder()
-            .center(Point.fromLngLat(2.5968216, 48.3925623))
-            .zoom(10.2)
-            .build()
+        val cameraOptions = mapViewModel.cameraState
+            ?.toCameraOptions()
+            ?: fontainebleauCameraOptions()
 
         mapViewModel.cameraState = null
 
