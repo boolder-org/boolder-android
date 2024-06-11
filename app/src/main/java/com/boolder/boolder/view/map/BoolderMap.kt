@@ -2,7 +2,6 @@ package com.boolder.boolder.view.map
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -22,12 +21,17 @@ import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS_NAM
 import com.boolder.boolder.utils.MapboxStyleFactory.Companion.LAYER_PROBLEMS_TEXT
 import com.boolder.boolder.utils.extension.coerceZoomAtLeast
 import com.boolder.boolder.view.map.animator.animationEndListener
+import com.boolder.boolder.view.map.extension.getAreaBarAndFiltersHeight
+import com.boolder.boolder.view.map.extension.getAreaBarHeight
+import com.boolder.boolder.view.map.extension.getCircuitStartButtonHeight
+import com.boolder.boolder.view.map.extension.getDefaultMargin
+import com.boolder.boolder.view.map.extension.getTopoBottomSheetHeight
+import com.boolder.boolder.view.map.extension.getTopoBottomSheetHeightWithMargin
 import com.mapbox.bindgen.Expected
 import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapInitOptions
 import com.mapbox.maps.MapView
@@ -222,14 +226,17 @@ class BoolderMap(
 
                 if (feature.hasProperty("id") && feature.geometry() != null) {
                     selectProblem(feature.getNumberProperty("id").toString())
-                    listener?.onProblemSelected(
-                        problemId = feature.getNumberProperty("id").toInt(),
-                        origin = TopoOrigin.MAP
-                    )
 
                     // Move camera if problem is hidden by bottomSheet
-                    if (geometry.screenCoordinate.y >= (height / 2) - 100) {
+                    val yThreshold = height - resources.getTopoBottomSheetHeightWithMargin()
+
+                    if (geometry.screenCoordinate.y >= yThreshold) {
                         focusOnBoulderProblem(feature)
+                    } else {
+                        listener?.onProblemSelected(
+                            problemId = feature.getNumberProperty("id").toInt(),
+                            origin = TopoOrigin.MAP
+                        )
                     }
                 } else {
                     unselectProblem()
@@ -387,10 +394,13 @@ class BoolderMap(
         coordinates: List<Point>,
         areaId: Int?
     ) {
+        val topInset = insets.top + resources.getAreaBarAndFiltersHeight().toDouble()
+        val defaultInset = resources.getDefaultMargin().toDouble()
+
         val cameraOptions = mapboxMap.cameraForCoordinates(
             coordinates = coordinates,
             camera = CameraOptions.Builder().build(),
-            coordinatesPadding = EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            coordinatesPadding = EdgeInsets(topInset, defaultInset, defaultInset, defaultInset),
             maxZoom = null,
             offset = null
         )
@@ -409,16 +419,14 @@ class BoolderMap(
     }
 
     private fun zoomToCircuitBounds(circuitCoordinates: List<Point>) {
-        val defaultMarginPixels = 24.0 * resources.displayMetrics.density
+        val topInset = insets.top + resources.getAreaBarAndFiltersHeight().toDouble()
+        val bottomInset = resources.getCircuitStartButtonHeight().toDouble()
+        val defaultInset = resources.getDefaultMargin().toDouble()
+
         val cameraOptions = mapboxMap.cameraForCoordinates(
             coordinates = circuitCoordinates,
             camera = CameraOptions.Builder().build(),
-            coordinatesPadding = EdgeInsets(
-                140.0 * resources.displayMetrics.density + insets.top,
-                defaultMarginPixels,
-                88.0 * resources.displayMetrics.density + insets.bottom,
-                defaultMarginPixels
-            ),
+            coordinatesPadding = EdgeInsets(topInset, defaultInset, bottomInset, defaultInset),
             maxZoom = null,
             offset = null
         ).coerceZoomAtLeast(15.0)
@@ -444,14 +452,26 @@ class BoolderMap(
     }
 
     private fun focusOnBoulderProblem(feature: Feature) {
+        val topInset = insets.top + resources.getAreaBarHeight().toDouble()
+        val bottomInset = resources.getTopoBottomSheetHeight().toDouble()
+
         val cameraOptions = CameraOptions.Builder()
             .center(feature.geometry() as Point)
-            .padding(EdgeInsets(40.0, 8.8, (height / 2).toDouble(), 8.8))
+            .padding(EdgeInsets(topInset, 0.0, bottomInset, 0.0))
             .build()
 
         val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        mapboxMap.easeTo(cameraOptions, mapAnimationOption)
+        mapboxMap.easeTo(
+            cameraOptions = cameraOptions,
+            animationOptions = mapAnimationOption,
+            animatorListener = animationEndListener {
+                listener?.onProblemSelected(
+                    problemId = feature.getNumberProperty("id").toInt(),
+                    origin = TopoOrigin.MAP
+                )
+            }
+        )
     }
 
     fun applyInsets(insets: Insets) {

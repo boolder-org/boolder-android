@@ -3,6 +3,7 @@ package com.boolder.boolder.view.map
 import android.content.Context
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,10 @@ import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.MapControlsOverlay
+import com.boolder.boolder.view.map.extension.getAreaBarAndFiltersHeight
+import com.boolder.boolder.view.map.extension.getAreaBarHeight
+import com.boolder.boolder.view.map.extension.getDefaultMargin
+import com.boolder.boolder.view.map.extension.getTopoBottomSheetHeight
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT_ID
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment
@@ -82,6 +87,7 @@ class MapFragment : Fragment(), BoolderMapListener {
 
     private lateinit var mapView: BoolderMap
     private var pendingMapAction: (() -> Unit)? = null
+    private var topInset = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,6 +142,7 @@ class MapFragment : Fragment(), BoolderMapListener {
 
                 updateMargins(bottom = bottomMargin + systemInsets.bottom + bottomNavHeight)
             }
+            topInset = systemInsets.top
 
             insets
         }
@@ -381,6 +388,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     override fun onZoomLevelChanged(zoomLevel: Double) {
+        Log.d("wang", "Zoom value: $zoomLevel")
         mapViewModel.onZoomLevelChanged(zoomLevel)
     }
 
@@ -416,10 +424,13 @@ class MapFragment : Fragment(), BoolderMapListener {
             area.northEastLat.toDouble()
         )
 
+        val topInset = topInset + resources.getAreaBarAndFiltersHeight().toDouble()
+        val defaultInset = resources.getDefaultMargin().toDouble()
+
         val cameraOptions = mapView.mapboxMap.cameraForCoordinates(
             coordinates = listOf(southWest, northEast),
             camera = CameraOptions.Builder().build(),
-            coordinatesPadding = EdgeInsets(60.0, 8.0, 8.0, 8.0),
+            coordinatesPadding = EdgeInsets(topInset, defaultInset, defaultInset, defaultInset),
             maxZoom = null,
             offset = null
         )
@@ -448,8 +459,15 @@ class MapFragment : Fragment(), BoolderMapListener {
                 center(point)
             }
 
-            padding(EdgeInsets(40.0, 0.0, mapView.height / 2.0, 0.0))
-            zoom(if (zoomLevel <= 19.0) 20.0 else zoomLevel)
+            padding(
+                EdgeInsets(
+                    topInset + resources.getAreaBarHeight().toDouble(),
+                    0.0,
+                    resources.getTopoBottomSheetHeight().toDouble(),
+                    0.0
+                )
+            )
+            zoom(if (zoomLevel < 19.0) 19.0 else zoomLevel)
             build()
         }
 
