@@ -14,7 +14,6 @@ import com.boolder.boolder.view.discover.levels.beginner.BeginnerLevelsViewModel
 import com.boolder.boolder.view.discover.trainandbike.TrainAndBikeViewModel
 import com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoViewModel
 import com.boolder.boolder.view.map.MapViewModel
-import com.boolder.boolder.view.map.TopoDataAggregator
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModelImpl
@@ -23,7 +22,6 @@ import com.boolder.boolder.view.ticklist.TickListViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.binds
-import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val viewModelModule = module {
@@ -32,8 +30,6 @@ val viewModelModule = module {
     viewModelOf(::MapViewModel)
     viewModelOf(::SearchViewModel)
     factory { MapboxStyleFactory() }
-
-    factoryOf(::TopoDataAggregator)
 
     viewModelOf(::GradesFilterViewModel)
 

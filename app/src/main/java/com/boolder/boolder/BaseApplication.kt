@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.boolder.boolder.data.databaseModule
 import com.boolder.boolder.data.network.networkModule
+import com.boolder.boolder.domain.domainModule
 import com.boolder.boolder.view.viewModelModule
 import com.boolder.boolder.offline.worker.BoolderWorkerFactory
 import org.koin.android.ext.android.getKoin
@@ -27,6 +28,7 @@ class BaseApplication : Application() {
                     appModule,
                     databaseModule,
                     networkModule,
+                    domainModule,
                     viewModelModule
                 )
             )
