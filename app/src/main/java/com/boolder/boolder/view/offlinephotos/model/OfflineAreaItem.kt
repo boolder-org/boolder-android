@@ -10,5 +10,8 @@ data class OfflineAreaItem(
 sealed interface OfflineAreaItemStatus {
     data object NotDownloaded : OfflineAreaItemStatus
     data class Downloaded(val folderSize: String) : OfflineAreaItemStatus
-    data class Downloading(val areaId: Int) : OfflineAreaItemStatus
+    data class Downloading(
+        val progress: Float,
+        val progressDetail: String
+    ) : OfflineAreaItemStatus
 }

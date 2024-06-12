@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,25 +33,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.boolder.boolder.R
-import com.boolder.boolder.offline.DOWNLOAD_TERMINATED_STATUSES
 import com.boolder.boolder.offline.OfflineAreaDownloader
-import com.boolder.boolder.offline.WORK_DATA_PROGRESS
 import com.boolder.boolder.offline.dummyOfflineAreaDownloader
-import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
 import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
+import java.util.Locale
 
 @Composable
 internal fun AreaPhotosDownloadItem(
@@ -87,10 +80,7 @@ internal fun AreaPhotosDownloadItem(
         AnimatedVisibility(
             visible = status !is OfflineAreaItemStatus.NotDownloaded
         ) {
-            DownloadInfo(
-                status = status,
-                offlineAreaDownloader = offlineAreaDownloader
-            )
+            DownloadInfo(status = status)
         }
 
         OutlinedButton(
@@ -119,8 +109,8 @@ internal fun AreaPhotosDownloadItem(
                     tint = Color.BoolderOrange
                 )
             },
-            title = { Text(stringResource(id = R.string.area_overview_photos_deletion_dialog_title)) },
-            text = { Text(stringResource(id = R.string.area_overview_photos_deletion_dialog_text)) },
+            title = { Text(stringResource(id = R.string.photos_download_deletion_dialog_title)) },
+            text = { Text(stringResource(id = R.string.photos_download_deletion_dialog_text)) },
             onDismissRequest = { showDeletionDialog = false },
             confirmButton = {
                 TextButton(
@@ -128,13 +118,13 @@ internal fun AreaPhotosDownloadItem(
                         showDeletionDialog = false
                         offlineAreaDownloader.onDeleteAreaPhotos(areaId)
                     },
-                    content = { Text(stringResource(id = R.string.area_overview_photos_deletion_dialog_confirm_button)) }
+                    content = { Text(stringResource(id = R.string.photos_download_deletion_dialog_confirm_button)) }
                 )
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDeletionDialog = false },
-                    content = { Text(stringResource(id = R.string.area_overview_photos_deletion_dialog_cancel_button)) }
+                    content = { Text(stringResource(id = R.string.photos_download_deletion_dialog_cancel_button)) }
                 )
             }
         )
@@ -148,50 +138,16 @@ private data class AreaPhotosDownloadItemParam(
 )
 
 @Composable
-private fun DownloadInfo(
-    status: OfflineAreaItemStatus,
-    offlineAreaDownloader: OfflineAreaDownloader
-) {
+private fun DownloadInfo(status: OfflineAreaItemStatus) {
     when (status) {
         is OfflineAreaItemStatus.NotDownloaded -> Unit
-        is OfflineAreaItemStatus.Downloading -> DownloadInfoDownloading(
-            areaId = status.areaId,
-            offlineAreaDownloader = offlineAreaDownloader
-        )
+        is OfflineAreaItemStatus.Downloading -> DownloadInfoDownloading(status.progress)
         is OfflineAreaItemStatus.Downloaded -> DownloadInfoDownloaded(status.folderSize)
     }
-
 }
 
 @Composable
-private fun DownloadInfoDownloading(
-    areaId: Int,
-    offlineAreaDownloader: OfflineAreaDownloader
-) {
-    if (LocalInspectionMode.current) {
-        DownloadInfoDownloadingProgress(progress = .35f)
-    } else {
-        val workInfoList by WorkManager.getInstance(LocalContext.current)
-            .getWorkInfosForUniqueWorkLiveData(areaId.getDownloadTopoImagesWorkName())
-            .observeAsState()
-
-        if (workInfoList?.all { it.state in DOWNLOAD_TERMINATED_STATUSES } == true) {
-            offlineAreaDownloader.onAreaDownloadTerminated(areaId)
-        }
-
-        val workInfo = workInfoList
-            ?.firstOrNull { it.state == WorkInfo.State.RUNNING }
-            ?: return
-
-        val progress = workInfo.progress
-            .getFloat(WORK_DATA_PROGRESS, 0f)
-
-        DownloadInfoDownloadingProgress(progress = progress)
-    }
-}
-
-@Composable
-private fun DownloadInfoDownloadingProgress(progress: Float) {
+private fun DownloadInfoDownloading(progress: Float) {
     val infiniteTransition = rememberInfiniteTransition("rotationAngle")
     val rotationAngle by infiniteTransition.animateFloat(
         label = "rotationAngle",
@@ -225,7 +181,7 @@ private fun DownloadInfoDownloadingProgress(progress: Float) {
             )
 
             Text(
-                text = String.format("%.0f%%", progress * 100),
+                text = String.format(Locale.getDefault(), "%.0f%%", progress * 100),
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -281,7 +237,7 @@ private fun AreaPhotosDownloadItemPreview(
 private class AreaPhotosDownloadItemPreviewParameterProvider : PreviewParameterProvider<OfflineAreaItemStatus> {
     override val values = sequenceOf(
         OfflineAreaItemStatus.NotDownloaded,
-        OfflineAreaItemStatus.Downloading(areaId = 42),
+        OfflineAreaItemStatus.Downloading(progress = .4f, progressDetail = "4/10"),
         OfflineAreaItemStatus.Downloaded(folderSize = "33 MB")
     )
 }
