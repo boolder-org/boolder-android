@@ -132,24 +132,20 @@ private fun TopoProblemSteepness(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )
-
-            val steepnessText = stringResource(id = steepness.textRes)
-            val text = if (isSitStart) {
-                listOf(steepnessText, stringResource(id = R.string.sit_start))
-                    .joinToString(separator = " • ")
-            } else {
-                steepnessText
-            }
-
-            Text(
-                modifier = Modifier.weight(1f),
-                text = text,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp
-            )
-        } else {
-            Spacer(modifier = Modifier.weight(1f))
         }
+
+        val text = listOfNotNull(
+            steepness?.textRes?.let { stringResource(id = it) },
+            if (isSitStart) stringResource(id = R.string.sit_start) else null
+        ).joinToString(separator = " • ")
+
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 18.sp
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
 
         tickStatus?.let {
             val (iconRes, tintColor) = when (it) {
@@ -301,6 +297,33 @@ private class TopoFooterPreviewParameterProvider : PreviewParameterProvider<Prob
         dummyProblem(tickStatus = null),
         dummyProblem(tickStatus = TickStatus.PROJECT),
         dummyProblem(tickStatus = TickStatus.SUCCEEDED),
+        dummyProblem(
+            sitStart = false,
+            tickStatus = null
+        ),
+        dummyProblem(
+            sitStart = false,
+            tickStatus = TickStatus.PROJECT
+        ),
+        dummyProblem(
+            sitStart = false,
+            tickStatus = TickStatus.SUCCEEDED
+        ),
+        dummyProblem(
+            steepness = "",
+            sitStart = true,
+            tickStatus = null
+        ),
+        dummyProblem(
+            steepness = "",
+            sitStart = true,
+            tickStatus = TickStatus.PROJECT
+        ),
+        dummyProblem(
+            steepness = "",
+            sitStart = true,
+            tickStatus = TickStatus.SUCCEEDED
+        ),
         dummyProblem(
             steepness = "",
             sitStart = false,
