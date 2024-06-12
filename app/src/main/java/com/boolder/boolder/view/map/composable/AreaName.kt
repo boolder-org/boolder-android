@@ -13,21 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,18 +31,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.boolder.boolder.R
-import com.boolder.boolder.offline.WORK_DATA_PROGRESS
-import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
 import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.utils.previewgenerator.dummyOfflineAreaItem
 import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
-import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
-import kotlin.math.roundToInt
 
 @Composable
 internal fun AreaName(
@@ -94,8 +83,6 @@ internal fun AreaName(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-
-            AreaOfflineStatusInfo(item = offlineAreaItem)
         }
 
         Box {
@@ -128,68 +115,6 @@ private fun Modifier.iconActionModifier(onClick: () -> Unit) =
         .padding(8.dp)
         .size(24.dp)
 
-@Composable
-private fun AreaOfflineStatusInfo(item: OfflineAreaItem?) {
-    item ?: return
-
-    when (val status = item.status) {
-        is OfflineAreaItemStatus.NotDownloaded -> Unit
-        is OfflineAreaItemStatus.Downloading -> AreaDownloadProgress(areaId = status.areaId)
-        is OfflineAreaItemStatus.Downloaded -> IconDownloaded()
-    }
-}
-
-@Composable
-private fun AreaDownloadProgress(areaId: Int) {
-    if (LocalInspectionMode.current) {
-        AreaDownloadProgress(progress = .34f)
-        return
-    }
-
-    val workInfoList by WorkManager.getInstance(LocalContext.current)
-        .getWorkInfosForUniqueWorkLiveData(areaId.getDownloadTopoImagesWorkName())
-        .observeAsState()
-
-    val workInfo = workInfoList
-        ?.firstOrNull { it.state == WorkInfo.State.RUNNING }
-        ?: return
-
-    val progress = workInfo.progress
-        .getFloat(WORK_DATA_PROGRESS, 0f)
-
-    AreaDownloadProgress(progress = progress)
-}
-
-@Composable
-private fun AreaDownloadProgress(progress: Float) {
-    Row(
-        horizontalArrangement = spacedBy(2.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "${(progress * 100f).roundToInt()}%",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        CircularProgressIndicator(
-            modifier = Modifier.size(16.dp),
-            strokeCap = StrokeCap.Round
-        )
-    }
-}
-
-@Composable
-private fun IconDownloaded(
-    modifier: Modifier = Modifier
-) {
-    Icon(
-        modifier = modifier,
-        painter = painterResource(id = R.drawable.ic_download_done),
-        contentDescription = null,
-        tint = Color.Gray
-    )
-}
-
 @PreviewLightDark
 @Composable
 private fun AreaNamePreview(
@@ -207,19 +132,8 @@ private fun AreaNamePreview(
 
 class AreaNamePreviewParameterProvider : PreviewParameterProvider<OfflineAreaItem> {
 
-    override val values = listOf(
-        OfflineAreaItemStatus.NotDownloaded,
-        OfflineAreaItemStatus.Downloading(areaId = 0),
-        OfflineAreaItemStatus.Downloaded(folderSize = "50 MB")
+    override val values = sequenceOf(
+        dummyOfflineAreaItem(area = dummyArea(warning = null)),
+        dummyOfflineAreaItem()
     )
-        .flatMap {
-            listOf(
-                dummyOfflineAreaItem(
-                    area = dummyArea(warning = null),
-                    status = it
-                ),
-                dummyOfflineAreaItem(status = it)
-            )
-        }
-        .asSequence()
 }

@@ -23,5 +23,8 @@ fun Resources.getTopoBottomSheetHeightWithMargin(): Float =
 fun Resources.getCircuitStartButtonHeight(): Float =
     displayMetrics.density * (HEIGHT_DP_MARGIN_16 + HEIGHT_DP_CIRCUIT_START_BUTTON + HEIGHT_DP_MARGIN_16)
 
+fun Resources.getCircuitHorizontalMargin(): Float =
+    displayMetrics.density * HEIGHT_DP_MARGIN_16 * 4
+
 fun Resources.getDefaultMargin(): Float =
     displayMetrics.density * HEIGHT_DP_MARGIN_16

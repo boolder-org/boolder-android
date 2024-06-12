@@ -21,6 +21,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.domain.model.Area
+import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.offline.dummyOfflineAreaDownloader
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.composable.OfflinePhotosAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
@@ -29,10 +31,7 @@ import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 @Composable
 fun OfflinePhotosScreen(
     screenState: OfflinePhotosViewModel.ScreenState,
-    onDownloadAreaClicked: (Int) -> Unit,
-    onDownloadTerminated: (Int) -> Unit,
-    onCancelDownload: (Int) -> Unit,
-    onDeleteAreaClicked: (Int) -> Unit,
+    offlineAreaDownloader: OfflineAreaDownloader,
     modifier: Modifier = Modifier
 ) {
     val internalModifier = modifier
@@ -45,10 +44,7 @@ fun OfflinePhotosScreen(
         OfflinePhotosScreenContent(
             modifier = internalModifier,
             screenState = screenState,
-            onDownloadAreaClicked = onDownloadAreaClicked,
-            onDownloadTerminated = onDownloadTerminated,
-            onCancelDownload = onCancelDownload,
-            onDeleteAreaClicked = onDeleteAreaClicked
+            offlineAreaDownloader = offlineAreaDownloader
         )
     }
 }
@@ -68,10 +64,7 @@ private fun OfflinePhotosScreenLoading(
 @Composable
 private fun OfflinePhotosScreenContent(
     screenState: OfflinePhotosViewModel.ScreenState,
-    onDownloadAreaClicked: (Int) -> Unit,
-    onDownloadTerminated: (Int) -> Unit,
-    onCancelDownload: (Int) -> Unit,
-    onDeleteAreaClicked: (Int) -> Unit,
+    offlineAreaDownloader: OfflineAreaDownloader,
     modifier: Modifier = Modifier
 ) {
     val systemBarsInsets = WindowInsets.systemBars.asPaddingValues()
@@ -93,10 +86,9 @@ private fun OfflinePhotosScreenContent(
             OfflinePhotosAreaItem(
                 areaName = it.area.name,
                 status = it.status,
-                onDownloadClicked = { onDownloadAreaClicked(it.area.id) },
-                onDownloadTerminated = { onDownloadTerminated(it.area.id) },
-                onCancelDownload = { onCancelDownload(it.area.id) },
-                onDeleteClicked = { onDeleteAreaClicked(it.area.id) }
+                onDownloadClicked = { offlineAreaDownloader.onDownloadArea(it.area.id) },
+                onCancelDownload = { offlineAreaDownloader.onCancelAreaDownload(it.area.id) },
+                onDeleteClicked = { offlineAreaDownloader.onDeleteAreaPhotos(it.area.id) }
             )
         }
     }
@@ -111,10 +103,7 @@ private fun OfflinePhotosScreenPreview(
     BoolderTheme {
         OfflinePhotosScreen(
             screenState = screenState,
-            onDownloadAreaClicked = {},
-            onDownloadTerminated = {},
-            onCancelDownload = {},
-            onDeleteAreaClicked = {}
+            offlineAreaDownloader = dummyOfflineAreaDownloader()
         )
     }
 }
@@ -145,7 +134,7 @@ private class OfflinePhotosScreenPreviewParameterProvider :
                 area = area,
                 status = when {
                     index < 4 -> OfflineAreaItemStatus.Downloaded(folderSize = "50 MB")
-                    index < 5 -> OfflineAreaItemStatus.Downloading(areaId = 48)
+                    index < 5 -> OfflineAreaItemStatus.Downloading(progress = .4f, progressDetail = "4/10")
                     else -> OfflineAreaItemStatus.NotDownloaded
                 }
             )

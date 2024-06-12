@@ -83,4 +83,18 @@ interface AreaDao {
         ORDER BY lines.topo_id ASC
     """)
     suspend fun getAllTopoIdsForArea(areaId: Int): List<Int>
+
+    @Query("""
+        SELECT id FROM areas 
+        WHERE north_east_lat > :latSouth AND :latNorth > south_west_lat
+            AND north_east_lon > :lonWest AND :lonEast > south_west_lon
+        ORDER BY priority ASC, name ASC
+        LIMIT 5
+    """)
+    suspend fun getIntersectingAreaIds(
+        latNorth: Float,
+        latSouth: Float,
+        lonEast: Float,
+        lonWest: Float
+    ): List<Int>
 }

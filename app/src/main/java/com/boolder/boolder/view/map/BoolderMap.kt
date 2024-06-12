@@ -23,6 +23,7 @@ import com.boolder.boolder.utils.extension.coerceZoomAtLeast
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.extension.getAreaBarAndFiltersHeight
 import com.boolder.boolder.view.map.extension.getAreaBarHeight
+import com.boolder.boolder.view.map.extension.getCircuitHorizontalMargin
 import com.boolder.boolder.view.map.extension.getCircuitStartButtonHeight
 import com.boolder.boolder.view.map.extension.getDefaultMargin
 import com.boolder.boolder.view.map.extension.getTopoBottomSheetHeight
@@ -421,12 +422,12 @@ class BoolderMap(
     private fun zoomToCircuitBounds(circuitCoordinates: List<Point>) {
         val topInset = insets.top + resources.getAreaBarAndFiltersHeight().toDouble()
         val bottomInset = resources.getCircuitStartButtonHeight().toDouble()
-        val defaultInset = resources.getDefaultMargin().toDouble()
+        val lateralInset = resources.getCircuitHorizontalMargin().toDouble()
 
         val cameraOptions = mapboxMap.cameraForCoordinates(
             coordinates = circuitCoordinates,
             camera = CameraOptions.Builder().build(),
-            coordinatesPadding = EdgeInsets(topInset, defaultInset, bottomInset, defaultInset),
+            coordinatesPadding = EdgeInsets(topInset, lateralInset, bottomInset, lateralInset),
             maxZoom = null,
             offset = null
         ).coerceZoomAtLeast(15.0)
