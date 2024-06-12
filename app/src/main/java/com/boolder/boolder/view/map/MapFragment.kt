@@ -332,7 +332,9 @@ class MapFragment : Fragment(), BoolderMapListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putCameraState(mapView.mapboxMap.cameraState)
+        if (::mapView.isInitialized) {
+            outState.putCameraState(mapView.mapboxMap.cameraState)
+        }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -371,12 +373,16 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     override fun onPoiSelected(poiName: String, googleMapsUrl: String) {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.dialog_poi) return
+
         val direction = MapFragmentDirections.showPoi(
             poiName = poiName,
             googleMapsUrl = googleMapsUrl
         )
 
-        findNavController().navigate(direction)
+        navController.navigate(direction)
     }
 
     override fun onAreaVisited(areaId: Int) {
