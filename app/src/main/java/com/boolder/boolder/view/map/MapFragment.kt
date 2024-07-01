@@ -3,11 +3,9 @@ package com.boolder.boolder.view.map
 import android.content.Context
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
@@ -17,8 +15,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.postDelayed
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.boolder.boolder.R
@@ -136,12 +132,6 @@ class MapFragment : Fragment(), BoolderMapListener {
             val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
             mapView.applyInsets(systemInsets)
-            binding.fabLocation.updateLayoutParams<MarginLayoutParams> {
-                val bottomMargin = resources.getDimensionPixelSize(R.dimen.margin_map_controls)
-                val bottomNavHeight = resources.getDimensionPixelSize(R.dimen.height_bottom_nav_bar)
-
-                updateMargins(bottom = bottomMargin + systemInsets.bottom + bottomNavHeight)
-            }
             topInset = systemInsets.top
 
             insets
@@ -178,10 +168,6 @@ class MapFragment : Fragment(), BoolderMapListener {
             }
         }
 
-        binding.fabLocation.setOnClickListener {
-            locationProvider.askForPosition()
-        }
-
         binding.topoView.apply {
             topoCallbacks = mapViewModel
             tickedProblemSaver = mapViewModel
@@ -207,7 +193,9 @@ class MapFragment : Fragment(), BoolderMapListener {
                         onHideAreaName = ::onAreaLeft,
                         onAreaInfoClicked = { navigateToAreaOverviewScreen(screenState.areaState?.area?.id) },
                         onSearchBarClicked = ::navigateToSearchScreen,
-                        onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked
+                        onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked,
+                        onDownloadAreaClicked = mapViewModel::onDownloadAreaClicked,
+                        onFindMyPositionClicked = locationProvider::askForPosition
                     )
                 }
             }
@@ -233,6 +221,8 @@ class MapFragment : Fragment(), BoolderMapListener {
                     problemId = event.problemId,
                     photoUri = event.photoUri
                 )
+
+                is MapViewModel.Event.ShowAreaDownloadOptions -> showDownloadAreaBottomSheet(event)
 
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
 
@@ -394,7 +384,6 @@ class MapFragment : Fragment(), BoolderMapListener {
     }
 
     override fun onZoomLevelChanged(zoomLevel: Double) {
-        Log.d("wang", "Zoom value: $zoomLevel")
         mapViewModel.onZoomLevelChanged(zoomLevel)
     }
 
@@ -548,6 +537,19 @@ class MapFragment : Fragment(), BoolderMapListener {
         if (navController.currentDestination?.id == R.id.dialog_grades_filter) return
 
         val direction = MapFragmentDirections.showGradesFilter(gradeRange = event.currentGradeRange)
+
+        navController.navigate(direction)
+    }
+
+    private fun showDownloadAreaBottomSheet(event: MapViewModel.Event.ShowAreaDownloadOptions) {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id == R.id.dialog_area_download) return
+
+        val direction = MapFragmentDirections.showAreaDownloadBottomSheet(
+            areaId = event.areaId,
+            nearbyAreaIds = event.nearbyAreaIds.toIntArray()
+        )
 
         navController.navigate(direction)
     }

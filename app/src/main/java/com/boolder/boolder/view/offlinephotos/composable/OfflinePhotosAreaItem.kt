@@ -16,29 +16,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.boolder.boolder.R
-import com.boolder.boolder.offline.DOWNLOAD_TERMINATED_STATUSES
-import com.boolder.boolder.offline.WORK_DATA_PROGRESS
-import com.boolder.boolder.offline.WORK_DATA_PROGRESS_DETAIL
-import com.boolder.boolder.offline.getDownloadTopoImagesWorkName
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 
@@ -47,7 +36,6 @@ fun OfflinePhotosAreaItem(
     areaName: String,
     status: OfflineAreaItemStatus,
     onDownloadClicked: () -> Unit,
-    onDownloadTerminated: () -> Unit,
     onCancelDownload: () -> Unit,
     onDeleteClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -69,8 +57,8 @@ fun OfflinePhotosAreaItem(
         is OfflineAreaItemStatus.Downloading -> OfflinePhotosAreaDownloadingItem(
             modifier = internalModifier,
             areaName = areaName,
-            areaId = status.areaId,
-            onDownloadTerminated = onDownloadTerminated,
+            progress = status.progress,
+            progressDetail = status.progressDetail,
             onCancelDownload = onCancelDownload
         )
 
@@ -108,7 +96,7 @@ private fun OfflinePhotosAreaNotDownloadedItem(
                 .padding(8.dp),
             painter = painterResource(id = R.drawable.ic_download_for_offline),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -116,8 +104,8 @@ private fun OfflinePhotosAreaNotDownloadedItem(
 @Composable
 private fun OfflinePhotosAreaDownloadingItem(
     areaName: String,
-    areaId: Int,
-    onDownloadTerminated: () -> Unit,
+    progress: Float,
+    progressDetail: String,
     onCancelDownload: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -129,57 +117,22 @@ private fun OfflinePhotosAreaDownloadingItem(
             .fillMaxWidth()
             .height(56.dp)
 
-        if (LocalInspectionMode.current) {
-            Box(
-                modifier = progressModifier
-                    .graphicsLayer {
-                        transformOrigin = TransformOrigin(0f, 0f)
-                        scaleX = .4f
-                    }
-                    .background(color = Color.Gray.copy(alpha = .3f))
-            )
+        Box(
+            modifier = progressModifier
+                .graphicsLayer {
+                    transformOrigin = TransformOrigin(0f, 0f)
+                    scaleX = progress
+                }
+                .background(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .3f)
+                )
+        )
 
-            OfflinePhotosAreaDownloadingItemContent(
-                areaName = areaName,
-                progressDetail = "4/10",
-                onCancelDownload = {}
-            )
-        } else {
-            val workInfoList by WorkManager.getInstance(LocalContext.current)
-                .getWorkInfosForUniqueWorkLiveData(areaId.getDownloadTopoImagesWorkName())
-                .observeAsState()
-
-            if (workInfoList?.all { it.state in DOWNLOAD_TERMINATED_STATUSES } == true) {
-                onDownloadTerminated()
-            }
-
-            val workInfo = workInfoList
-                ?.firstOrNull { it.state == WorkInfo.State.RUNNING }
-                ?: return@Box
-
-            val progress = workInfo.progress
-                .getFloat(WORK_DATA_PROGRESS, 0f)
-
-            Box(
-                modifier = progressModifier
-                    .graphicsLayer {
-                        transformOrigin = TransformOrigin(0f, 0f)
-                        scaleX = progress
-                    }
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .3f)
-                    )
-            )
-
-            val progressDetail = workInfo.progress
-                .getString(WORK_DATA_PROGRESS_DETAIL)
-
-            OfflinePhotosAreaDownloadingItemContent(
-                areaName = areaName,
-                progressDetail = progressDetail,
-                onCancelDownload = onCancelDownload
-            )
-        }
+        OfflinePhotosAreaDownloadingItemContent(
+            areaName = areaName,
+            progressDetail = progressDetail,
+            onCancelDownload = onCancelDownload
+        )
     }
 }
 
@@ -298,7 +251,6 @@ private fun OfflinePhotosAreaItemPreview(
             areaName = "Apremont",
             status = status,
             onDownloadClicked = {},
-            onDownloadTerminated = {},
             onCancelDownload = {},
             onDeleteClicked = {}
         )
@@ -309,7 +261,7 @@ private class OfflinePhotosAreaItemPreviewParameterProvider :
     PreviewParameterProvider<OfflineAreaItemStatus> {
     override val values = sequenceOf(
         OfflineAreaItemStatus.NotDownloaded,
-        OfflineAreaItemStatus.Downloading(areaId = 7),
+        OfflineAreaItemStatus.Downloading(progress = .7f, progressDetail = "7/10"),
         OfflineAreaItemStatus.Downloaded(folderSize = "50 MB"),
     )
 }

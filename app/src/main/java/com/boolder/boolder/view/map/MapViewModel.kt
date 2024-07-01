@@ -29,11 +29,14 @@ import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
 import com.mapbox.maps.CameraState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MapViewModel(
@@ -77,6 +80,9 @@ class MapViewModel(
         max = ALL_GRADES.last(),
         isCustom = false
     )
+
+    private var offlineAreaStatusJob: Job? = null
+    private var nearbyAreaIds: List<Int> = emptyList()
 
     private var lastZoomValue = 0.0
     private var isProblemTopoShown = false
@@ -177,30 +183,53 @@ class MapViewModel(
     fun onAreaVisited(areaId: Int) {
         viewModelScope.launch {
             val currentAreaState = _screenStateFlow.value.areaState
-            val currentCircuitState = _screenStateFlow.value.circuitState
 
             if (currentAreaState?.area?.id == areaId) return@launch
 
+            nearbyAreaIds = emptyList()
+            offlineAreaStatusJob?.cancel()
+
+            val newCircuitState = if (currentAreaState?.area == null) {
+                _screenStateFlow.value.circuitState
+            } else {
+                null
+            }
+
+            _screenStateFlow.update { it.copy(circuitState = newCircuitState) }
+
             val area = areaRepository.getAreaById(areaId) ?: return@launch
 
-            val offlineStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
+            offlineAreaStatusJob = viewModelScope.launch {
+                nearbyAreaIds = areaRepository.getNearbyAreaIds(area)
 
-            val newAreaState = OfflineAreaItem(
-                area = area,
-                status = offlineStatus
-            )
-            val newCircuitState = if (currentAreaState?.area == null) currentCircuitState else null
+                combine(
+                    flows = (listOf(areaId) + nearbyAreaIds)
+                        .map { boolderOfflineRepository.getStatusForAreaIdFlow(it) },
+                    transform = { statuses ->
+                        when {
+                            statuses.any { it is OfflineAreaItemStatus.Downloading } -> OfflineAreaItemStatus.Downloading(.5f, "")
+                            statuses.first() is OfflineAreaItemStatus.Downloaded -> OfflineAreaItemStatus.Downloaded("")
+                            else -> OfflineAreaItemStatus.NotDownloaded
+                        }
+                    }
+                ).collect { offlineStatus ->
+                    if (!isActive) return@collect
 
-            _screenStateFlow.update {
-                it.copy(
-                    areaState = newAreaState,
-                    circuitState = newCircuitState
-                )
+                    val newAreaState = OfflineAreaItem(
+                        area = area,
+                        status = offlineStatus
+                    )
+
+                    _screenStateFlow.update { it.copy(areaState = newAreaState) }
+                }
             }
         }
     }
 
     fun onAreaLeft() {
+        offlineAreaStatusJob?.cancel()
+        nearbyAreaIds = emptyList()
+
         _screenStateFlow.value.areaState ?: return
 
         _screenStateFlow.update {
@@ -340,20 +369,25 @@ class MapViewModel(
         }
     }
 
+    fun onDownloadAreaClicked() {
+        viewModelScope.launch {
+            val currentAreaId = _screenStateFlow.value.areaState?.area?.id ?: return@launch
+
+            val event = Event.ShowAreaDownloadOptions(
+                areaId = currentAreaId,
+                nearbyAreaIds = nearbyAreaIds
+            )
+
+            _eventFlow.emit(event)
+        }
+    }
+
     // region OfflineAreaDownloader
 
     override fun onDownloadArea(areaId: Int) {
         val currentAreaState = _screenStateFlow.value.areaState ?: return
 
         if (currentAreaState.area.id != areaId) return
-
-        _screenStateFlow.update {
-            it.copy(
-                areaState = currentAreaState.copy(
-                    status = OfflineAreaItemStatus.Downloading(areaId)
-                )
-            )
-        }
 
         boolderOfflineRepository.downloadArea(areaId)
     }
@@ -365,28 +399,6 @@ class MapViewModel(
 
         boolderOfflineRepository.cancelAreaDownload(areaId)
         boolderOfflineRepository.deleteArea(areaId)
-
-        _screenStateFlow.update {
-            it.copy(
-                areaState = currentAreaState.copy(
-                    status = OfflineAreaItemStatus.NotDownloaded
-                )
-            )
-        }
-    }
-
-    override fun onAreaDownloadTerminated(areaId: Int) {
-        val currentAreaState = _screenStateFlow.value.areaState ?: return
-
-        if (currentAreaState.area.id != areaId) return
-
-        _screenStateFlow.update {
-            it.copy(
-                areaState = currentAreaState.copy(
-                    status = OfflineAreaItemStatus.Downloaded(folderSize = "")
-                )
-            )
-        }
     }
 
     override fun onDeleteAreaPhotos(areaId: Int) {
@@ -551,6 +563,11 @@ class MapViewModel(
         data class ShowProblemPhotoFullScreen(
             val problemId: Int,
             val photoUri: String
+        ) : Event
+
+        data class ShowAreaDownloadOptions(
+            val areaId: Int,
+            val nearbyAreaIds: List<Int>
         ) : Event
 
         data class ZoomOnCircuit(val circuit: Circuit) : Event
