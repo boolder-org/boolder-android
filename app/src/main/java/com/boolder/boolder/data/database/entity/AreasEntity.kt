@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
         orders = [Index.Order.ASC]
     )]
 )
-data class AreasEntity(
+data class AreaEntity(
     @PrimaryKey
     val id: Int,
     val name: String,
@@ -56,5 +56,9 @@ data class AreasEntity(
     val level8Count: Int,
     @ColumnInfo(name = "problems_count")
     val problemsCount: Int,
+    @ColumnInfo(name = "cluster_id")
+    val clusterId: Int?,
+    @ColumnInfo(name = "download_size")
+    val downloadSize: Float
 )
 

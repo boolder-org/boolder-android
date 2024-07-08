@@ -1,7 +1,7 @@
 package com.boolder.boolder.domain
 
 import com.boolder.boolder.R
-import com.boolder.boolder.data.database.entity.AreasEntity
+import com.boolder.boolder.data.database.entity.AreaEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.ProblemWithAreaName
@@ -62,7 +62,7 @@ fun LineEntity.convert(): Line {
     return Line(id, problemId, topoId, coordinates)
 }
 
-fun AreasEntity.convert(): Area {
+fun AreaEntity.convert(): Area {
     val (description, warning) = when (getLanguage()) {
         "fr" -> descriptionFr to warningFr
         else -> descriptionEn to warningEn

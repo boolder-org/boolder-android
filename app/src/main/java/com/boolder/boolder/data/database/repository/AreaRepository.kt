@@ -1,7 +1,7 @@
 package com.boolder.boolder.data.database.repository
 
 import com.boolder.boolder.data.database.dao.AreaDao
-import com.boolder.boolder.data.database.entity.AreasEntity
+import com.boolder.boolder.data.database.entity.AreaEntity
 import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.AccessFromPoi
 import com.boolder.boolder.domain.model.Area
@@ -14,7 +14,7 @@ class AreaRepository(
     private val areaDao: AreaDao
 ) {
 
-    suspend fun areasByName(name: String): List<AreasEntity> =
+    suspend fun areasByName(name: String): List<AreaEntity> =
         areaDao.areasByName(name)
 
     suspend fun getAreaById(id: Int): Area? =

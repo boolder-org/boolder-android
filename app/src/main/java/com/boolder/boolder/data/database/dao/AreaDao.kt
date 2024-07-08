@@ -3,7 +3,7 @@ package com.boolder.boolder.data.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import com.boolder.boolder.data.database.entity.AccessFromPoi
-import com.boolder.boolder.data.database.entity.AreasEntity
+import com.boolder.boolder.data.database.entity.AreaEntity
 import com.boolder.boolder.domain.model.AreasEntityWithBeginnerCircuitsCount
 import com.boolder.boolder.domain.model.TrainStationPoiWithBikeRoutes
 
@@ -11,16 +11,16 @@ import com.boolder.boolder.domain.model.TrainStationPoiWithBikeRoutes
 interface AreaDao {
 
     @Query("SELECT * FROM areas WHERE name_searchable LIKE :name ORDER BY priority ASC LIMIT 10")
-    suspend fun areasByName(name: String): List<AreasEntity>
+    suspend fun areasByName(name: String): List<AreaEntity>
 
     @Query("SELECT * FROM areas WHERE id = :id")
-    suspend fun getAreaById(id: Int): AreasEntity?
+    suspend fun getAreaById(id: Int): AreaEntity?
 
     @Query("SELECT * FROM areas ORDER BY name COLLATE UNICODE")
-    suspend fun getAllAreas(): List<AreasEntity>
+    suspend fun getAllAreas(): List<AreaEntity>
 
     @Query("SELECT * FROM areas ORDER BY problems_count DESC")
-    suspend fun getAllAreasByProblemsCount(): List<AreasEntity>
+    suspend fun getAllAreasByProblemsCount(): List<AreaEntity>
 
     @Query("""
         SELECT 
@@ -45,7 +45,7 @@ interface AreaDao {
         WHERE tags LIKE '%' || :tag || '%'
         ORDER BY problems_count DESC
     """)
-    suspend fun getTaggedAreas(tag: String): List<AreasEntity>
+    suspend fun getTaggedAreas(tag: String): List<AreaEntity>
 
     @Query("""
         SELECT 
