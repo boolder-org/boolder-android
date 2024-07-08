@@ -6,7 +6,7 @@ import com.boolder.boolder.data.database.dao.AreaDao
 import com.boolder.boolder.data.database.dao.CircuitDao
 import com.boolder.boolder.data.database.dao.LineDao
 import com.boolder.boolder.data.database.dao.ProblemDao
-import com.boolder.boolder.data.database.entity.AreasEntity
+import com.boolder.boolder.data.database.entity.AreaEntity
 import com.boolder.boolder.data.database.entity.CircuitEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.PoiEntity
@@ -15,14 +15,14 @@ import com.boolder.boolder.data.database.entity.ProblemEntity
 
 @Database(
     entities = [
-        AreasEntity::class,
+        AreaEntity::class,
         CircuitEntity::class,
         LineEntity::class,
         PoiEntity::class,
         PoiRouteEntity::class,
         ProblemEntity::class
     ],
-    version = 23, // increment version number everytime the boolder.db database changes (schema or data)
+    version = 24, // increment version number everytime the boolder.db database changes (schema or data)
     exportSchema = true
 )
 abstract class BoolderAppDatabase : RoomDatabase() {
