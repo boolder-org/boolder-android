@@ -5,5 +5,6 @@ import org.koin.dsl.module
 
 val domainModule = module {
     factoryOf(::TopoDataAggregator)
+    factoryOf(::PhotoUriRetriever)
     factoryOf(::CircuitProblemsRetriever)
 }

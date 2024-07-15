@@ -1,25 +1,21 @@
 package com.boolder.boolder.domain
 
-import android.net.Uri
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.circuitColorSafe
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
-import com.boolder.boolder.data.network.repository.TopoRepository
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
 import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
-import com.boolder.boolder.offline.FileExplorer
 
 class TopoDataAggregator(
-    private val topoRepository: TopoRepository,
     private val problemRepository: ProblemRepository,
     private val lineRepository: LineRepository,
     private val tickedProblemRepository: TickedProblemRepository,
-    private val fileExplorer: FileExplorer,
+    private val photoUriRetriever: PhotoUriRetriever,
     private val circuitProblemsRetriever: CircuitProblemsRetriever
 ) {
 
@@ -38,13 +34,9 @@ class TopoDataAggregator(
         val mainLine = lineRepository.loadByProblemId(problemId)
         val topoId = mainLine?.topoId
 
-        val imageFileUri = topoId
-            ?.let { fileExplorer.getTopoImageFile(areaId = mainProblem.areaId, topoId = it) }
-            ?.let(Uri::fromFile)
-
-        val photoUrl = topoId?.let { topoRepository.getTopoPictureById(it) }
-
-        val photoUri = (imageFileUri ?: photoUrl).toString()
+        val photoUri = topoId?.let {
+            photoUriRetriever.getPhotoUri(topoId = it, areaId = mainProblem.areaId)
+        }
 
         val mainProblemAndLine = ProblemWithLine(
             problem = mainProblem.convert(tickStatus = mainProblemTickStatus),
