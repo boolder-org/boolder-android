@@ -254,10 +254,13 @@
         android:name="com.boolder.boolder.view.map.areadownload.AreaDownloadBottomSheetDialog"
         android:label="Area download bottom sheet dialog">
         <argument
-            android:name="area_id"
+            android:name="cluster_id"
             app:argType="integer" />
         <argument
-            android:name="nearby_area_ids"
+            android:name="closest_area_id"
+            app:argType="integer" />
+        <argument
+            android:name="area_ids"
             app:argType="integer[]" />
     </dialog>
 

@@ -63,23 +63,6 @@ class AreaRepository(
     suspend fun getAllTopoIdsForArea(areaId: Int): List<Int> =
         areaDao.getAllTopoIdsForArea(areaId)
 
-    suspend fun getNearbyAreaIds(area: Area): List<Int> =
-        areaDao.getIntersectingAreaIds(
-            latNorth = area.northEastLat + NEARBY_THRESHOLD_IN_LATITUDE_DEGREES,
-            latSouth = area.southWestLat - NEARBY_THRESHOLD_IN_LATITUDE_DEGREES,
-            lonWest = area.southWestLon - NEARBY_THRESHOLD_IN_LONGITUDE_DEGREES,
-            lonEast = area.northEastLon + NEARBY_THRESHOLD_IN_LONGITUDE_DEGREES
-        ).filter { it != area.id }
-
-    companion object {
-        private const val NEARBY_THRESHOLD_KM = .5
-
-        private const val EARTH_CIRCUMFERENCE_KM = 40_075.017
-        private const val LONGITUDE_DEGREE_IN_KM = EARTH_CIRCUMFERENCE_KM / 360.0
-        private const val NEARBY_THRESHOLD_IN_LONGITUDE_DEGREES = (NEARBY_THRESHOLD_KM / LONGITUDE_DEGREE_IN_KM).toFloat()
-
-        private const val EARTH_POLAR_CIRCUMFERENCE_KM = 40_007.863
-        private const val LATITUDE_DEGREE_IN_KM = EARTH_POLAR_CIRCUMFERENCE_KM / 360.0
-        private const val NEARBY_THRESHOLD_IN_LATITUDE_DEGREES = (NEARBY_THRESHOLD_KM / LATITUDE_DEGREE_IN_KM).toFloat()
-    }
+    suspend fun getAreasInCluster(clusterId: Int): List<Area> =
+        areaDao.getAreasInCluster(clusterId).map { it.convert() }
 }

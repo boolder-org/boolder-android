@@ -147,7 +147,9 @@
     <string name="full_screen_photo_error">Cette photo ne peut être affichée</string>
 
     <string name="area_download_sheet_title">Téléchargements</string>
-    <string name="area_download_sheet_nearby_areas">Autres secteurs proches</string>
+    <string name="area_download_sheet_all_areas_in_cluster">Tous les secteurs de %s</string>
+    <string name="area_download_sheet_hint_title">Téléchargez les secteurs en avance</string>
+    <string name="area_download_sheet_hint_message">Vous éviterez les temps de chargement et vous pourrez utiliser Boolder sans connexion à Internet.</string>
 
     <string name="photos_download_cancellation_dialog_title">Attention</string>
     <string name="photos_download_cancellation_dialog_text">Voulez-vous annuler le téléchargement des photos ?</string>

@@ -1,6 +1,7 @@
 package com.boolder.boolder
 
 import androidx.work.WorkManager
+import com.boolder.boolder.data.dataStore
 import com.boolder.boolder.offline.BoolderOfflineRepository
 import com.boolder.boolder.offline.worker.BoolderWorkerFactory
 import org.koin.android.ext.koin.androidApplication
@@ -12,4 +13,6 @@ val appModule = module {
     factoryOf(::BoolderOfflineRepository)
     factory { WorkManager.getInstance(androidApplication()) }
     factory { androidApplication().resources }
+
+    single { androidApplication().dataStore }
 }

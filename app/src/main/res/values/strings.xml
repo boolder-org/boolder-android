@@ -148,9 +148,11 @@
     <string name="contribute_learn_more">Learn more about Boolder</string>
 
     <string name="full_screen_photo_error">This photo can\'t be displayed</string>
-    
+
     <string name="area_download_sheet_title">Downloads</string>
-    <string name="area_download_sheet_nearby_areas">Other nearby areas</string>
+    <string name="area_download_sheet_all_areas_in_cluster">All areas in %s</string>
+    <string name="area_download_sheet_hint_title">Download areas in advance</string>
+    <string name="area_download_sheet_hint_message">Skip loading times and use Boolder without an Internet connection.</string>
 
     <string name="photos_download_cancellation_dialog_title">Warning</string>
     <string name="photos_download_cancellation_dialog_text">Do you want to cancel the photos download?</string>

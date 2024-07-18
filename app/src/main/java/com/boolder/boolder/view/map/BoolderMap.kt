@@ -84,6 +84,8 @@ class BoolderMap(
 
         fun onAreaVisited(areaId: Int)
         fun onAreaLeft()
+        fun onClusterVisited(clusterId: Int, latitude: Double, longitude: Double)
+        fun onClusterLeft()
         fun onZoomLevelChanged(zoomLevel: Double)
     }
 
@@ -117,6 +119,7 @@ class BoolderMap(
             lastCameraCheckTimestamp = now
 
             detectArea()
+            detectCluster(it.cameraState.center)
         }
 
         camera.addCameraZoomChangeListener { listener?.onZoomLevelChanged(it) }
@@ -578,6 +581,43 @@ class BoolderMap(
             queriedFeature.value?.firstOrNull()?.queriedFeature?.feature?.properties()?.get("areaId")
                 ?.let { areaId -> listener?.onAreaVisited(areaId.asInt) }
                 ?: listener?.onAreaLeft()
+        }
+    }
+
+    private fun detectCluster(cameraCenter: Point) {
+        val halfSquareSize = width / 8
+
+        val left = (width / 2 - halfSquareSize).toDouble()
+        val right = (width / 2 + halfSquareSize).toDouble()
+        val top = (height / 2 - halfSquareSize).toDouble()
+        val bottom = (height / 2 + halfSquareSize).toDouble()
+
+        mapboxMap.queryRenderedFeatures(
+            geometry = RenderedQueryGeometry(
+                listOf(
+                    ScreenCoordinate(left, top),
+                    ScreenCoordinate(right, top),
+                    ScreenCoordinate(right, bottom),
+                    ScreenCoordinate(left, bottom)
+                )
+            ),
+            options = RenderedQueryOptions(
+                listOf("clusters-layer"),
+                Expression.gte {
+                    zoom()
+                    literal(12.0)
+                }
+            )
+        ) { queriedFeature ->
+            queriedFeature.value?.firstOrNull()?.queriedFeature?.feature?.properties()?.get("clusterId")
+                ?.let {
+                    listener?.onClusterVisited(
+                        clusterId = it.asInt,
+                        latitude = cameraCenter.latitude(),
+                        longitude = cameraCenter.longitude()
+                    )
+                }
+                ?: listener?.onClusterLeft()
         }
     }
 }

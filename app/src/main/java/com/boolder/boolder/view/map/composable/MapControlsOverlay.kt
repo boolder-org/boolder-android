@@ -31,16 +31,19 @@ import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.utils.extension.composeColor
 import com.boolder.boolder.utils.previewgenerator.dummyArea
+import com.boolder.boolder.utils.previewgenerator.dummyCluster
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.filter.DummyFiltersEventHandler
 import com.boolder.boolder.view.map.filter.FiltersEventHandler
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
+import com.boolder.boolder.view.offlinephotos.model.OfflineClusterItemStatus
 
 @Composable
 fun MapControlsOverlay(
     offlineAreaItem: OfflineAreaItem?,
+    clusterState: MapViewModel.ClusterState?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
     popularState: MapViewModel.PopularFilterState,
@@ -52,7 +55,7 @@ fun MapControlsOverlay(
     onAreaInfoClicked: () -> Unit,
     onSearchBarClicked: () -> Unit,
     onCircuitStartClicked: () -> Unit,
-    onDownloadAreaClicked: () -> Unit,
+    onDownloadButtonClicked: () -> Unit,
     onFindMyPositionClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -80,8 +83,8 @@ fun MapControlsOverlay(
         ) {
             MapFloatingActionButtons(
                 modifier = Modifier.align(Alignment.BottomEnd),
-                offlineAreaItem = offlineAreaItem,
-                onDownloadAreaClicked = onDownloadAreaClicked,
+                clusterState = clusterState,
+                onDownloadAreaClicked = onDownloadButtonClicked,
                 onFindMyPositionClicked = onFindMyPositionClicked
             )
 
@@ -111,7 +114,7 @@ fun MapControlsOverlay(
 
 @Composable
 private fun MapFloatingActionButtons(
-    offlineAreaItem: OfflineAreaItem?,
+    clusterState: MapViewModel.ClusterState?,
     onDownloadAreaClicked: () -> Unit,
     onFindMyPositionClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -122,7 +125,7 @@ private fun MapFloatingActionButtons(
         verticalArrangement = spacedBy(16.dp)
     ) {
         AnimatedVisibility(
-            visible = offlineAreaItem != null,
+            visible = clusterState != null,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
@@ -132,12 +135,12 @@ private fun MapFloatingActionButtons(
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
                 onClick = onDownloadAreaClicked
             ) {
-                when (offlineAreaItem?.status) {
-                    is OfflineAreaItemStatus.Downloading -> CircularProgressIndicator(
+                when (clusterState?.downloadStatus) {
+                    OfflineClusterItemStatus.DOWNLOADING -> CircularProgressIndicator(
                         modifier = Modifier.size(24.dp)
                     )
 
-                    is OfflineAreaItemStatus.Downloaded -> Icon(
+                    OfflineClusterItemStatus.DOWNLOADED -> Icon(
                         painter = painterResource(id = R.drawable.ic_download_done),
                         contentDescription = stringResource(id = R.string.cd_downloaded_area),
                         tint = MaterialTheme.colorScheme.primary
@@ -174,6 +177,12 @@ private fun MapControlsOverlayPreview() {
                 area = dummyArea(),
                 status = OfflineAreaItemStatus.NotDownloaded
             ),
+            clusterState = MapViewModel.ClusterState(
+                cluster = dummyCluster(),
+                areas = emptyList(),
+                closestArea = dummyArea(),
+                downloadStatus = OfflineClusterItemStatus.NOT_DOWNLOADED
+            ),
             circuitState = MapViewModel.CircuitState(
                 circuitId = 0,
                 color = CircuitColor.ORANGE,
@@ -192,7 +201,7 @@ private fun MapControlsOverlayPreview() {
             onAreaInfoClicked = {},
             onSearchBarClicked = {},
             onCircuitStartClicked = {},
-            onDownloadAreaClicked = {},
+            onDownloadButtonClicked = {},
             onFindMyPositionClicked = {}
         )
     }

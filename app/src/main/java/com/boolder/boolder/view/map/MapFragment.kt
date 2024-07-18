@@ -183,6 +183,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                             bottom = dimensionResource(id = R.dimen.height_bottom_nav_bar)
                         ),
                         offlineAreaItem = screenState.areaState,
+                        clusterState = screenState.clusterState,
                         circuitState = screenState.circuitState,
                         gradeState = screenState.gradeState,
                         popularState = screenState.popularFilterState,
@@ -194,7 +195,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                         onAreaInfoClicked = { navigateToAreaOverviewScreen(screenState.areaState?.area?.id) },
                         onSearchBarClicked = ::navigateToSearchScreen,
                         onCircuitStartClicked = mapViewModel::onCircuitDepartureButtonClicked,
-                        onDownloadAreaClicked = mapViewModel::onDownloadAreaClicked,
+                        onDownloadButtonClicked = mapViewModel::onDownloadButtonClicked,
                         onFindMyPositionClicked = locationProvider::askForPosition
                     )
                 }
@@ -375,6 +376,8 @@ class MapFragment : Fragment(), BoolderMapListener {
         navController.navigate(direction)
     }
 
+    // region BoolderMapListener
+
     override fun onAreaVisited(areaId: Int) {
         mapViewModel.onAreaVisited(areaId)
     }
@@ -383,9 +386,19 @@ class MapFragment : Fragment(), BoolderMapListener {
         mapViewModel.onAreaLeft()
     }
 
+    override fun onClusterVisited(clusterId: Int, latitude: Double, longitude: Double) {
+        mapViewModel.onClusterVisited(clusterId, latitude, longitude)
+    }
+
+    override fun onClusterLeft() {
+        mapViewModel.onClusterLeft()
+    }
+
     override fun onZoomLevelChanged(zoomLevel: Double) {
         mapViewModel.onZoomLevelChanged(zoomLevel)
     }
+
+    // endregion BoolderMapListener
 
     private fun onNewTopo(nullableTopo: Topo?) {
         nullableTopo?.let { topo ->
@@ -547,8 +560,9 @@ class MapFragment : Fragment(), BoolderMapListener {
         if (navController.currentDestination?.id == R.id.dialog_area_download) return
 
         val direction = MapFragmentDirections.showAreaDownloadBottomSheet(
-            areaId = event.areaId,
-            nearbyAreaIds = event.nearbyAreaIds.toIntArray()
+            clusterId = event.clusterId,
+            closestAreaId = event.closestAreaId,
+            areaIds = event.areaIds.toIntArray()
         )
 
         navController.navigate(direction)

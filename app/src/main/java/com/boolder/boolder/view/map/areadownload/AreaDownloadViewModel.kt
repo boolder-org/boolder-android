@@ -1,53 +1,75 @@
 package com.boolder.boolder.view.map.areadownload
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.data.database.repository.AreaRepository
+import com.boolder.boolder.data.database.repository.ClusterRepository
+import com.boolder.boolder.domain.model.center
+import com.boolder.boolder.domain.model.centerDistanceFromLatLon
 import com.boolder.boolder.offline.BoolderOfflineRepository
 import com.boolder.boolder.offline.OfflineAreaDownloader
+import com.boolder.boolder.offline.OfflineClusterDownloader
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
+import com.boolder.boolder.view.offlinephotos.model.OfflineClusterItem
+import com.boolder.boolder.view.offlinephotos.model.OfflineClusterItemStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AreaDownloadViewModel(
     savedStateHandle: SavedStateHandle,
+    private val clusterRepository: ClusterRepository,
     private val areaRepository: AreaRepository,
-    private val boolderOfflineRepository: BoolderOfflineRepository
-) : ViewModel(), OfflineAreaDownloader {
+    private val boolderOfflineRepository: BoolderOfflineRepository,
+    private val dataStore: DataStore<Preferences>
+) : ViewModel(), OfflineClusterDownloader, OfflineAreaDownloader {
 
-    private val areaId = requireNotNull(savedStateHandle.get<Int>("area_id"))
-    private val nearbyAreaIds = requireNotNull(savedStateHandle.get<IntArray>("nearby_area_ids"))
+    private val clusterId = requireNotNull(savedStateHandle.get<Int>("cluster_id"))
+    private val closestAreaId = requireNotNull(savedStateHandle.get<Int>("closest_area_id"))
+    private val areaIds = requireNotNull(savedStateHandle.get<IntArray>("area_ids"))
 
     private val _screenState = MutableStateFlow(
-        ScreenState(loadingNearbyItemsCount = nearbyAreaIds.size)
+        ScreenState(areasCount = areaIds.size)
     )
     val screenState = _screenState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val area = areaRepository.getAreaById(areaId) ?: return@launch
+            val clusterName = clusterRepository.getClusterById(clusterId)?.name ?: return@launch
 
-            val nearbyAreas = nearbyAreaIds
-                .toList()
+            val closestArea = areaRepository.getAreaById(closestAreaId) ?: return@launch
+
+            val closestAreaCenter = closestArea.center()
+            val closestAreaCenterLat = closestAreaCenter.first.toDouble()
+            val closestAreaCenterLon = closestAreaCenter.second.toDouble()
+
+            val otherAreas = areaIds.filter { it != closestAreaId }
                 .mapNotNull { areaRepository.getAreaById(it) ?: return@mapNotNull null }
+                .sortedBy { it.centerDistanceFromLatLon(closestAreaCenterLat, closestAreaCenterLon) }
 
-            val nearbyAreaItemsFlow = if (nearbyAreas.isEmpty()) {
+            val sortedAreas = listOf(closestArea) + otherAreas
+
+            val areaItemsFlow = if (sortedAreas.isEmpty()) {
                 flowOf(emptyList())
             } else {
                 combine(
-                    flows = nearbyAreas.map { nearbyArea ->
+                    flows = sortedAreas.map { nearbyArea ->
                         boolderOfflineRepository.getStatusForAreaIdFlow(nearbyArea.id)
                     },
                     transform = { nearbyAreaStatuses ->
                         nearbyAreaStatuses.mapIndexed { index, status ->
                             OfflineAreaItem(
-                                area = nearbyAreas[index],
+                                area = sortedAreas[index],
                                 status = status
                             )
                         }
@@ -56,25 +78,48 @@ class AreaDownloadViewModel(
             }
 
             combine(
-                flow = boolderOfflineRepository.getStatusForAreaIdFlow(areaId),
-                flow2 = nearbyAreaItemsFlow,
-                transform = { areaStatus, nearbyAreaItems -> areaStatus to nearbyAreaItems }
-            ).collect { (offlineAreaItemStatus, nearbyAreaItems) ->
-                _screenState.update {
-                    ScreenState(
-                        loadingNearbyItemsCount = null,
+                flow = areaItemsFlow,
+                flow2 = dataStore.data.map { it[SHOW_DOWNLOAD_HINT_KEY] ?: true },
+                transform = { areaItems, showDownloadHint -> areaItems to showDownloadHint }
+            ).collect { (areaItems, showDownloadHint) ->
+                _screenState.update { state ->
+                    state.copy(
                         content = Content(
-                            offlineAreaItem = OfflineAreaItem(
-                                area = area,
-                                status = offlineAreaItemStatus
+                            clusterItem = OfflineClusterItem(
+                                name = clusterName,
+                                status = when {
+                                    areaItems.any { it.status is OfflineAreaItemStatus.Downloading } -> OfflineClusterItemStatus.DOWNLOADING
+                                    areaItems.all { it.status is OfflineAreaItemStatus.Downloaded } -> OfflineClusterItemStatus.DOWNLOADED
+                                    else -> OfflineClusterItemStatus.NOT_DOWNLOADED
+                                }
                             ),
-                            nearbyAreaItems = nearbyAreaItems
+                            areaItems = areaItems,
+                            showDownloadHint = showDownloadHint
                         )
                     )
                 }
             }
         }
     }
+
+    // region OfflineClusterDownloader
+
+    override fun onDownloadCluster() {
+        areaIds.forEach(::onDownloadArea)
+    }
+
+    override fun onCancelClusterDownload() {
+        val areaItems = screenState.value.content?.areaItems ?: return
+
+        areaItems.filter { it.status is OfflineAreaItemStatus.Downloading }
+            .forEach { onCancelAreaDownload(it.area.id) }
+    }
+
+    override fun onDeleteClusterPhotos() {
+        areaIds.forEach(::onDeleteAreaPhotos)
+    }
+
+    // endregion OfflineClusterDownloader
 
     // region OfflineAreaDownloader
 
@@ -106,19 +151,29 @@ class AreaDownloadViewModel(
     private fun checkArea(areaId: Int): OfflineAreaItem? {
         val currentScreenState = screenState.value.content ?: return null
 
-        return (currentScreenState.nearbyAreaItems + currentScreenState.offlineAreaItem)
-            .find { it.area.id == areaId }
+        return currentScreenState.areaItems.find { it.area.id == areaId }
     }
 
     // endregion OfflineAreaDownloader
 
+    fun onDismissDownloadHint() {
+        viewModelScope.launch {
+            dataStore.edit { it[SHOW_DOWNLOAD_HINT_KEY] = false }
+        }
+    }
+
     data class ScreenState(
-        val loadingNearbyItemsCount: Int?,
+        val areasCount: Int,
         val content: Content? = null
     )
 
     data class Content(
-        val offlineAreaItem: OfflineAreaItem,
-        val nearbyAreaItems: List<OfflineAreaItem> = emptyList()
+        val clusterItem: OfflineClusterItem,
+        val areaItems: List<OfflineAreaItem> = emptyList(),
+        val showDownloadHint: Boolean = false
     )
+
+    companion object {
+        private val SHOW_DOWNLOAD_HINT_KEY = booleanPreferencesKey("show_download_hint")
+    }
 }
