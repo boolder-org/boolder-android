@@ -59,4 +59,7 @@ class AreaRepository(
                 )
             }
         )
+
+    suspend fun getAllTopoIdsForArea(areaId: Int): List<Int> =
+        areaDao.getAllTopoIdsForArea(areaId)
 }

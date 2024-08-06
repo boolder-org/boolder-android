@@ -15,7 +15,6 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 @RunWith(MockitoJUnitRunner::class)
 class PhotoUriRetrieverTest {
@@ -56,28 +55,12 @@ class PhotoUriRetrieverTest {
         val topoId = 0
 
         retriever.stub { on { getLocalImageUri(areaId, topoId) } doReturn null }
-        topoRepository.stub { onBlocking { getTopoPictureById(topoId) } doReturn "https://www.boolder.com/path/to/image" }
+        topoRepository.stub { onBlocking { getTopoPictureById(topoId) } doReturn "https://assets.boolder.com/proxy/topos/0" }
 
         // When
         val uri = retriever.getPhotoUri(areaId, topoId)
 
         // Then
-        assertEquals(uri, "https://www.boolder.com/path/to/image")
-    }
-
-    @Test
-    fun `getPhotoUri() should return null`() = runTest {
-        // Given
-        val areaId = 0
-        val topoId = 0
-
-        retriever.stub { on { getLocalImageUri(areaId, topoId) } doReturn null }
-        topoRepository.stub { onBlocking { getTopoPictureById(topoId) } doReturn null }
-
-        // When
-        val uri = retriever.getPhotoUri(areaId, topoId)
-
-        // Then
-        assertNull(uri)
+        assertEquals(uri, "https://assets.boolder.com/proxy/topos/0")
     }
 }

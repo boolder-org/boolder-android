@@ -73,4 +73,14 @@ interface AreaDao {
         ORDER BY pois.id ASC, poi_routes.distance_in_minutes ASC
     """)
     suspend fun getTrainStationPoiWithBikeRoutes(): List<TrainStationPoiWithBikeRoutes>
+
+    @Query("""
+        SELECT DISTINCT lines.topo_id 
+        FROM areas
+            JOIN problems ON problems.area_id = areas.id
+            JOIN lines ON lines.problem_id = problems.id
+        WHERE areas.id = :areaId
+        ORDER BY lines.topo_id ASC
+    """)
+    suspend fun getAllTopoIdsForArea(areaId: Int): List<Int>
 }
