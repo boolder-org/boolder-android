@@ -6,6 +6,7 @@ import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.data.network.repository.TopoRepository
 import com.boolder.boolder.data.userdatabase.UserDatabase
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
 import org.koin.android.ext.koin.androidContext
@@ -30,4 +31,6 @@ val databaseModule = module {
     }
 
     single { TickedProblemRepository(get<UserDatabase>().tickedProblemDao()) }
+
+    single { TopoRepository(get()) }
 }

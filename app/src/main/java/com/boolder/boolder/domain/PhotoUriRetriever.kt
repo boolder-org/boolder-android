@@ -10,7 +10,7 @@ class PhotoUriRetriever(
     private val fileExplorer: FileExplorer
 ) {
 
-    suspend fun getPhotoUri(topoId: Int, areaId: Int): String? =
+    fun getPhotoUri(topoId: Int, areaId: Int): String =
         getLocalImageUri(topoId = topoId, areaId = areaId)
             ?: topoRepository.getTopoPictureById(topoId)
 
