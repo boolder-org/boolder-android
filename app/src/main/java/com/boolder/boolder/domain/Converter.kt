@@ -2,12 +2,14 @@ package com.boolder.boolder.domain
 
 import com.boolder.boolder.R
 import com.boolder.boolder.data.database.entity.AreaEntity
+import com.boolder.boolder.data.database.entity.ClusterEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.entity.ProblemWithAreaName
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.data.userdatabase.entity.TickedProblemEntity
 import com.boolder.boolder.domain.model.Area
+import com.boolder.boolder.domain.model.Cluster
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.TickedProblem
@@ -106,4 +108,9 @@ fun AreaEntity.convert(): Area {
 fun TickedProblemEntity.convert() = TickedProblem(
     problemId = problemId,
     tickStatus = tickStatus
+)
+
+fun ClusterEntity.convert() = Cluster(
+    id = id,
+    name = name
 )

@@ -49,7 +49,8 @@ class MainActivity : AppCompatActivity() {
             R.id.tick_list_fragment,
             R.id.contribute_fragment,
             R.id.dialog_circuit_filter,
-            R.id.dialog_grades_filter
+            R.id.dialog_grades_filter,
+            R.id.dialog_area_download
         )
     }
 }

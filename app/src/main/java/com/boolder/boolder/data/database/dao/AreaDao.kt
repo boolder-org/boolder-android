@@ -83,4 +83,7 @@ interface AreaDao {
         ORDER BY lines.topo_id ASC
     """)
     suspend fun getAllTopoIdsForArea(areaId: Int): List<Int>
+
+    @Query("SELECT * FROM areas WHERE cluster_id = :clusterId")
+    suspend fun getAreasInCluster(clusterId: Int): List<AreaEntity>
 }

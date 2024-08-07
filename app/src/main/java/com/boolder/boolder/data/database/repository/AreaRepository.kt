@@ -62,4 +62,7 @@ class AreaRepository(
 
     suspend fun getAllTopoIdsForArea(areaId: Int): List<Int> =
         areaDao.getAllTopoIdsForArea(areaId)
+
+    suspend fun getAreasInCluster(clusterId: Int): List<Area> =
+        areaDao.getAreasInCluster(clusterId).map { it.convert() }
 }

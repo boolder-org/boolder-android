@@ -12,6 +12,7 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.rgb
 import com.mapbox.maps.extension.style.expressions.dsl.generated.switchCase
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.generated.circleLayer
+import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
 import com.mapbox.maps.extension.style.layers.properties.generated.Visibility
@@ -33,6 +34,23 @@ class MapboxStyleFactory {
                 lineDasharray(listOf(4.0, 1.0))
                 lineColor(colorFromProperty("color"))
                 visibility(Visibility.NONE)
+            }
+
+            +vectorSource("clusters") {
+                url(BoolderMapConfig.clustersVectorSourceUrl)
+            }
+            +fillLayer(LAYER_CLUSTERS, "clusters") {
+                sourceLayer(BoolderMapConfig.clustersSourceLayerId)
+                minZoom(1.0)
+                fillOpacity(0.0)
+                filter(
+                    match {
+                        geometryType()
+                        get("Polygon")
+                        literal(true)
+                        literal(false)
+                    }
+                )
             }
 
             +vectorSource(LAYER_PROBLEMS) {
@@ -305,6 +323,11 @@ class MapboxStyleFactory {
          * Similar to [LAYER_PROBLEMS_TEXT] but with a bigger label.
          */
         const val LAYER_CIRCUIT_PROBLEMS_TEXT = "circuit-problems-text"
+
+        /**
+         * Hulls grouping areas that are nearby or linked to the same parking or train station.
+         */
+        const val LAYER_CLUSTERS = "clusters-layer"
 
         /**
          * Points representing the boulder problems
