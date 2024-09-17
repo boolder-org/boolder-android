@@ -22,7 +22,7 @@ import com.boolder.boolder.data.database.entity.ProblemEntity
         PoiRouteEntity::class,
         ProblemEntity::class
     ],
-    version = 24, // increment version number everytime the boolder.db database changes (schema or data)
+    version = 25, // increment version number everytime the boolder.db database changes (schema or data)
     exportSchema = true
 )
 abstract class BoolderAppDatabase : RoomDatabase() {
