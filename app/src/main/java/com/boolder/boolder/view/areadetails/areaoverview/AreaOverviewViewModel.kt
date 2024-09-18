@@ -37,42 +37,25 @@ class AreaOverviewViewModel(
             val circuits = circuitRepository.getAvailableCircuits(areaId)
             val accessesFromPoi = areaRepository.getAccessesFromPoiByAreaId(areaId)
 
-            _screenState.value = ScreenState.Content(
-                area = area,
-                circuits = circuits,
-                accessesFromPoi = accessesFromPoi,
-                offlineAreaItemStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
-            )
+            boolderOfflineRepository.getStatusForAreaIdFlow(areaId)
+                .collect { offlineAreaItemStatus ->
+                    _screenState.value = ScreenState.Content(
+                        area = area,
+                        circuits = circuits,
+                        accessesFromPoi = accessesFromPoi,
+                        offlineAreaItemStatus = offlineAreaItemStatus
+                    )
+                }
         }
     }
 
     override fun onDownloadArea(areaId: Int) {
-        val currentState = _screenState.value as? ScreenState.Content ?: return
-
-        _screenState.update {
-            currentState.copy(offlineAreaItemStatus = OfflineAreaItemStatus.Downloading(areaId))
-        }
-
         boolderOfflineRepository.downloadArea(areaId)
     }
 
     override fun onCancelAreaDownload(areaId: Int) {
-        val currentState = _screenState.value as? ScreenState.Content ?: return
-
-        boolderOfflineRepository.cancelAreaDownload(areaId)
         boolderOfflineRepository.deleteArea(areaId)
-
-        _screenState.update {
-            currentState.copy(offlineAreaItemStatus = OfflineAreaItemStatus.NotDownloaded)
-        }
-    }
-
-    override fun onAreaDownloadTerminated(areaId: Int) {
-        val currentState = _screenState.value as? ScreenState.Content ?: return
-
-        val newStatus = boolderOfflineRepository.getStatusForAreaId(areaId)
-
-        _screenState.update { currentState.copy(offlineAreaItemStatus = newStatus) }
+        boolderOfflineRepository.cancelAreaDownload(areaId)
     }
 
     override fun onDeleteAreaPhotos(areaId: Int) {

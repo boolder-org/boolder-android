@@ -27,10 +27,7 @@ class OfflinePhotosFragment : Fragment() {
 
                     OfflinePhotosScreen(
                         screenState = screenState,
-                        onDownloadAreaClicked = viewModel::onDownloadAreaClicked,
-                        onDownloadTerminated = viewModel::onDownloadTerminated,
-                        onCancelDownload = viewModel::onCancelDownload,
-                        onDeleteAreaClicked = viewModel::onDeleteAreaClicked
+                        offlineAreaDownloader = viewModel
                     )
                 }
             }

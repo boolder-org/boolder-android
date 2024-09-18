@@ -37,6 +37,12 @@
             android:id="@+id/show_poi"
             app:destination="@+id/dialog_poi" />
         <action
+            android:id="@+id/show_area_download_bottom_sheet"
+            app:destination="@+id/dialog_area_download" />
+        <action
+            android:id="@+id/navigate_to_download_manager"
+            app:destination="@+id/offline_photos_fragment" />
+        <action
             android:id="@+id/show_problem_photo_full_screen"
             app:destination="@+id/full_screen_photo_fragment" />
     </fragment>
@@ -241,6 +247,21 @@
         <argument
             android:name="google_maps_url"
             app:argType="string" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/dialog_area_download"
+        android:name="com.boolder.boolder.view.map.areadownload.AreaDownloadBottomSheetDialog"
+        android:label="Area download bottom sheet dialog">
+        <argument
+            android:name="cluster_id"
+            app:argType="integer" />
+        <argument
+            android:name="closest_area_id"
+            app:argType="integer" />
+        <argument
+            android:name="area_ids"
+            app:argType="integer[]" />
     </dialog>
 
 </navigation>

@@ -6,7 +6,6 @@
     <string name="tab_contribute">Contribuer</string>
 
     <string name="search_query_hint">Nom de voie ou secteur</string>
-    <string name="cd_find_my_position">Me localiser</string>
     <string name="cancel">Annuler</string>
     <string name="cancel_search">Annuler la recherche</string>
     <string name="cd_go_back">Retour</string>
@@ -98,10 +97,6 @@
     <string name="area_overview_delete_photos">Supprimer les photos</string>
     <string name="area_overview_download_in_progress">Téléchargement en cours…</string>
     <string name="area_overview_downloaded_photos">Photos téléchargées (%s)</string>
-    <string name="area_overview_photos_deletion_dialog_title">Attention</string>
-    <string name="area_overview_photos_deletion_dialog_text">Voulez-vous supprimer les photos téléchargées ?</string>
-    <string name="area_overview_photos_deletion_dialog_confirm_button">Supprimer</string>
-    <string name="area_overview_photos_deletion_dialog_cancel_button">Annuler</string>
     <string name="area_overview_error_cannot_display_area">Impossible d\'afficher les informations de ce secteur</string>
     <string name="area_circuit_beginner_friendly">Ce circuit convient aux débutants</string>
     <string name="area_circuit_dangerous">Ce circuit est dangereux : certains blocs sont très hauts et/ou avec une réception difficile</string>
@@ -151,7 +146,24 @@
 
     <string name="full_screen_photo_error">Cette photo ne peut être affichée</string>
 
+    <string name="area_download_sheet_title">Téléchargements</string>
+    <string name="area_download_sheet_all_areas_in_cluster">Tous les secteurs de %s</string>
+    <string name="area_download_sheet_hint_title">Téléchargez les secteurs en avance</string>
+    <string name="area_download_sheet_hint_message">Vous éviterez les temps de chargement et vous pourrez utiliser Boolder sans connexion à Internet.</string>
+
+    <string name="photos_download_cancellation_dialog_title">Attention</string>
+    <string name="photos_download_cancellation_dialog_text">Voulez-vous annuler le téléchargement des photos ?</string>
+    <string name="photos_download_cancellation_dialog_confirm_button">Annuler le téléchargement</string>
+    <string name="photos_download_cancellation_dialog_cancel_button">Continuer à télécharger</string>
+    <string name="photos_download_deletion_dialog_title">Attention</string>
+    <string name="photos_download_deletion_dialog_text">Voulez-vous supprimer les photos téléchargées ?</string>
+    <string name="photos_download_deletion_dialog_confirm_button">Supprimer</string>
+    <string name="photos_download_deletion_dialog_cancel_button">Annuler</string>
+
     <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
     <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>
+    <string name="cd_download_area">Télécharger le secteur</string>
+    <string name="cd_downloaded_area">Les photos du secteur ont été téléchargées</string>
+    <string name="cd_find_my_position">Me localiser</string>
 
 </resources>
