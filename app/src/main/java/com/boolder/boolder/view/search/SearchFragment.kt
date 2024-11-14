@@ -1,10 +1,12 @@
 package com.boolder.boolder.view.search
 
+import android.content.Context
 import android.os.Bundle
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -66,12 +68,20 @@ class SearchFragment : Fragment() {
                 .searchContainer
                 .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(top = topMargin) }
 
+            binding.suggestionContainer
+                .updateLayoutParams<ViewGroup.MarginLayoutParams> { updateMargins(bottom = contentInsets.bottom) }
+
             binding.recyclerView.updatePadding(bottom = contentInsets.bottom)
 
             WindowInsetsCompat.CONSUMED
         }
 
-        binding.searchComponent.searchBar.requestFocus()
+        with(binding.searchComponent.searchBar) {
+            if (!requestFocus()) return@with
+
+            (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                .showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+        }
 
         binding.searchComponent.searchFirstIcon.apply {
             val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_arrow_back)
