@@ -1,6 +1,5 @@
 package com.boolder.boolder.view.map.filter.grade
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -31,8 +30,6 @@ class GradesFilterViewModel(
         .map {
             val minGrade = it[PREF_CUSTOM_GRADE_RANGE_MIN]
             val maxGrade = it[PREF_CUSTOM_GRADE_RANGE_MAX]
-
-            Log.d("WANG", "New values: $minGrade, $maxGrade")
 
             if (minGrade == null || maxGrade == null) return@map DEFAULT_CUSTOM_RANGE
 
