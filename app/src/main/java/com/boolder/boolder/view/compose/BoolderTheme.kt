@@ -1,14 +1,17 @@
 package com.boolder.boolder.view.compose
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ripple.RippleAlpha
-import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.RippleDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoolderTheme(
     content: @Composable () -> Unit
@@ -49,32 +52,17 @@ fun BoolderTheme(
         } else {
             boolderColorSchemeLight
         },
-        content = content
+        content = {
+            val rippleConfiguration = RippleConfiguration(
+                color = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                rippleAlpha = RippleDefaults.RippleAlpha
+            )
+
+            CompositionLocalProvider(LocalRippleConfiguration provides rippleConfiguration) {
+                content()
+            }
+        }
     )
-}
-
-@Immutable
-object BoolderRippleTheme : RippleTheme {
-
-    @Composable
-    override fun defaultColor(): Color {
-        val darkTheme = isSystemInDarkTheme()
-
-        return RippleTheme.defaultRippleColor(
-            contentColor = if (darkTheme) Color.White else Color.Black,
-            lightTheme = !darkTheme
-        )
-    }
-
-    @Composable
-    override fun rippleAlpha(): RippleAlpha {
-        val darkTheme = isSystemInDarkTheme()
-
-        return RippleTheme.defaultRippleAlpha(
-            contentColor = if (darkTheme) Color.White else Color.Black,
-            lightTheme = !darkTheme
-        )
-    }
 }
 
 @Stable

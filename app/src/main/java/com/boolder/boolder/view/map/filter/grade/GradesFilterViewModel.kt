@@ -1,28 +1,58 @@
 package com.boolder.boolder.view.map.filter.grade
 
+import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.boolder.boolder.data.datastore.PREF_CUSTOM_GRADE_RANGE_MAX
+import com.boolder.boolder.data.datastore.PREF_CUSTOM_GRADE_RANGE_MIN
+import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.GradeRange
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GradesFilterViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val preferencesDatastore: DataStore<Preferences>
 ) : ViewModel() {
 
-    private var customGradeRange = savedStateHandle.get<GradeRange>(ARG_GRADE_RANGE)
-        ?.takeIf {it.isCustom }
-        ?: DEFAULT_CUSTOM_RANGE
+    private val customGradeRangeFlow = preferencesDatastore.data
+        .map {
+            val minGrade = it[PREF_CUSTOM_GRADE_RANGE_MIN]
+            val maxGrade = it[PREF_CUSTOM_GRADE_RANGE_MAX]
+
+            Log.d("WANG", "New values: $minGrade, $maxGrade")
+
+            if (minGrade == null || maxGrade == null) return@map DEFAULT_CUSTOM_RANGE
+
+            GradeRange(min = minGrade, max = maxGrade)
+        }
+        .onEach { customGradeRange ->
+            _screenStateFlow.update { it.copy(gradeRanges = QUICK_GRADE_RANGES + customGradeRange) }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = savedStateHandle.get<GradeRange>(ARG_GRADE_RANGE)
+                ?.takeIf {it.isCustom }
+                ?: DEFAULT_CUSTOM_RANGE
+        )
 
     private val _screenStateFlow = MutableStateFlow(
         ScreenState(
-            gradeRanges = QUICK_GRADE_RANGES + customGradeRange,
-            selectedGradeRange = requireNotNull(savedStateHandle[ARG_GRADE_RANGE])
+            gradeRanges = QUICK_GRADE_RANGES,
+            selectedGradeRange = requireNotNull(savedStateHandle.get<GradeRange>(ARG_GRADE_RANGE))
         )
     )
     val screenStateFlow = _screenStateFlow.asStateFlow()
@@ -37,22 +67,37 @@ class GradesFilterViewModel(
     }
 
     fun onCustomLowBoundSelected(grade: String) {
-        customGradeRange = customGradeRange.copy(min = grade)
-        _screenStateFlow.update {
-            it.copy(
-                gradeRanges = QUICK_GRADE_RANGES + customGradeRange,
-                selectedGradeRange = customGradeRange
-            )
-        }
+        val minGradeIndex = ALL_GRADES.indexOf(grade)
+        val maxGradeIndex = ALL_GRADES.indexOf(customGradeRangeFlow.value.max)
+
+        val customGradeRange = GradeRange(
+            min = grade,
+            max = if (minGradeIndex > maxGradeIndex) grade else customGradeRangeFlow.value.max
+        )
+
+        updateCustomGradeRange(customGradeRange)
     }
 
     fun onCustomHighBoundSelected(grade: String) {
-        customGradeRange = customGradeRange.copy(max = grade)
-        _screenStateFlow.update {
-            it.copy(
-                gradeRanges = QUICK_GRADE_RANGES + customGradeRange,
-                selectedGradeRange = customGradeRange
-            )
+        val minGradeIndex = ALL_GRADES.indexOf(customGradeRangeFlow.value.min)
+        val maxGradeIndex = ALL_GRADES.indexOf(grade)
+
+        val customGradeRange = GradeRange(
+            min = if (minGradeIndex > maxGradeIndex) grade else customGradeRangeFlow.value.min,
+            max = grade
+        )
+
+        updateCustomGradeRange(customGradeRange)
+    }
+
+    private fun updateCustomGradeRange(gradeRange: GradeRange) {
+        viewModelScope.launch {
+            preferencesDatastore.edit {
+                it[PREF_CUSTOM_GRADE_RANGE_MIN] = gradeRange.min
+                it[PREF_CUSTOM_GRADE_RANGE_MAX] = gradeRange.max
+            }
+
+            _screenStateFlow.update { it.copy(selectedGradeRange = gradeRange) }
         }
     }
 

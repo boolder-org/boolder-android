@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -20,12 +19,12 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +42,6 @@ import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.gradeRangeLevelDisplay
-import com.boolder.boolder.view.compose.BoolderRippleTheme
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel.Companion.QUICK_GRADE_RANGES
 
@@ -78,13 +76,11 @@ internal fun GradesFilterLayout(
             textAlign = TextAlign.Center
         )
 
-        CompositionLocalProvider(LocalRippleTheme provides BoolderRippleTheme) {
-            GradeRangesList(
-                gradeRanges = gradeRanges,
-                selectedGradeRange = selectedGradeRange,
-                onGradeRangeSelected = onGradeRangeSelected
-            )
-        }
+        GradeRangesList(
+            gradeRanges = gradeRanges,
+            selectedGradeRange = selectedGradeRange,
+            onGradeRangeSelected = onGradeRangeSelected
+        )
 
         CustomRangeSelectors(
             selectedGradeRange = selectedGradeRange,
@@ -192,9 +188,6 @@ private fun CustomRangeSelectors(
         val minGrade = selectedGradeRange?.min.orEmpty()
         val maxGrade = selectedGradeRange?.max.orEmpty()
 
-        val maxLowBoundIndex = ALL_GRADES.indexOf(maxGrade).coerceAtLeast(0)
-        val minHighBoundIndex = ALL_GRADES.indexOf(minGrade).coerceAtLeast(0)
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -205,20 +198,12 @@ private fun CustomRangeSelectors(
                 modifier = Modifier.weight(1f),
                 label = stringResource(id = R.string.grade_min),
                 value = minGrade,
-                grades = ALL_GRADES.subList(
-                    fromIndex = 0,
-                    toIndex = maxLowBoundIndex + 1
-                ),
                 onGradeSelected = onCustomLowBoundSelected
             )
             CustomRangeSelectorItem(
                 modifier = Modifier.weight(1f),
                 label = stringResource(id = R.string.grade_max),
                 value = maxGrade,
-                grades = ALL_GRADES.subList(
-                    fromIndex = minHighBoundIndex,
-                    toIndex = ALL_GRADES.size
-                ),
                 onGradeSelected = onCustomHighBoundSelected
             )
         }
@@ -230,7 +215,6 @@ private fun CustomRangeSelectors(
 private fun CustomRangeSelectorItem(
     label: String,
     value: String,
-    grades: List<String>,
     onGradeSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -244,22 +228,24 @@ private fun CustomRangeSelectorItem(
             onExpandedChange = { expanded = !expanded}
         ) {
             TextField(
-                modifier = Modifier.menuAnchor(),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 label = { Text(text = label) },
                 value = value,
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .2f),
                     unfocusedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .1f)
                 )
             )
 
             ExposedDropdownMenu(
                 expanded = expanded,
+                containerColor = MaterialTheme.colorScheme.background,
                 onDismissRequest = { expanded = false }
             ) {
-                grades.forEach { grade ->
+                ALL_GRADES.forEach { grade ->
                     DropdownMenuItem(
                         text = { Text(text = grade) },
                         onClick = {
@@ -285,7 +271,7 @@ private fun BottomButtons(
     ) {
         Button(
             colors = ButtonDefaults.outlinedButtonColors(),
-            border = ButtonDefaults.outlinedButtonBorder,
+            border = ButtonDefaults.outlinedButtonBorder(),
             onClick = onGradeRangeReset
         ) {
             Text(text = stringResource(id = R.string.reset))

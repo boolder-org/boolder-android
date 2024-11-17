@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -19,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +33,6 @@ import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.view.compose.BoolderOrange
-import com.boolder.boolder.view.compose.BoolderRippleTheme
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.CircuitItem
 import com.mapbox.geojson.Point
@@ -106,12 +103,10 @@ private fun CircuitsContent(
     onCircuitSelected: (Int) -> Unit
 ) {
     Column {
-        CompositionLocalProvider(LocalRippleTheme provides BoolderRippleTheme) {
-            CircuitsList(
-                availableCircuits = availableCircuits,
-                onCircuitSelected = onCircuitSelected
-            )
-        }
+        CircuitsList(
+            availableCircuits = availableCircuits,
+            onCircuitSelected = onCircuitSelected
+        )
 
         BottomButtons(
             modifier = Modifier
@@ -162,7 +157,7 @@ private fun BottomButtons(
     ) {
         Button(
             colors = ButtonDefaults.outlinedButtonColors(),
-            border = ButtonDefaults.outlinedButtonBorder,
+            border = ButtonDefaults.outlinedButtonBorder(),
             onClick = onReset
         ) {
             Text(text = stringResource(id = R.string.reset))

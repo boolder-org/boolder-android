@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
@@ -98,7 +97,6 @@ fun MapHeaderLayout(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FiltersRow(
     circuitState: MapViewModel.CircuitState?,
@@ -168,7 +166,7 @@ private fun FiltersRow(
             if (showCircuitFilterChip) {
                 item(key = circuitState?.circuitId) {
                     MapFilterChip(
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItem(),
                         selected = isCircuitFilterActive,
                         label = circuitState?.color?.localizedName()
                             ?: stringResource(id = R.string.circuits),
@@ -182,7 +180,7 @@ private fun FiltersRow(
 
             item(key = gradeState.gradeRangeButtonTitle) {
                 MapFilterChip(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     selected = isGradeFilterActive,
                     label = gradeState.gradeRangeButtonTitle,
                     iconRes = R.drawable.ic_signal_cellular_alt,
@@ -192,7 +190,7 @@ private fun FiltersRow(
 
             item(key = "popular-filter") {
                 MapFilterChip(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     selected = isPopularFilterActive,
                     label = stringResource(id = R.string.filter_popular),
                     iconRes = R.drawable.ic_favorite_border,
@@ -202,7 +200,7 @@ private fun FiltersRow(
 
             item(key = "projects-filter") {
                 MapFilterChip(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     selected = isProjectsFilterActive,
                     label = stringResource(id = R.string.filter_projects),
                     iconRes = R.drawable.ic_star_outline,
@@ -212,7 +210,7 @@ private fun FiltersRow(
 
             item(key = "ticked-filter") {
                 MapFilterChip(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     selected = isTickedFilterActive,
                     label = stringResource(id = R.string.filter_ticked),
                     iconRes = R.drawable.ic_check_circle,
@@ -237,6 +235,7 @@ private fun MapFilterResetChip(
         shape = CircleShape,
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.elevatedButtonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         onClick = onClick,
@@ -262,6 +261,7 @@ private fun MapFilterChip(
         selected = selected,
         shape = CircleShape,
         colors = FilterChipDefaults.elevatedFilterChipColors(
+            containerColor = MaterialTheme.colorScheme.surface,
             labelColor = MaterialTheme.colorScheme.onSurface,
             iconColor = MaterialTheme.colorScheme.onSurface
         ),
