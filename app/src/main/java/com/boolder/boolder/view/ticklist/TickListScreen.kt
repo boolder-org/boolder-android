@@ -85,6 +85,7 @@ internal fun TickListScreen(
                             if (showOverflowActions) {
                                 DropdownMenu(
                                     expanded = true,
+                                    containerColor = MaterialTheme.colorScheme.surface,
                                     onDismissRequest = { showOverflowActions = false },
                                     content = {
                                         TickListOverflowActions(
