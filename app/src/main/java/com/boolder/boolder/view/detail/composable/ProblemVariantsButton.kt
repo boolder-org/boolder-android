@@ -52,6 +52,7 @@ internal fun ProblemVariantsButton(
         if (showSelector) {
             DropdownMenu(
                 expanded = true,
+                containerColor = MaterialTheme.colorScheme.surface,
                 onDismissRequest = { showSelector = false },
                 content = {
                     variants.forEach {
