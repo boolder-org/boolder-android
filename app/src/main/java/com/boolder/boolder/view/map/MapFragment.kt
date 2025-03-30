@@ -433,21 +433,21 @@ class MapFragment : Fragment(), BoolderMapListener {
         val topInset = topInset + resources.getAreaBarAndFiltersHeight().toDouble()
         val defaultInset = resources.getDefaultMargin().toDouble()
 
-        val cameraOptions = mapView.mapboxMap.cameraForCoordinates(
+        mapView.mapboxMap.cameraForCoordinates(
             coordinates = listOf(southWest, northEast),
             camera = CameraOptions.Builder().build(),
             coordinatesPadding = EdgeInsets(topInset, defaultInset, defaultInset, defaultInset),
             maxZoom = null,
             offset = null
-        )
+        ) { cameraOptions ->
+            mapView.camera.flyTo(
+                cameraOptions = cameraOptions,
+                animationOptions = defaultMapAnimationOptions {},
+                animatorListener = animationEndListener { delayedVisitToArea(area.id) }
+            )
 
-        mapView.camera.flyTo(
-            cameraOptions = cameraOptions,
-            animationOptions = defaultMapAnimationOptions {},
-            animatorListener = animationEndListener { delayedVisitToArea(area.id) }
-        )
-
-        bottomSheetBehavior.state = STATE_HIDDEN
+            bottomSheetBehavior.state = STATE_HIDDEN
+        }
     }
 
     private fun flyToProblem(problem: Problem, origin: TopoOrigin) {
