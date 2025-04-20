@@ -26,6 +26,14 @@ class GradesFilterViewModel(
     private val preferencesDatastore: DataStore<Preferences>
 ) : ViewModel() {
 
+    private val _screenStateFlow = MutableStateFlow(
+        ScreenState(
+            gradeRanges = QUICK_GRADE_RANGES,
+            selectedGradeRange = requireNotNull(savedStateHandle.get<GradeRange>(ARG_GRADE_RANGE))
+        )
+    )
+    val screenStateFlow = _screenStateFlow.asStateFlow()
+
     private val customGradeRangeFlow = preferencesDatastore.data
         .map {
             val minGrade = it[PREF_CUSTOM_GRADE_RANGE_MIN]
@@ -45,14 +53,6 @@ class GradesFilterViewModel(
                 ?.takeIf {it.isCustom }
                 ?: DEFAULT_CUSTOM_RANGE
         )
-
-    private val _screenStateFlow = MutableStateFlow(
-        ScreenState(
-            gradeRanges = QUICK_GRADE_RANGES,
-            selectedGradeRange = requireNotNull(savedStateHandle.get<GradeRange>(ARG_GRADE_RANGE))
-        )
-    )
-    val screenStateFlow = _screenStateFlow.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<Event>()
     val eventFlow = _eventFlow.asSharedFlow()
