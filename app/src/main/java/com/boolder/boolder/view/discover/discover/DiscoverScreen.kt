@@ -20,9 +20,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,8 +56,19 @@ internal fun DiscoverScreen(
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit,
     onContributeClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    event: DiscoverViewModel.Event? = null
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    event?.let {
+        val message = when (event) {
+            is DiscoverViewModel.Event.NoBrowserAvailable -> stringResource(R.string.discover_snackbar_no_browser_found)
+        }
+
+        LaunchedEffect(event.key) { snackbarHostState.showSnackbar(message) }
+    }
+
     Scaffold(
         modifier = modifier
             .padding(bottom = dimensionResource(id = R.dimen.height_bottom_nav_bar))
@@ -65,6 +80,7 @@ internal fun DiscoverScreen(
                 }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = {
             when (screenState) {
                 is DiscoverViewModel.ScreenState.Loading -> LoadingScreen()

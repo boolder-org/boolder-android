@@ -1,10 +1,12 @@
 package com.boolder.boolder.view.discover.discover
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -27,14 +29,16 @@ class DiscoverFragment : Fragment() {
         ComposeView(inflater.context).apply {
             setContent {
                 BoolderTheme {
-                    val screenState = viewModel.screenState.collectAsStateWithLifecycle().value
+                    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+                    val event by viewModel.events.collectAsStateWithLifecycle(null)
 
                     DiscoverScreen(
                         screenState = screenState,
                         onDiscoverHeaderItemClicked = ::onDiscoverHeaderItemClicked,
                         onAreaClicked = ::onAreaClicked,
                         onRateAppClicked = ::onOpenPlayStorePage,
-                        onContributeClicked = ::onOpenContributeWebPage
+                        onContributeClicked = ::onOpenContributeWebPage,
+                        event = event
                     )
                 }
             }
@@ -91,6 +95,10 @@ class DiscoverFragment : Fragment() {
     private fun openWebUrl(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
 
-        startActivity(intent)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            viewModel.onNoBrowserAvailable(url)
+        }
     }
 }

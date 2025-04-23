@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.domain.model.Area
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -15,6 +17,9 @@ class DiscoverViewModel(
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
     val screenState = _screenState.asStateFlow()
+
+    private val _events = MutableSharedFlow<Event>()
+    val events = _events.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -30,11 +35,23 @@ class DiscoverViewModel(
         }
     }
 
+    fun onNoBrowserAvailable(url: String) {
+        val event = Event.NoBrowserAvailable(url + "?" + System.currentTimeMillis())
+
+        viewModelScope.launch { _events.emit(event) }
+    }
+
     sealed interface ScreenState {
         data object Loading : ScreenState
         data class Content(
             val allAreas: List<Area>,
             val popularAreas: List<Area>
         ) : ScreenState
+    }
+
+    sealed interface Event {
+        val key: String
+
+        data class NoBrowserAvailable(override val key: String) : Event
     }
 }
