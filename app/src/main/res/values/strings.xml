@@ -120,6 +120,7 @@
     <string name="discover_section_all_areas">All areas</string>
     <string name="discover_section_popular_areas">Popular</string>
     <string name="discover_section_support">Want to help?</string>
+    <string name="discover_snackbar_no_browser_found">No browser found, can\'t open the link</string>
     <string name="discover_support_rate">Rate the app</string>
     <string name="discover_support_contribute">Contribute</string>
 

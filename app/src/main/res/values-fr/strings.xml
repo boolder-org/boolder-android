@@ -117,6 +117,7 @@
     <string name="discover_section_all_areas">Tous les secteurs</string>
     <string name="discover_section_popular_areas">Populaires</string>
     <string name="discover_section_support">Envie d\'aider ?</string>
+    <string name="discover_snackbar_no_browser_found">Aucun navigateur trouvé, impossible d\'ouvrir le lien</string>
     <string name="discover_support_rate">Noter l\'appli</string>
     <string name="discover_support_contribute">Contribuer</string>
 
