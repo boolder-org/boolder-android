@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -42,7 +43,6 @@ internal fun DriesFastScreen(
     screenState: DriesFastViewModel.ScreenState,
     onBackPressed: () -> Unit,
     onAreaClicked: (Int) -> Unit,
-    onBleauWeatherClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -71,8 +71,7 @@ internal fun DriesFastScreen(
                 is DriesFastViewModel.ScreenState.Content -> DriesFastScreenContent(
                     modifier = Modifier.padding(it),
                     screenState = screenState,
-                    onAreaClicked = onAreaClicked,
-                    onBleauWeatherClicked = onBleauWeatherClicked
+                    onAreaClicked = onAreaClicked
                 )
             }
         }
@@ -83,7 +82,6 @@ internal fun DriesFastScreen(
 private fun DriesFastScreenContent(
     screenState: DriesFastViewModel.ScreenState.Content,
     onAreaClicked: (Int) -> Unit,
-    onBleauWeatherClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -106,8 +104,7 @@ private fun DriesFastScreenContent(
         )
 
         UsefulLinkItem(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            onBleauWeatherClicked = onBleauWeatherClicked
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 }
@@ -140,28 +137,28 @@ private fun WarningItem(
 
 @Composable
 private fun UsefulLinkItem(
-    onBleauWeatherClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val usefulLinkStr = stringResource(id = R.string.top_areas_dry_fast_useful_link)
 
-    ClickableText(
+    Text(
         modifier = modifier,
         text = buildAnnotatedString {
             append(usefulLinkStr)
             append(" ")
-            withStyle(
-                MaterialTheme.typography.bodyLarge.toSpanStyle()
-                    .copy(color = MaterialTheme.colorScheme.primary)
+            withLink(
+                LinkAnnotation.Url(
+                    url = "https://www.facebook.com/people/Bleau-Meteo/100055389702633/",
+                    styles = TextLinkStyles(style = MaterialTheme.typography.bodyLarge.toSpanStyle()
+                        .copy(color = MaterialTheme.colorScheme.primary)
+                    )
+                )
             ) {
                 append("Bleau Météo")
             }
         },
         style = MaterialTheme.typography.bodyLarge
-            .copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = .7f)),
-        onClick = { offset ->
-            if (offset > usefulLinkStr.length) onBleauWeatherClicked()
-        }
+            .copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = .7f))
     )
 }
 
@@ -175,8 +172,7 @@ private fun DriesFastScreenPreview(
         DriesFastScreen(
             screenState = screenState,
             onBackPressed = {},
-            onAreaClicked = {},
-            onBleauWeatherClicked = {}
+            onAreaClicked = {}
         )
     }
 }

@@ -69,7 +69,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     //Mapbox
-    implementation("com.mapbox.maps:android:11.4.0")
+    implementation("com.mapbox.maps:android:11.9.0")
 
     // Play Services
     implementation("com.google.android.gms:play-services-location:21.3.0")
@@ -102,8 +102,8 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.3")
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")

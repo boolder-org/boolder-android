@@ -276,7 +276,7 @@ class BoolderMap(
             sourceId = "problems",
             sourceLayerId = BoolderMapConfig.problemsSourceLayerId,
             featureId = featureId,
-            state = Value.fromJson("""{"selected": true}""").value!!,
+            state = Value(hashMapOf("selected" to Value(true))),
             callback = {
                 if (it.isError) return@setFeatureState
 
@@ -293,7 +293,7 @@ class BoolderMap(
                 sourceId = "problems",
                 sourceLayerId = BoolderMapConfig.problemsSourceLayerId,
                 featureId = it,
-                state = Value.fromJson("""{"selected": false}""").value!!,
+                state = Value(hashMapOf("selected" to Value(false))),
                 callback = {}
             )
         }
@@ -397,25 +397,25 @@ class BoolderMap(
         val topInset = insets.top + resources.getAreaBarAndFiltersHeight().toDouble()
         val defaultInset = resources.getDefaultMargin().toDouble()
 
-        val cameraOptions = mapboxMap.cameraForCoordinates(
+        mapboxMap.cameraForCoordinates(
             coordinates = coordinates,
             camera = CameraOptions.Builder().build(),
             coordinatesPadding = EdgeInsets(topInset, defaultInset, defaultInset, defaultInset),
             maxZoom = null,
             offset = null
-        )
+        ) { cameraOptions ->
+            val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
+            mapboxMap.flyTo(
+                cameraOptions = cameraOptions,
+                animationOptions = mapAnimationOption,
+                animatorListener = animationEndListener {
+                    areaId ?: return@animationEndListener
 
-        mapboxMap.flyTo(
-            cameraOptions = cameraOptions,
-            animationOptions = mapAnimationOption,
-            animatorListener = animationEndListener {
-                areaId ?: return@animationEndListener
-
-                listener?.onAreaVisited(areaId)
-            }
-        )
+                    listener?.onAreaVisited(areaId)
+                }
+            )
+        }
     }
 
     private fun zoomToCircuitBounds(circuitCoordinates: List<Point>) {
@@ -423,19 +423,17 @@ class BoolderMap(
         val bottomInset = resources.getCircuitStartButtonHeight().toDouble()
         val defaultInset = resources.getDefaultMargin().toDouble()
 
-        val cameraOptions = mapboxMap.cameraForCoordinates(
+        mapboxMap.cameraForCoordinates(
             coordinates = circuitCoordinates,
             camera = CameraOptions.Builder().build(),
             coordinatesPadding = EdgeInsets(topInset, defaultInset, bottomInset, defaultInset),
             maxZoom = null,
             offset = null
-        ).coerceZoomAtLeast(15.0)
+        ) { cameraOptions ->
+            val mapAnimationOption = MapAnimationOptions.mapAnimationOptions { duration(500L) }
 
-        val mapAnimationOption = MapAnimationOptions.mapAnimationOptions {
-            duration(500L)
+            mapboxMap.flyTo(cameraOptions.coerceZoomAtLeast(15.0), mapAnimationOption)
         }
-
-        mapboxMap.flyTo(cameraOptions, mapAnimationOption)
     }
 
 
