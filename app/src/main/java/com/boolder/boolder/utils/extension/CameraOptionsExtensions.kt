@@ -1,5 +1,6 @@
 package com.boolder.boolder.utils.extension
 
+import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 
 fun CameraOptions.coerceZoomAtLeast(minZoom: Double): CameraOptions {
@@ -13,3 +14,9 @@ fun CameraOptions.coerceZoomAtLeast(minZoom: Double): CameraOptions {
         .zoom(zoom.coerceAtLeast(minZoom))
         .build()
 }
+
+fun fontainebleauCameraOptions(): CameraOptions =
+    CameraOptions.Builder()
+        .center(Point.fromLngLat(2.570619713818104, 48.40056240478899))
+        .zoom(9.4)
+        .build()
