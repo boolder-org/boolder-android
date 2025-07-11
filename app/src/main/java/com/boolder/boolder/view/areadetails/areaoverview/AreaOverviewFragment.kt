@@ -62,7 +62,7 @@ class AreaOverviewFragment : Fragment() {
     private fun onAreaProblemsCountClicked() {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.area_problems_fragment) return
+        if (navController.currentDestination?.id != R.id.area_overview_fragment) return
 
         val direction = AreaOverviewFragmentDirections.navigateToAreaProblemsScreen(areaId = args.areaId)
 
@@ -72,7 +72,7 @@ class AreaOverviewFragment : Fragment() {
     private fun onCircuitClicked(circuitId: Int) {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.area_circuit_fragment) return
+        if (navController.currentDestination?.id != R.id.area_overview_fragment) return
 
         val direction = AreaOverviewFragmentDirections.navigateToAreaCircuitScreen(circuitId = circuitId)
 
