@@ -46,13 +46,8 @@ class DiscoverFragment : Fragment() {
 
     private fun onDiscoverHeaderItemClicked(item: DiscoverHeaderItem) {
         val navController = findNavController()
-        val targetDestinationIds = arrayOf(
-            R.id.levels_fragment,
-            R.id.dries_fast_fragment,
-            R.id.train_and_bike_fragment
-        )
 
-        if (navController.currentDestination?.id in targetDestinationIds) return
+        if (navController.currentDestination?.id != R.id.discover_fragment) return
 
         val direction = when (item) {
             DiscoverHeaderItem.BEGINNER_GUIDE -> {
@@ -74,7 +69,7 @@ class DiscoverFragment : Fragment() {
     private fun onAreaClicked(areaId: Int) {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.area_overview_fragment) return
+        if (navController.currentDestination?.id != R.id.discover_fragment) return
 
         val direction = DiscoverFragmentDirections.navigateToAreaOverviewScreen(
             areaId = areaId,
@@ -97,7 +92,7 @@ class DiscoverFragment : Fragment() {
 
         try {
             startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
+        } catch (_: ActivityNotFoundException) {
             viewModel.onNoBrowserAvailable(url)
         }
     }

@@ -500,7 +500,7 @@ class MapFragment : Fragment(), BoolderMapListener {
 
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.area_overview_fragment) return
+        if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.navigateToAreaOverviewScreen(areaId = areaId)
 
@@ -511,7 +511,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun navigateToSearchScreen() {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.search_fragment) return
+        if (navController.currentDestination?.id != R.id.map_fragment) return
 
         onTopoUnselected()
         navController.navigate(MapFragmentDirections.navigateToSearch())
@@ -520,7 +520,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun navigateToFullScreenProblemPhoto(problemId: Int, photoUri: String) {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.full_screen_photo_fragment) return
+        if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.showProblemPhotoFullScreen(
             problemId = problemId,
@@ -533,7 +533,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.dialog_circuit_filter) return
+        if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.showCircuitsFilter(
             availableCircuits = event.availableCircuits.toTypedArray()
@@ -545,7 +545,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private fun showGradesFilterBottomSheet(event: MapViewModel.Event.ShowGradeRanges) {
         val navController = findNavController()
 
-        if (navController.currentDestination?.id == R.id.dialog_grades_filter) return
+        if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.showGradesFilter(gradeRange = event.currentGradeRange)
 
