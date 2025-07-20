@@ -42,9 +42,7 @@ import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.MapControlsOverlay
-import com.boolder.boolder.view.map.extension.getAreaBarAndFiltersHeight
 import com.boolder.boolder.view.map.extension.getAreaBarHeight
-import com.boolder.boolder.view.map.extension.getDefaultMargin
 import com.boolder.boolder.view.map.extension.getTopoBottomSheetHeight
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT_ID
@@ -430,24 +428,10 @@ class MapFragment : Fragment(), BoolderMapListener {
             area.northEastLat.toDouble()
         )
 
-        val topInset = topInset + resources.getAreaBarAndFiltersHeight().toDouble()
-        val defaultInset = resources.getDefaultMargin().toDouble()
-
-        mapView.mapboxMap.cameraForCoordinates(
+        mapView.zoomToAreaBounds(
             coordinates = listOf(southWest, northEast),
-            camera = CameraOptions.Builder().build(),
-            coordinatesPadding = EdgeInsets(topInset, defaultInset, defaultInset, defaultInset),
-            maxZoom = null,
-            offset = null
-        ) { cameraOptions ->
-            mapView.camera.flyTo(
-                cameraOptions = cameraOptions,
-                animationOptions = defaultMapAnimationOptions {},
-                animatorListener = animationEndListener { delayedVisitToArea(area.id) }
-            )
-
-            bottomSheetBehavior.state = STATE_HIDDEN
-        }
+            areaId = area.id
+        )
     }
 
     private fun flyToProblem(problem: Problem, origin: TopoOrigin) {

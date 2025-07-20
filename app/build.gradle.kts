@@ -69,7 +69,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     //Mapbox
-    implementation("com.mapbox.maps:android:11.9.0")
+    implementation("com.mapbox.maps:android-ndk27:11.13.3")
 
     // Play Services
     implementation("com.google.android.gms:play-services-location:21.3.0")
