@@ -390,7 +390,7 @@ class BoolderMap(
     }
 
     // Triggered when user click on a Area or Cluster on Map
-    private fun zoomToAreaBounds(
+    fun zoomToAreaBounds(
         coordinates: List<Point>,
         areaId: Int?
     ) {
