@@ -48,6 +48,8 @@ import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialo
 import com.boolder.boolder.view.map.filter.circuit.CircuitFilterBottomSheetDialogFragment.Companion.RESULT_CIRCUIT_ID
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment
 import com.boolder.boolder.view.map.filter.grade.GradesFilterBottomSheetDialogFragment.Companion.RESULT_GRADE_RANGE
+import com.boolder.boolder.view.map.filter.steepness.SteepnessFilterBottomSheetDialogFragment
+import com.boolder.boolder.view.map.filter.steepness.SteepnessFilterBottomSheetDialogFragment.Companion.RESULT_STEEPNESSES
 import com.boolder.boolder.view.search.SearchFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -197,6 +199,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                         offlineAreaItem = screenState.areaState,
                         circuitState = screenState.circuitState,
                         gradeState = screenState.gradeState,
+                        steepnessState = screenState.steepnessFilterState,
                         popularState = screenState.popularFilterState,
                         projectsState = screenState.projectsFilterState,
                         tickedState = screenState.tickedFilterState,
@@ -214,6 +217,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 updateCircuit(screenState.circuitState?.circuitId?.toLong())
                 applyFilters(
                     grades = screenState.gradeState.grades,
+                    steepnesses = screenState.steepnessFilterState.steepnesses,
                     showPopular = screenState.popularFilterState.isEnabled,
                     projectIds = screenState.projectsFilterState.projectIds,
                     tickedIds = screenState.tickedFilterState.tickedProblemIds
@@ -226,6 +230,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 is MapViewModel.Event.SelectProblemOnMap -> mapView.selectProblem(event.problemId.toString())
                 is MapViewModel.Event.ShowAvailableCircuits -> showCircuitFilterBottomSheet(event)
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
+                is MapViewModel.Event.ShowSteepnesses -> showSteepnessFilterBottomSheet(event)
 
                 is MapViewModel.Event.ShowProblemPhotoFullScreen -> navigateToFullScreenProblemPhoto(
                     problemId = event.problemId,
@@ -299,6 +304,15 @@ class MapFragment : Fragment(), BoolderMapListener {
             val gradeRange = requireNotNull(bundle.getParcelable<GradeRange>(RESULT_GRADE_RANGE))
 
             mapViewModel.onGradeRangeSelected(gradeRange)
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            /* requestKey = */ SteepnessFilterBottomSheetDialogFragment.REQUEST_KEY,
+            /* lifecycleOwner = */ this
+        ) { _, bundle ->
+            val steepnesses = requireNotNull(bundle.getStringArray(RESULT_STEEPNESSES))
+
+            mapViewModel.onSteepnessesSelected(steepnesses.toList())
         }
 
         arguments?.getString("problem_id")?.toIntOrNull()?.let { problemId ->
@@ -532,6 +546,18 @@ class MapFragment : Fragment(), BoolderMapListener {
         if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.showGradesFilter(gradeRange = event.currentGradeRange)
+
+        navController.navigate(direction)
+    }
+
+    private fun showSteepnessFilterBottomSheet(event: MapViewModel.Event.ShowSteepnesses) {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id != R.id.map_fragment) return
+
+        val direction = MapFragmentDirections.showSteepnessFilter(
+            selectedSteepnesses = event.selectedSteepnesses.toTypedArray()
+        )
 
         navController.navigate(direction)
     }

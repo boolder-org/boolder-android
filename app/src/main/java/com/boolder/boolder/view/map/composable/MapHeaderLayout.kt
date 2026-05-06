@@ -55,6 +55,7 @@ fun MapHeaderLayout(
     offlineAreaItem: OfflineAreaItem?,
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
+    steepnessState: MapViewModel.SteepnessFilterState,
     popularState: MapViewModel.PopularFilterState,
     projectsState: MapViewModel.ProjectsFilterState,
     tickedState: MapViewModel.TickedFilterState,
@@ -87,6 +88,7 @@ fun MapHeaderLayout(
             FiltersRow(
                 circuitState = circuitState,
                 gradeState = gradeState,
+                steepnessState = steepnessState,
                 popularState = popularState,
                 projectsState = projectsState,
                 tickedState = tickedState,
@@ -101,6 +103,7 @@ fun MapHeaderLayout(
 private fun FiltersRow(
     circuitState: MapViewModel.CircuitState?,
     gradeState: MapViewModel.GradeState,
+    steepnessState: MapViewModel.SteepnessFilterState,
     popularState: MapViewModel.PopularFilterState,
     projectsState: MapViewModel.ProjectsFilterState,
     tickedState: MapViewModel.TickedFilterState,
@@ -111,12 +114,14 @@ private fun FiltersRow(
 
     val isCircuitFilterActive = circuitState != null
     val isGradeFilterActive = gradeState.grades != ALL_GRADES
+    val isSteepnessFilterActive = steepnessState.steepnesses != MapViewModel.ALL_STEEPNESSES
     val isPopularFilterActive = popularState.isEnabled
     val isProjectsFilterActive = projectsState.projectIds.isNotEmpty()
     val isTickedFilterActive = tickedState.tickedProblemIds.isNotEmpty()
 
     val showResetButton = isCircuitFilterActive
         || isGradeFilterActive
+        || isSteepnessFilterActive
         || isPopularFilterActive
         || isProjectsFilterActive
         || isTickedFilterActive
@@ -185,6 +190,16 @@ private fun FiltersRow(
                     label = gradeState.gradeRangeButtonTitle,
                     iconRes = R.drawable.ic_signal_cellular_alt,
                     onClick = filtersEventHandler::onGradeFilterChipClicked
+                )
+            }
+
+            item(key = steepnessState.buttonTitle) {
+                MapFilterChip(
+                    modifier = Modifier.animateItem(),
+                    selected = isSteepnessFilterActive,
+                    label = steepnessState.buttonTitle,
+                    iconRes = R.drawable.ic_steepness_wall,
+                    onClick = filtersEventHandler::onSteepnessFilterChipClicked
                 )
             }
 
@@ -268,6 +283,7 @@ private fun MapFilterChip(
         label = { Text(text = label) },
         leadingIcon = {
             Icon(
+                modifier = Modifier.size(FilterChipDefaults.IconSize),
                 painter = painterResource(id = iconRes),
                 contentDescription = null
             )
@@ -289,6 +305,10 @@ private fun MapHeaderLayoutPreview(
             gradeState = MapViewModel.GradeState(
                 gradeRangeButtonTitle = stringResource(id = R.string.grade),
                 grades = ALL_GRADES
+            ),
+            steepnessState = MapViewModel.SteepnessFilterState(
+                buttonTitle = stringResource(id = R.string.steepness),
+                steepnesses = MapViewModel.ALL_STEEPNESSES
             ),
             popularState = MapViewModel.PopularFilterState(isEnabled = false),
             projectsState = MapViewModel.ProjectsFilterState(projectIds = emptyList()),

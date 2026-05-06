@@ -53,6 +53,9 @@
     <string name="stepness_overhang">Dévers</string>
     <string name="stepness_roof">Toit</string>
     <string name="stepness_traverse">Traversée</string>
+    <string name="stepness_other">Autre</string>
+    <string name="steepness">Inclinaison</string>
+    <string name="filter_steepness_count">Inclinaison (%d)</string>
 
     <string name="topo_action_project_add">Ajouter en projet</string>
     <string name="topo_action_project_remove">Retirer des projets</string>

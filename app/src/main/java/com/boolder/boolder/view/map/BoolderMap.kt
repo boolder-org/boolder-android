@@ -491,6 +491,7 @@ class BoolderMap(
 
     fun applyFilters(
         grades: List<String>,
+        steepnesses: List<String>,
         showPopular: Boolean,
         projectIds: List<Int>,
         tickedIds: List<Int>
@@ -510,6 +511,17 @@ class BoolderMap(
                 literal(grades)
                 literal(true)
                 literal(false)
+            }
+
+            if (steepnesses.isEmpty()) {
+                literal(false)
+            } else {
+                match {
+                    get("steepness")
+                    literal(steepnesses)
+                    literal(true)
+                    literal(false)
+                }
             }
 
             if (showPopular) get("featured")

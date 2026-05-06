@@ -16,6 +16,7 @@ import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.ProblemWithLine
+import com.boolder.boolder.domain.model.Steepness
 import com.boolder.boolder.domain.model.TickedProblem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
@@ -57,6 +58,10 @@ class MapViewModel(
             gradeState = GradeState(
                 gradeRangeButtonTitle = resources.getString(R.string.grades),
                 grades = ALL_GRADES
+            ),
+            steepnessFilterState = SteepnessFilterState(
+                buttonTitle = resources.getString(R.string.steepness),
+                steepnesses = ALL_STEEPNESSES
             ),
             popularFilterState = PopularFilterState(isEnabled = false),
             projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
@@ -174,6 +179,30 @@ class MapViewModel(
         _screenStateFlow.update { it.copy(gradeState = newGradeState) }
     }
 
+    fun onSteepnessesSelected(steepnesses: List<String>) {
+        val orderedSteepnesses = steepnesses.sortedBySteepnessOrder()
+
+        val buttonTitle = when {
+            orderedSteepnesses == ALL_STEEPNESSES -> resources.getString(R.string.steepness)
+            orderedSteepnesses.size == 1 -> {
+                val steepness = Steepness.fromTextValue(orderedSteepnesses.first())
+
+                steepness?.let { resources.getString(it.textRes) }
+                    ?: resources.getString(R.string.steepness)
+            }
+            else -> resources.getString(R.string.filter_steepness_count, orderedSteepnesses.size)
+        }
+
+        _screenStateFlow.update {
+            it.copy(
+                steepnessFilterState = SteepnessFilterState(
+                    buttonTitle = buttonTitle,
+                    steepnesses = orderedSteepnesses
+                )
+            )
+        }
+    }
+
     fun onAreaVisited(areaId: Int) {
         viewModelScope.launch {
             val currentAreaState = _screenStateFlow.value.areaState
@@ -243,6 +272,10 @@ class MapViewModel(
                     gradeRangeButtonTitle = resources.getString(R.string.grades),
                     grades = ALL_GRADES
                 ),
+                steepnessFilterState = SteepnessFilterState(
+                    buttonTitle = resources.getString(R.string.steepness),
+                    steepnesses = ALL_STEEPNESSES
+                ),
                 popularFilterState = PopularFilterState(isEnabled = false),
                 projectsFilterState = ProjectsFilterState(projectIds = emptyList()),
                 tickedFilterState = TickedFilterState(tickedProblemIds = emptyList())
@@ -268,6 +301,16 @@ class MapViewModel(
     override fun onGradeFilterChipClicked() {
         viewModelScope.launch {
             _eventFlow.emit(Event.ShowGradeRanges(currentGradeRange = currentGradeRange))
+        }
+    }
+
+    override fun onSteepnessFilterChipClicked() {
+        viewModelScope.launch {
+            _eventFlow.emit(
+                Event.ShowSteepnesses(
+                    selectedSteepnesses = _screenStateFlow.value.steepnessFilterState.steepnesses
+                )
+            )
         }
     }
 
@@ -515,6 +558,7 @@ class MapViewModel(
         val areaState: OfflineAreaItem?,
         val circuitState: CircuitState?,
         val gradeState: GradeState,
+        val steepnessFilterState: SteepnessFilterState,
         val popularFilterState: PopularFilterState,
         val projectsFilterState: ProjectsFilterState,
         val tickedFilterState: TickedFilterState,
@@ -530,6 +574,11 @@ class MapViewModel(
     data class GradeState(
         val gradeRangeButtonTitle: String,
         val grades: List<String>
+    )
+
+    data class SteepnessFilterState(
+        val buttonTitle: String,
+        val steepnesses: List<String>
     )
 
     data class PopularFilterState(val isEnabled: Boolean)
@@ -548,6 +597,8 @@ class MapViewModel(
 
         data class ShowGradeRanges(val currentGradeRange: GradeRange) : Event
 
+        data class ShowSteepnesses(val selectedSteepnesses: List<String>) : Event
+
         data class ShowProblemPhotoFullScreen(
             val problemId: Int,
             val photoUri: String
@@ -561,4 +612,11 @@ class MapViewModel(
         data object WarnNoSavedProjects : Event
         data object WarnNoTickedProblems : Event
     }
+
+    companion object {
+        val ALL_STEEPNESSES = Steepness.values().map { it.name.lowercase() }
+    }
 }
+
+private fun List<String>.sortedBySteepnessOrder(): List<String> =
+    MapViewModel.ALL_STEEPNESSES.filter { it in this }

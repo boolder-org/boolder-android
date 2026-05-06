@@ -27,6 +27,10 @@ enum class Steepness(
     TRAVERSE(
         textRes = R.string.stepness_traverse,
         iconRes = R.drawable.ic_steepness_traverse_left_right
+    ),
+    OTHER(
+        textRes = R.string.stepness_other,
+        iconRes = R.drawable.ic_more_horiz
     );
 
     companion object {
@@ -36,6 +40,7 @@ enum class Steepness(
             "roof" -> ROOF
             "wall" -> WALL
             "traverse" -> TRAVERSE
+            "other" -> OTHER
             else -> null
         }
     }

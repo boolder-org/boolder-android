@@ -15,6 +15,7 @@ import com.boolder.boolder.view.discover.trainandbike.TrainAndBikeViewModel
 import com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoViewModel
 import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
+import com.boolder.boolder.view.map.filter.steepness.SteepnessFilterViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModelImpl
 import com.boolder.boolder.view.search.SearchViewModel
@@ -32,6 +33,7 @@ val viewModelModule = module {
     factory { MapboxStyleFactory() }
 
     viewModelOf(::GradesFilterViewModel)
+    viewModelOf(::SteepnessFilterViewModel)
 
     viewModelOf(::OfflinePhotosViewModelImpl) { binds(listOf(OfflinePhotosViewModel::class)) }
     factory { FileExplorer(androidApplication()) }

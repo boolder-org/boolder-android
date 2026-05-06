@@ -34,6 +34,9 @@
             android:id="@+id/show_grades_filter"
             app:destination="@+id/dialog_grades_filter" />
         <action
+            android:id="@+id/show_steepness_filter"
+            app:destination="@+id/dialog_steepness_filter" />
+        <action
             android:id="@+id/show_poi"
             app:destination="@+id/dialog_poi" />
         <action
@@ -229,6 +232,15 @@
         <argument
             android:name="grade_range"
             app:argType="com.boolder.boolder.domain.model.GradeRange" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/dialog_steepness_filter"
+        android:name="com.boolder.boolder.view.map.filter.steepness.SteepnessFilterBottomSheetDialogFragment"
+        android:label="Steepness filter">
+        <argument
+            android:name="selected_steepnesses"
+            app:argType="string[]" />
     </dialog>
 
     <dialog
