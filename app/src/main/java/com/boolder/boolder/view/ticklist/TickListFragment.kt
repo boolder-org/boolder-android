@@ -52,6 +52,7 @@ class TickListFragment : Fragment() {
                     TickListScreen(
                         screenState = screenState,
                         onProblemClicked = ::onProblemClicked,
+                        onFilterSelected = viewModel::onFilterSelected,
                         onExportTickListClicked = viewModel::onExportTickList,
                         onImportTickListClicked = viewModel::onChooseTickListToImport
                     )

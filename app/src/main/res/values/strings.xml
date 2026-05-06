@@ -134,6 +134,9 @@
 
     <string name="tick_list_action_export">Export</string>
     <string name="tick_list_action_import">Import</string>
+    <string name="tick_list_filter_both">Both</string>
+    <string name="tick_list_filter_favorites">Favorites</string>
+    <string name="tick_list_filter_ticked">Ticked</string>
     <string name="tick_list_dialog_importation_button_cancel">Cancel</string>
     <string name="tick_list_dialog_importation_button_delete">Delete</string>
     <string name="tick_list_dialog_importation_button_keep">Keep</string>
@@ -143,6 +146,8 @@
     <string name="tick_list_dialog_overwriting_importation_no">No</string>
     <string name="tick_list_dialog_overwriting_importation_yes">Yes</string>
     <string name="tick_list_empty_state_body">Your projects and ticks will appear here.</string>
+    <string name="tick_list_empty_filter_favorites">No favorites to show.</string>
+    <string name="tick_list_empty_filter_ticked">No ticks to show.</string>
     <string name="tick_list_error_import_malformed_input">The file is malformed and can\'t be imported.</string>
     <string name="tick_list_error_import_cant_be_read">The file can\'t be read.</string>
 

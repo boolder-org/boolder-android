@@ -131,6 +131,9 @@
 
     <string name="tick_list_action_export">Exporter</string>
     <string name="tick_list_action_import">Importer</string>
+    <string name="tick_list_filter_both">Tout</string>
+    <string name="tick_list_filter_favorites">Favoris</string>
+    <string name="tick_list_filter_ticked">R&#233;ussies</string>
     <string name="tick_list_dialog_importation_button_cancel">Annuler</string>
     <string name="tick_list_dialog_importation_button_delete">Supprimer</string>
     <string name="tick_list_dialog_importation_button_keep">Conserver</string>
@@ -140,6 +143,8 @@
     <string name="tick_list_dialog_overwriting_importation_no">Non</string>
     <string name="tick_list_dialog_overwriting_importation_yes">Oui</string>
     <string name="tick_list_empty_state_body">Vos projets et vos voies réussies apparaîtront ici.</string>
+    <string name="tick_list_empty_filter_favorites">Aucun favori &#224; afficher.</string>
+    <string name="tick_list_empty_filter_ticked">Aucune voie r&#233;ussie &#224; afficher.</string>
     <string name="tick_list_error_import_malformed_input">Le fichier est malformé et ne peut être importé.</string>
     <string name="tick_list_error_import_cant_be_read">Le fichier ne peut être lu.</string>
 

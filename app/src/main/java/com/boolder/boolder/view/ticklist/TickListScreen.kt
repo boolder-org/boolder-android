@@ -9,15 +9,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +60,7 @@ import com.boolder.boolder.view.compose.ProblemIcon
 internal fun TickListScreen(
     screenState: TickListViewModel.ScreenState,
     onProblemClicked: (Problem) -> Unit,
+    onFilterSelected: (TickListViewModel.TickListFilter) -> Unit,
     onExportTickListClicked: () -> Unit,
     onImportTickListClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -114,7 +119,8 @@ internal fun TickListScreen(
                 is TickListViewModel.ScreenState.Content -> TickListScreenContent(
                     screenState = screenState,
                     contentPadding = it,
-                    onProblemClicked = onProblemClicked
+                    onProblemClicked = onProblemClicked,
+                    onFilterSelected = onFilterSelected
                 )
             }
         }
@@ -126,45 +132,128 @@ private fun TickListScreenContent(
     screenState: TickListViewModel.ScreenState.Content,
     contentPadding: PaddingValues,
     onProblemClicked: (Problem) -> Unit,
+    onFilterSelected: (TickListViewModel.TickListFilter) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (screenState.problems.isEmpty()) {
+    if (!screenState.hasSavedProblems) {
         TickListEmptyState(contentPadding = contentPadding)
         
         return
     }
-    
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            top = contentPadding.calculateTopPadding() + 8.dp,
-            bottom = 16.dp,
-            start = 16.dp,
-            end = 16.dp,
-        ),
-        verticalArrangement = spacedBy(8.dp)
-    ) {
-        itemsIndexed(
-            items = screenState.problems,
-            key = { _, problem -> problem.id }
-        ) { index, problem ->
-            if (index == 0 || screenState.problems[index - 1].areaName != problem.areaName) {
-                Text(
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .padding(bottom = 8.dp),
-                    text = problem.areaName.orEmpty(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
-                )
-            }
 
-            ProblemItem(
-                problem = problem,
-                onProblemClicked = { onProblemClicked(problem) }
+    Column(
+        modifier = modifier.fillMaxSize(),
+    ) {
+        TickListFilterRow(
+            selectedFilter = screenState.selectedFilter,
+            onFilterSelected = onFilterSelected,
+            modifier = Modifier
+                .padding(top = contentPadding.calculateTopPadding() + 8.dp)
+                .padding(horizontal = 16.dp)
+        )
+
+        if (screenState.problems.isEmpty()) {
+            TickListFilteredEmptyState(selectedFilter = screenState.selectedFilter)
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    top = 8.dp,
+                    bottom = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                ),
+                verticalArrangement = spacedBy(8.dp)
+            ) {
+                itemsIndexed(
+                    items = screenState.problems,
+                    key = { _, problem -> problem.id }
+                ) { index, problem ->
+                    if (index == 0 || screenState.problems[index - 1].areaName != problem.areaName) {
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = 16.dp)
+                                .padding(bottom = 8.dp),
+                            text = problem.areaName.orEmpty(),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    ProblemItem(
+                        problem = problem,
+                        onProblemClicked = { onProblemClicked(problem) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TickListFilterRow(
+    selectedFilter: TickListViewModel.TickListFilter,
+    onFilterSelected: (TickListViewModel.TickListFilter) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val filters = TickListViewModel.TickListFilter.values()
+
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = spacedBy(8.dp)
+    ) {
+        items(filters.size) { index ->
+            val filter = filters[index]
+
+            TickListFilterChip(
+                selected = selectedFilter == filter,
+                filter = filter,
+                onClick = { onFilterSelected(filter) }
             )
         }
+    }
+}
+
+@Composable
+private fun TickListFilterChip(
+    selected: Boolean,
+    filter: TickListViewModel.TickListFilter,
+    onClick: () -> Unit
+) {
+    ElevatedFilterChip(
+        selected = selected,
+        shape = CircleShape,
+        colors = FilterChipDefaults.elevatedFilterChipColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+            iconColor = MaterialTheme.colorScheme.onSurface
+        ),
+        label = { Text(text = stringResource(id = filter.labelRes())) },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = filter.iconRes()),
+                contentDescription = null
+            )
+        },
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun TickListFilteredEmptyState(
+    selectedFilter: TickListViewModel.TickListFilter
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = stringResource(id = selectedFilter.emptyStateRes()),
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -187,6 +276,28 @@ private fun TickListEmptyState(contentPadding: PaddingValues) {
         )
     }
 }
+
+@DrawableRes
+private fun TickListViewModel.TickListFilter.iconRes(): Int =
+    when (this) {
+        TickListViewModel.TickListFilter.BOTH -> R.drawable.ic_bookmark
+        TickListViewModel.TickListFilter.FAVORITES -> R.drawable.ic_star
+        TickListViewModel.TickListFilter.TICKED -> R.drawable.ic_check_circle
+    }
+
+private fun TickListViewModel.TickListFilter.labelRes(): Int =
+    when (this) {
+        TickListViewModel.TickListFilter.BOTH -> R.string.tick_list_filter_both
+        TickListViewModel.TickListFilter.FAVORITES -> R.string.tick_list_filter_favorites
+        TickListViewModel.TickListFilter.TICKED -> R.string.tick_list_filter_ticked
+    }
+
+private fun TickListViewModel.TickListFilter.emptyStateRes(): Int =
+    when (this) {
+        TickListViewModel.TickListFilter.BOTH -> R.string.tick_list_empty_state_body
+        TickListViewModel.TickListFilter.FAVORITES -> R.string.tick_list_empty_filter_favorites
+        TickListViewModel.TickListFilter.TICKED -> R.string.tick_list_empty_filter_ticked
+    }
 
 @Composable
 private fun ProblemItem(
@@ -279,6 +390,7 @@ private fun TickListScreenPreview(
         TickListScreen(
             screenState = screenState,
             onProblemClicked = {},
+            onFilterSelected = {},
             onExportTickListClicked = {},
             onImportTickListClicked = {}
         )

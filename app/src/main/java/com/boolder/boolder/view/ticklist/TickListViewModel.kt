@@ -68,8 +68,30 @@ internal class TickListViewModel(
                     .thenBy(Problem::name)
             )
 
+            val selectedFilter = (_screenState.value as? ScreenState.Content)
+                ?.selectedFilter
+                ?: TickListFilter.BOTH
+
             _screenState.update {
-                ScreenState.Content(problems = sortedProblems)
+                ScreenState.Content(
+                    problems = sortedProblems.filterBy(selectedFilter),
+                    selectedFilter = selectedFilter,
+                    hasSavedProblems = sortedProblems.isNotEmpty(),
+                    problemsForAllFilters = sortedProblems
+                )
+            }
+        }
+    }
+
+    fun onFilterSelected(filter: TickListFilter) {
+        _screenState.update { currentState ->
+            if (currentState is ScreenState.Content) {
+                currentState.copy(
+                    problems = currentState.problemsForAllFilters.filterBy(filter),
+                    selectedFilter = filter
+                )
+            } else {
+                currentState
             }
         }
     }
@@ -178,8 +200,17 @@ internal class TickListViewModel(
     sealed interface ScreenState {
         data object Loading : ScreenState
         data class Content(
-            val problems: List<Problem>
+            val problems: List<Problem>,
+            val selectedFilter: TickListFilter = TickListFilter.BOTH,
+            val hasSavedProblems: Boolean = problems.isNotEmpty(),
+            val problemsForAllFilters: List<Problem> = problems
         ) : ScreenState
+    }
+
+    enum class TickListFilter {
+        BOTH,
+        FAVORITES,
+        TICKED
     }
 
     sealed interface Event {
@@ -189,3 +220,10 @@ internal class TickListViewModel(
         data class AskForReplacementWhenImporting(val exportableTickList: ExportableTickList) : Event
     }
 }
+
+private fun List<Problem>.filterBy(filter: TickListViewModel.TickListFilter): List<Problem> =
+    when (filter) {
+        TickListViewModel.TickListFilter.BOTH -> this
+        TickListViewModel.TickListFilter.FAVORITES -> filter { it.tickStatus == TickStatus.PROJECT }
+        TickListViewModel.TickListFilter.TICKED -> filter { it.tickStatus == TickStatus.SUCCEEDED }
+    }
