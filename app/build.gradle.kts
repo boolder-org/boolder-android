@@ -125,4 +125,7 @@ dependencies {
 
     // Work manager
     implementation("androidx.work:work-runtime-ktx:2.10.0")
+
+    // Billing
+    implementation("com.android.billingclient:billing:9.1.0")
 }
