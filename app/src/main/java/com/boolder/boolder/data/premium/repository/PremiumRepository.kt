@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
+import com.android.billingclient.api.BillingClient.ConnectionState
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
@@ -36,7 +37,7 @@ class PremiumRepository(
     val status: StateFlow<PremiumStatus> = _status.asStateFlow()
 
     private val billingClient = BillingClient.newBuilder(context)
-        .setListener { billingResult, _ -> if (billingResult.isOk()) queryPurchases() }
+        .setListener { billingResult, _ -> if (billingResult.isOk()) refreshPurchases() }
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
         .enableAutoServiceReconnection()
         .build()
@@ -45,7 +46,7 @@ class PremiumRepository(
         billingClient.startConnection(
             object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    if (billingResult.isOk()) queryPurchases()
+                    if (billingResult.isOk()) refreshPurchases()
                 }
 
                 override fun onBillingServiceDisconnected() = Unit
@@ -53,7 +54,9 @@ class PremiumRepository(
         )
     }
 
-    private fun queryPurchases() {
+    fun refreshPurchases() {
+        if (billingClient.connectionState == ConnectionState.CONNECTING) return
+
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(ProductType.SUBS)
             .build()

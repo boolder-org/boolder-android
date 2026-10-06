@@ -9,11 +9,15 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.boolder.boolder.R
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.databinding.ActivityMainBinding
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val premiumRepository by inject<PremiumRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -29,6 +33,11 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.bottomNavigationView.isVisible = destination.id in BOTTOM_BAR_DESTINATION_IDS
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        premiumRepository.refreshPurchases()
     }
 
     override fun onNewIntent(intent: Intent) {
