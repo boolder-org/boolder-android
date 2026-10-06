@@ -196,11 +196,6 @@
         android:name="com.boolder.boolder.view.ticklist.TickListFragment"
         android:label="Tick list" />
 
-    <fragment
-        android:id="@+id/contribute_fragment"
-        android:name="com.boolder.boolder.view.contribute.ContributeFragment"
-        android:label="Contribute" />
-
     <dialog
         android:id="@+id/full_screen_photo_fragment"
         android:name="com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoFragment"

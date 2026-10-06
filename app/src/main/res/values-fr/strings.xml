@@ -3,7 +3,6 @@
     <string name="tab_map">Carte</string>
     <string name="tab_discover">Découvrir</string>
     <string name="tab_tick_list">Mes voies</string>
-    <string name="tab_contribute">Contribuer</string>
 
     <string name="search_query_hint">Nom de voie ou secteur</string>
     <string name="cd_find_my_position">Me localiser</string>
@@ -20,7 +19,6 @@
     <string name="save">Enregistrer</string>
     <string name="saved">Enregistré</string>
     <string name="bleau_info">Bleau.info</string>
-    <string name="report">Signaler</string>
 
     <string name="circuit_short_name_yellow">Jaune</string>
     <string name="circuit_short_name_purple">Violet</string>
@@ -119,7 +117,6 @@
     <string name="discover_section_support">Envie d\'aider ?</string>
     <string name="discover_snackbar_no_browser_found">Aucun navigateur trouvé, impossible d\'ouvrir le lien</string>
     <string name="discover_support_rate">Noter l\'appli</string>
-    <string name="discover_support_contribute">Contribuer</string>
 
     <string name="top_areas_levels_all_areas">Tous les secteurs</string>
     <string name="top_areas_levels_beginner_friendly">Idéal pour débuter</string>
@@ -142,13 +139,6 @@
     <string name="tick_list_empty_state_body">Vos projets et vos voies réussies apparaîtront ici.</string>
     <string name="tick_list_error_import_malformed_input">Le fichier est malformé et ne peut être importé.</string>
     <string name="tick_list_error_import_cant_be_read">Le fichier ne peut être lu.</string>
-
-    <string name="contribute_title">Contribuer à Boolder</string>
-    <string name="contribute_intro">Aidez nous à créer le meilleur topo collaboratif pour Fontainebleau !</string>
-    <string name="contribute_photo">Prenez les blocs manquants en photo</string>
-    <string name="contribute_report">Signalez des erreurs</string>
-    <string name="contribute_cta">Commencer à contribuer</string>
-    <string name="contribute_learn_more">En savoir plus sur Boolder</string>
 
     <string name="full_screen_photo_error">Cette photo ne peut être affichée</string>
 
