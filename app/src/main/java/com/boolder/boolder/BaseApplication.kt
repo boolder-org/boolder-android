@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.boolder.boolder.data.databaseModule
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.domain.domainModule
 import com.boolder.boolder.offline.worker.BoolderWorkerFactory
 import com.boolder.boolder.view.viewModelModule
@@ -38,5 +39,7 @@ class BaseApplication : Application() {
             .build()
 
         WorkManager.initialize(this, workManagerConfiguration)
+
+        getKoin().get<PremiumRepository>().start()
     }
 }
