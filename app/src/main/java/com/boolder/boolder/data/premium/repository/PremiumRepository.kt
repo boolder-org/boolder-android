@@ -13,9 +13,13 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.boolder.boolder.data.datastore.PREF_PREMIUM_SUBSCRIBED
+import com.boolder.boolder.data.premium.model.PREMIUM_PRODUCT_ID
+import com.boolder.boolder.data.premium.model.PremiumProduct
 import com.boolder.boolder.data.premium.model.PremiumStatus
+import com.boolder.boolder.data.premium.model.toPremiumProduct
 import com.boolder.boolder.data.premium.model.toPremiumStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +40,9 @@ class PremiumRepository(
     private val _status = MutableStateFlow(readCachedStatus())
     val status: StateFlow<PremiumStatus> = _status.asStateFlow()
 
+    private val _product = MutableStateFlow<PremiumProduct?>(null)
+    val product: StateFlow<PremiumProduct?> = _product.asStateFlow()
+
     private val billingClient = BillingClient.newBuilder(context)
         .setListener { billingResult, _ -> if (billingResult.isOk()) refreshPurchases() }
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
@@ -46,7 +53,10 @@ class PremiumRepository(
         billingClient.startConnection(
             object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    if (billingResult.isOk()) refreshPurchases()
+                    if (!billingResult.isOk()) return
+
+                    refreshPurchases()
+                    loadProduct()
                 }
 
                 override fun onBillingServiceDisconnected() = Unit
@@ -69,6 +79,26 @@ class PremiumRepository(
                 .forEach(::acknowledgePurchase)
 
             updateStatus(purchases.toPremiumStatus())
+        }
+    }
+
+    fun loadProduct() {
+        if (_product.value != null) return
+        if (billingClient.connectionState == ConnectionState.CONNECTING) return
+
+        val product = QueryProductDetailsParams.Product.newBuilder()
+            .setProductId(PREMIUM_PRODUCT_ID)
+            .setProductType(ProductType.SUBS)
+            .build()
+
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(listOf(product))
+            .build()
+
+        billingClient.queryProductDetailsAsync(params) { billingResult, result ->
+            if (!billingResult.isOk()) return@queryProductDetailsAsync
+
+            _product.value = result.productDetailsList.firstOrNull()?.toPremiumProduct()
         }
     }
 

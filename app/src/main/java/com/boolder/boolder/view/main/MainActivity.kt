@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         premiumRepository.refreshPurchases()
+        premiumRepository.loadProduct()
     }
 
     override fun onNewIntent(intent: Intent) {
