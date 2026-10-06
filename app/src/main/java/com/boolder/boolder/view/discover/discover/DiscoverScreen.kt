@@ -55,7 +55,6 @@ internal fun DiscoverScreen(
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit,
-    onContributeClicked: () -> Unit,
     modifier: Modifier = Modifier,
     event: DiscoverViewModel.Event? = null
 ) {
@@ -89,8 +88,7 @@ internal fun DiscoverScreen(
                     contentPadding = it,
                     onDiscoverHeaderItemClicked = onDiscoverHeaderItemClicked,
                     onAreaClicked = onAreaClicked,
-                    onRateAppClicked = onRateAppClicked,
-                    onContributeClicked = onContributeClicked
+                    onRateAppClicked = onRateAppClicked
                 )
             }
         }
@@ -103,8 +101,7 @@ private fun DiscoverScreenContent(
     contentPadding: PaddingValues,
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
-    onRateAppClicked: () -> Unit,
-    onContributeClicked: () -> Unit
+    onRateAppClicked: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -149,14 +146,6 @@ private fun DiscoverScreenContent(
                 text = stringResource(id = R.string.discover_support_rate),
                 iconRes = R.drawable.ic_star_outline,
                 onClick = onRateAppClicked
-            )
-        }
-
-        item {
-            SupportItem(
-                text = stringResource(id = R.string.discover_support_contribute),
-                iconRes = R.drawable.ic_add_circle_outline,
-                onClick = onContributeClicked
             )
         }
     }
@@ -324,8 +313,7 @@ private fun DiscoverScreenPreview(
             screenState = screenState,
             onDiscoverHeaderItemClicked = {},
             onAreaClicked = {},
-            onRateAppClicked = {},
-            onContributeClicked = {}
+            onRateAppClicked = {}
         )
     }
 }

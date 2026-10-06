@@ -37,7 +37,6 @@ class DiscoverFragment : Fragment() {
                         onDiscoverHeaderItemClicked = ::onDiscoverHeaderItemClicked,
                         onAreaClicked = ::onAreaClicked,
                         onRateAppClicked = ::onOpenPlayStorePage,
-                        onContributeClicked = ::onOpenContributeWebPage,
                         event = event
                     )
                 }
@@ -81,10 +80,6 @@ class DiscoverFragment : Fragment() {
 
     private fun onOpenPlayStorePage() {
         openWebUrl("https://play.google.com/store/apps/details?id=com.boolder.boolder")
-    }
-
-    private fun onOpenContributeWebPage() {
-        openWebUrl("https://www.boolder.com/${getLanguage()}/contribute")
     }
 
     private fun openWebUrl(url: String) {
