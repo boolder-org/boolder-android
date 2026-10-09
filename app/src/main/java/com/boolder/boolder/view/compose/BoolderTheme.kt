@@ -70,3 +70,36 @@ val Color.Companion.BoolderOrange get() = Color(red = 255, green = 149, blue = 0
 
 @Stable
 val Color.Companion.BoolderYellow get() = Color(red = 255, green = 204, blue = 0)
+
+@Stable
+val Color.Companion.BoolderGreenBright get() = Color(0xFF7FCF80)
+
+@Stable
+val Color.Companion.BoolderGreenDark get() = Color(0xFF4FA850)
+
+@Stable
+val Color.Companion.BoolderGreenDeep get() = Color(0xFF3E8C40)
+
+@Stable
+val Color.Companion.BoolderGreenLight get() = Color(0xFFE4F3E4)
+
+@Stable
+val Color.Companion.BleauInfoBlue get() = Color(0xFF1D4ED8)
+
+@Stable
+val Color.Companion.BleauInfoBlueDark get() = Color(0xFF1E3A8A)
+
+@Stable
+val Color.Companion.BleauInfoBlueMedium get() = Color(0xFF3B5FA8)
+
+@Stable
+val Color.Companion.BleauInfoBlueSoft get() = Color(0xFF9DB2D8)
+
+@Stable
+val Color.Companion.BleauInfoBlueBorder get() = Color(0xFFDBEAFE)
+
+@Stable
+val Color.Companion.BleauInfoBlueLight get() = Color(0xFFEFF6FF)
+
+@Stable
+val Color.Companion.LockedPhotoVeil get() = Color(0xFF1C2618)

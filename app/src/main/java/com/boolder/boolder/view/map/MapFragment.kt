@@ -232,6 +232,8 @@ class MapFragment : Fragment(), BoolderMapListener {
                     photoUri = event.photoUri
                 )
 
+                is MapViewModel.Event.ShowPaywall -> navigateToPaywall()
+
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
 
                 is MapViewModel.Event.ZoomOnCircuitStartProblem -> onProblemSelected(
@@ -512,6 +514,14 @@ class MapFragment : Fragment(), BoolderMapListener {
         )
 
         navController.navigate(direction)
+    }
+
+    private fun navigateToPaywall() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id != R.id.map_fragment) return
+
+        navController.navigate(MapFragmentDirections.showPaywall())
     }
 
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {

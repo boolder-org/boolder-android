@@ -149,4 +149,24 @@
     <string name="premium_photo_locked_button">Voir l\'abonnement</string>
     <string name="premium_photo_locked_button_with_price">Voir l\'abonnement · %1$s/an</string>
 
+    <string name="premium_paywall_close">Fermer</string>
+    <string name="premium_paywall_title">Boolder Premium</string>
+    <string name="premium_paywall_subtitle">Tout Fontainebleau dans ta poche</string>
+    <string name="premium_paywall_benefits_title">Ce que tu obtiens</string>
+    <string name="premium_paywall_benefit_areas_title">90 secteurs</string>
+    <string name="premium_paywall_benefit_areas_description">Tout le massif de Fontainebleau</string>
+    <string name="premium_paywall_benefit_problems_title">20 000 voies</string>
+    <string name="premium_paywall_benefit_problems_description">Cotées et classées par circuit</string>
+    <string name="premium_paywall_benefit_photos_title">10 000 photos de blocs</string>
+    <string name="premium_paywall_benefit_photos_description">Avec le tracé de chaque voie</string>
+    <string name="premium_paywall_reasons_title">Pourquoi un abonnement</string>
+    <string name="premium_paywall_reasons_partnership">Boolder × bleau.info</string>
+    <string name="premium_paywall_reasons_description">Boolder est un projet bénévole, sans publicité ni investisseur. Ton abonnement est partagé &lt;b>à parts égales&lt;/b> avec bleau.info, le topo de référence de Fontainebleau.</string>
+    <string name="premium_paywall_subscribe">S\'abonner</string>
+    <string name="premium_paywall_subscribe_with_price">S\'abonner — %1$s/an</string>
+    <string name="premium_paywall_legal">Abonnement annuel à renouvellement automatique, résiliable à tout moment dans Google Play.</string>
+    <string name="premium_paywall_terms">Conditions</string>
+    <string name="premium_paywall_privacy">Confidentialité</string>
+    <string name="premium_paywall_restore">Restaurer un achat</string>
+
 </resources>

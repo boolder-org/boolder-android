@@ -480,7 +480,7 @@ class MapViewModel(
     }
 
     override fun onPremiumRequested() {
-        // TODO(premium): D1
+        viewModelScope.launch { _eventFlow.emit(Event.ShowPaywall) }
     }
 
     // endregion TopoCallbacks
@@ -578,6 +578,8 @@ class MapViewModel(
 
         data class ZoomOnCircuitStartProblem(val problemId: Int) : Event
         data class ZoomOnArea(val area: Area) : Event
+
+        data object ShowPaywall : Event
 
         data object WarnNoSavedProjects : Event
         data object WarnNoTickedProblems : Event

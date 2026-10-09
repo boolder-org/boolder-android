@@ -17,6 +17,7 @@ import com.boolder.boolder.view.map.MapViewModel
 import com.boolder.boolder.view.map.filter.grade.GradesFilterViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModel
 import com.boolder.boolder.view.offlinephotos.OfflinePhotosViewModelImpl
+import com.boolder.boolder.view.premium.PaywallViewModel
 import com.boolder.boolder.view.search.SearchViewModel
 import com.boolder.boolder.view.ticklist.TickListViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -50,4 +51,6 @@ val viewModelModule = module {
     viewModelOf(::TickListViewModel)
 
     viewModelOf(::FullScreenPhotoViewModel)
+
+    viewModelOf(::PaywallViewModel)
 }

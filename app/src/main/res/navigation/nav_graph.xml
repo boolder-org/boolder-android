@@ -39,6 +39,9 @@
         <action
             android:id="@+id/show_problem_photo_full_screen"
             app:destination="@+id/full_screen_photo_fragment" />
+        <action
+            android:id="@+id/show_paywall"
+            app:destination="@+id/dialog_paywall" />
     </fragment>
 
     <fragment
@@ -207,6 +210,11 @@
             android:name="photo_uri"
             app:argType="string" />
     </dialog>
+
+    <dialog
+        android:id="@+id/dialog_paywall"
+        android:name="com.boolder.boolder.view.premium.PaywallBottomSheetDialogFragment"
+        android:label="Paywall" />
 
     <dialog
         android:id="@+id/dialog_circuit_filter"

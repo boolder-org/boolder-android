@@ -152,4 +152,24 @@
     <string name="premium_photo_locked_button">See the subscription</string>
     <string name="premium_photo_locked_button_with_price">See the subscription · %1$s/year</string>
 
+    <string name="premium_paywall_close">Close</string>
+    <string name="premium_paywall_title">Boolder Premium</string>
+    <string name="premium_paywall_subtitle">All of Fontainebleau in your pocket</string>
+    <string name="premium_paywall_benefits_title">What you get</string>
+    <string name="premium_paywall_benefit_areas_title">90 areas</string>
+    <string name="premium_paywall_benefit_areas_description">The whole Fontainebleau forest</string>
+    <string name="premium_paywall_benefit_problems_title">20,000 problems</string>
+    <string name="premium_paywall_benefit_problems_description">Graded and sorted by circuit</string>
+    <string name="premium_paywall_benefit_photos_title">10,000 boulder photos</string>
+    <string name="premium_paywall_benefit_photos_description">With the line of every problem</string>
+    <string name="premium_paywall_reasons_title">Why a subscription</string>
+    <string name="premium_paywall_reasons_partnership">Boolder × bleau.info</string>
+    <string name="premium_paywall_reasons_description">Boolder is a volunteer project, with no ads and no investors. Your subscription is shared &lt;b>equally&lt;/b> with bleau.info, the reference guide for Fontainebleau.</string>
+    <string name="premium_paywall_subscribe">Subscribe</string>
+    <string name="premium_paywall_subscribe_with_price">Subscribe — %1$s/year</string>
+    <string name="premium_paywall_legal">Yearly subscription with automatic renewal, cancel anytime in Google Play.</string>
+    <string name="premium_paywall_terms">Terms</string>
+    <string name="premium_paywall_privacy">Privacy</string>
+    <string name="premium_paywall_restore">Restore purchase</string>
+
 </resources>
