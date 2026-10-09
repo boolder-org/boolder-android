@@ -30,11 +30,12 @@ import com.boolder.boolder.view.compose.BoolderTheme
 internal fun LockedPhoto(
     painter: Painter,
     premiumPrice: String?,
-    onPremiumRequested: () -> Unit
+    onPremiumRequested: (() -> Unit)?,
+    imageModifier: Modifier = Modifier
 ) {
     Box(contentAlignment = Alignment.Center) {
         Image(
-            modifier = Modifier.blur(radius = 24.dp),
+            modifier = imageModifier.blur(radius = 24.dp),
             painter = painter,
             contentDescription = null
         )
@@ -68,12 +69,14 @@ internal fun LockedPhoto(
                 textAlign = TextAlign.Center
             )
 
-            Button(onClick = onPremiumRequested) {
-                Text(
-                    text = premiumPrice
-                        ?.let { stringResource(id = R.string.premium_photo_locked_button_with_price, it) }
-                        ?: stringResource(id = R.string.premium_photo_locked_button)
-                )
+            onPremiumRequested?.let {
+                Button(onClick = it) {
+                    Text(
+                        text = premiumPrice
+                            ?.let { price -> stringResource(id = R.string.premium_photo_locked_button_with_price, price) }
+                            ?: stringResource(id = R.string.premium_photo_locked_button)
+                    )
+                }
             }
         }
     }

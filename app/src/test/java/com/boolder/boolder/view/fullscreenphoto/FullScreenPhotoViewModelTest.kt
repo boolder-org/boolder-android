@@ -1,17 +1,21 @@
 package com.boolder.boolder.view.fullscreenphoto
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.data.premium.model.PremiumStatus
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -32,6 +36,7 @@ class FullScreenPhotoViewModelTest {
     @Mock private lateinit var savedStateHandle: SavedStateHandle
     @Mock private lateinit var lineRepository: LineRepository
     @Mock private lateinit var problemRepository: ProblemRepository
+    @Mock private lateinit var premiumRepository: PremiumRepository
 
     @Before
     fun setUp() {
@@ -51,6 +56,7 @@ class FullScreenPhotoViewModelTest {
             doReturn("https://www.boolder.com/en/photo/666.png").whenever(savedStateHandle).get<String>("photo_uri")
             doReturn(PROBLEM_ENTITY).whenever(problemRepository).problemById(666)
             doReturn(LINE_ENTITY).whenever(lineRepository).loadByProblemId(666)
+            mockPremium(freeAreaIds = setOf(1), status = PremiumStatus.NOT_SUBSCRIBED)
         }
 
         // When
@@ -68,8 +74,49 @@ class FullScreenPhotoViewModelTest {
                 )
             )
 
-            assertEquals(FullScreenPhotoViewModel.ScreenState.Loading, awaitItem())
-            assertEquals(contentState, awaitItem())
+            assertEquals(contentState, awaitFinalState())
+        }
+    }
+
+    @Test
+    fun `viewModel should emit a locked Content state for a paid area when not subscribed`() = runTest {
+        // Given
+        val viewModel = viewModelWithMocking {
+            doReturn(666).whenever(savedStateHandle).get<Int>("problem_id")
+            doReturn("https://www.boolder.com/en/photo/666.png").whenever(savedStateHandle).get<String>("photo_uri")
+            doReturn(PROBLEM_ENTITY).whenever(problemRepository).problemById(666)
+            doReturn(LINE_ENTITY).whenever(lineRepository).loadByProblemId(666)
+            mockPremium(freeAreaIds = setOf(2), status = PremiumStatus.NOT_SUBSCRIBED)
+        }
+
+        // When
+        viewModel.screenState.test {
+
+            // Then
+            val contentState = awaitFinalState() as FullScreenPhotoViewModel.ScreenState.Content
+
+            assertEquals(true, contentState.isPhotoLocked)
+        }
+    }
+
+    @Test
+    fun `viewModel should emit an unlocked Content state for a paid area when subscribed`() = runTest {
+        // Given
+        val viewModel = viewModelWithMocking {
+            doReturn(666).whenever(savedStateHandle).get<Int>("problem_id")
+            doReturn("https://www.boolder.com/en/photo/666.png").whenever(savedStateHandle).get<String>("photo_uri")
+            doReturn(PROBLEM_ENTITY).whenever(problemRepository).problemById(666)
+            doReturn(LINE_ENTITY).whenever(lineRepository).loadByProblemId(666)
+            mockPremium(freeAreaIds = setOf(2), status = PremiumStatus.SUBSCRIBED)
+        }
+
+        // When
+        viewModel.screenState.test {
+
+            // Then
+            val contentState = awaitFinalState() as FullScreenPhotoViewModel.ScreenState.Content
+
+            assertEquals(false, contentState.isPhotoLocked)
         }
     }
 
@@ -86,7 +133,7 @@ class FullScreenPhotoViewModelTest {
         viewModel.screenState.test {
 
             // Then
-            assertEquals(FullScreenPhotoViewModel.ScreenState.Error, awaitItem())
+            assertEquals(FullScreenPhotoViewModel.ScreenState.Error, awaitFinalState())
         }
     }
 
@@ -96,8 +143,17 @@ class FullScreenPhotoViewModelTest {
         return FullScreenPhotoViewModel(
             savedStateHandle = savedStateHandle,
             lineRepository = lineRepository,
-            problemRepository = problemRepository
+            problemRepository = problemRepository,
+            premiumRepository = premiumRepository
         )
+    }
+
+    private suspend fun ReceiveTurbine<FullScreenPhotoViewModel.ScreenState>.awaitFinalState(): FullScreenPhotoViewModel.ScreenState =
+        awaitItem().let { if (it is FullScreenPhotoViewModel.ScreenState.Loading) awaitItem() else it }
+
+    private fun mockPremium(freeAreaIds: Set<Int>, status: PremiumStatus) {
+        doReturn(MutableStateFlow(freeAreaIds)).whenever(premiumRepository).freeAreaIds
+        doReturn(MutableStateFlow(status)).whenever(premiumRepository).status
     }
 
     companion object {
