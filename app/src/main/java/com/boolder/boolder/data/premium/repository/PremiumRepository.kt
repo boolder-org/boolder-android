@@ -1,5 +1,6 @@
 package com.boolder.boolder.data.premium.repository
 
+import android.app.Activity
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -10,6 +11,7 @@ import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClient.ConnectionState
 import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
@@ -20,12 +22,17 @@ import com.boolder.boolder.data.datastore.PREF_PREMIUM_SUBSCRIBED
 import com.boolder.boolder.data.premium.model.PREMIUM_PRODUCT_ID
 import com.boolder.boolder.data.premium.model.PremiumProduct
 import com.boolder.boolder.data.premium.model.PremiumStatus
+import com.boolder.boolder.data.premium.model.PurchaseResult
 import com.boolder.boolder.data.premium.model.toPremiumProduct
 import com.boolder.boolder.data.premium.model.toPremiumStatus
+import com.boolder.boolder.data.premium.model.toPurchaseResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -48,8 +55,11 @@ class PremiumRepository(
     private val _freeAreaIds = MutableStateFlow(emptySet<Int>())
     val freeAreaIds: StateFlow<Set<Int>> = _freeAreaIds.asStateFlow()
 
+    private val _purchaseResults = MutableSharedFlow<PurchaseResult>()
+    val purchaseResults: SharedFlow<PurchaseResult> = _purchaseResults.asSharedFlow()
+
     private val billingClient = BillingClient.newBuilder(context)
-        .setListener { billingResult, _ -> if (billingResult.isOk()) refreshPurchases() }
+        .setListener { billingResult, purchases -> onPurchasesUpdated(billingResult, purchases.orEmpty()) }
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
         .enableAutoServiceReconnection()
         .build()
@@ -83,12 +93,47 @@ class PremiumRepository(
         billingClient.queryPurchasesAsync(params) { billingResult, purchases ->
             if (!billingResult.isOk()) return@queryPurchasesAsync
 
-            purchases
-                .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
-                .forEach(::acknowledgePurchase)
-
-            updateStatus(purchases.toPremiumStatus())
+            onPurchasesFetched(purchases)
         }
+    }
+
+    fun launchPurchase(activity: Activity) {
+        val product = _product.value ?: return
+
+        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+            .setProductDetails(product.productDetails)
+            .setOfferToken(product.offerToken)
+            .build()
+
+        val params = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(listOf(productDetailsParams))
+            .build()
+
+        val billingResult = billingClient.launchBillingFlow(activity, params)
+
+        if (!billingResult.isOk()) onPurchasesUpdated(billingResult, emptyList())
+    }
+
+    private fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>) {
+        val purchaseResult = toPurchaseResult(billingResult.responseCode, purchases)
+
+        when (purchaseResult) {
+            PurchaseResult.SUCCESS -> onPurchasesFetched(purchases)
+            PurchaseResult.ALREADY_OWNED -> refreshPurchases()
+            PurchaseResult.CANCELED,
+            PurchaseResult.PENDING,
+            PurchaseResult.ERROR -> Unit
+        }
+
+        coroutineScope.launch { _purchaseResults.emit(purchaseResult) }
+    }
+
+    private fun onPurchasesFetched(purchases: List<Purchase>) {
+        purchases
+            .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
+            .forEach(::acknowledgePurchase)
+
+        updateStatus(purchases.toPremiumStatus())
     }
 
     fun loadProduct() {

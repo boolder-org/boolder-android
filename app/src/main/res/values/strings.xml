@@ -172,4 +172,9 @@
     <string name="premium_paywall_privacy">Privacy</string>
     <string name="premium_paywall_restore">Restore purchase</string>
 
+    <string name="premium_purchase_pending_title">Purchase pending</string>
+    <string name="premium_purchase_pending_message">Your photos will be unlocked as soon as the payment is confirmed.</string>
+    <string name="premium_purchase_error_title">Purchase failed</string>
+    <string name="premium_purchase_error_message">The purchase could not be completed. Try again in a moment.</string>
+
 </resources>

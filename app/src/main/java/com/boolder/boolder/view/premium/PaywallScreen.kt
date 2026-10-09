@@ -29,6 +29,7 @@ enum class PaywallPresentation {
 internal fun PaywallScreen(
     presentation: PaywallPresentation,
     premiumPrice: String?,
+    isPurchaseInProgress: Boolean,
     onCloseClicked: () -> Unit,
     onSubscribeClicked: () -> Unit,
     onRestoreClicked: () -> Unit,
@@ -59,6 +60,7 @@ internal fun PaywallScreen(
 
         PaywallActions(
             premiumPrice = premiumPrice,
+            isPurchaseInProgress = isPurchaseInProgress,
             onSubscribeClicked = onSubscribeClicked,
             onRestoreClicked = onRestoreClicked,
             onTermsClicked = onTermsClicked,
@@ -77,6 +79,7 @@ private fun PaywallScreenPreview(
         PaywallScreen(
             presentation = PaywallPresentation.SHEET,
             premiumPrice = premiumPrice,
+            isPurchaseInProgress = false,
             onCloseClicked = {},
             onSubscribeClicked = {},
             onRestoreClicked = {},

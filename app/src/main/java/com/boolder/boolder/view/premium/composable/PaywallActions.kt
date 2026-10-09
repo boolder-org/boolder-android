@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import com.boolder.boolder.view.compose.BoolderTheme
 @Composable
 internal fun PaywallActions(
     premiumPrice: String?,
+    isPurchaseInProgress: Boolean,
     onSubscribeClicked: () -> Unit,
     onRestoreClicked: () -> Unit,
     onTermsClicked: () -> Unit,
@@ -43,17 +46,26 @@ internal fun PaywallActions(
     ) {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = premiumPrice != null,
+            enabled = premiumPrice != null && !isPurchaseInProgress,
             onClick = onSubscribeClicked
         ) {
-            Text(
-                modifier = Modifier.padding(vertical = 8.dp),
-                text = premiumPrice
-                    ?.let { stringResource(id = R.string.premium_paywall_subscribe_with_price, it) }
-                    ?: stringResource(id = R.string.premium_paywall_subscribe),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            if (isPurchaseInProgress) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    text = premiumPrice
+                        ?.let { stringResource(id = R.string.premium_paywall_subscribe_with_price, it) }
+                        ?: stringResource(id = R.string.premium_paywall_subscribe),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Text(
@@ -114,6 +126,7 @@ private fun PaywallActionsPreview() {
         Surface {
             PaywallActions(
                 premiumPrice = "10,00 €",
+                isPurchaseInProgress = false,
                 onSubscribeClicked = {},
                 onRestoreClicked = {},
                 onTermsClicked = {},

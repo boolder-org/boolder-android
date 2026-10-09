@@ -12,11 +12,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import com.boolder.boolder.R
+import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.getLanguage
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
@@ -32,12 +35,14 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
             setContent {
                 BoolderTheme {
                     val premiumPrice by viewModel.premiumPrice.collectAsStateWithLifecycle()
+                    val isPurchaseInProgress by viewModel.isPurchaseInProgress.collectAsStateWithLifecycle()
 
                     PaywallScreen(
                         presentation = PaywallPresentation.SHEET,
                         premiumPrice = premiumPrice,
+                        isPurchaseInProgress = isPurchaseInProgress,
                         onCloseClicked = ::onCloseClicked,
-                        onSubscribeClicked = {}, // TODO(premium): D2
+                        onSubscribeClicked = { viewModel.onSubscribeClicked(requireActivity()) },
                         onRestoreClicked = {}, // TODO(premium): D4
                         onTermsClicked = ::onTermsClicked,
                         onPrivacyClicked = ::onPrivacyClicked
@@ -53,6 +58,22 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
             skipCollapsed = true
             state = BottomSheetBehavior.STATE_EXPANDED
         }
+
+        viewModel.events.launchAndCollectIn(owner = viewLifecycleOwner) { event ->
+            when (event) {
+                is PaywallViewModel.Event.PurchaseSucceeded -> onCloseClicked()
+
+                is PaywallViewModel.Event.PurchasePending -> showDialog(
+                    titleRes = R.string.premium_purchase_pending_title,
+                    messageRes = R.string.premium_purchase_pending_message
+                )
+
+                is PaywallViewModel.Event.PurchaseFailed -> showDialog(
+                    titleRes = R.string.premium_purchase_error_title,
+                    messageRes = R.string.premium_purchase_error_message
+                )
+            }
+        }
     }
 
     private fun onCloseClicked() {
@@ -66,6 +87,16 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
 
     private fun onPrivacyClicked() {
         openWebUrl("https://www.boolder.com/${getLanguage()}/privacy")
+    }
+
+    private fun showDialog(titleRes: Int, messageRes: Int) {
+        val context = context ?: return
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(titleRes)
+            .setMessage(messageRes)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     private fun openWebUrl(url: String) {

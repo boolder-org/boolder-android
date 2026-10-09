@@ -169,4 +169,9 @@
     <string name="premium_paywall_privacy">Confidentialité</string>
     <string name="premium_paywall_restore">Restaurer un achat</string>
 
+    <string name="premium_purchase_pending_title">Achat en attente</string>
+    <string name="premium_purchase_pending_message">Tes photos seront débloquées dès que le paiement sera confirmé.</string>
+    <string name="premium_purchase_error_title">Achat impossible</string>
+    <string name="premium_purchase_error_message">L\'achat n\'a pas pu aboutir. Réessaie dans un instant.</string>
+
 </resources>
