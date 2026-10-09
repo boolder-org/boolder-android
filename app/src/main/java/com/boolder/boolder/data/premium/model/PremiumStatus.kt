@@ -16,3 +16,10 @@ fun List<Purchase>.toPremiumStatus(): PremiumStatus {
 
     return if (isSubscribed) PremiumStatus.SUBSCRIBED else PremiumStatus.NOT_SUBSCRIBED
 }
+
+fun isPhotoLocked(
+    areaId: Int,
+    freeAreaIds: Set<Int>,
+    status: PremiumStatus
+): Boolean =
+    areaId !in freeAreaIds && status != PremiumStatus.SUBSCRIBED

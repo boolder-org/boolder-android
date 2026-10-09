@@ -15,6 +15,7 @@ import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.datastore.PREF_PREMIUM_SUBSCRIBED
 import com.boolder.boolder.data.premium.model.PREMIUM_PRODUCT_ID
 import com.boolder.boolder.data.premium.model.PremiumProduct
@@ -32,7 +33,8 @@ import kotlinx.coroutines.runBlocking
 
 class PremiumRepository(
     context: Context,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val areaRepository: AreaRepository
 ) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -43,6 +45,9 @@ class PremiumRepository(
     private val _product = MutableStateFlow<PremiumProduct?>(null)
     val product: StateFlow<PremiumProduct?> = _product.asStateFlow()
 
+    private val _freeAreaIds = MutableStateFlow(emptySet<Int>())
+    val freeAreaIds: StateFlow<Set<Int>> = _freeAreaIds.asStateFlow()
+
     private val billingClient = BillingClient.newBuilder(context)
         .setListener { billingResult, _ -> if (billingResult.isOk()) refreshPurchases() }
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
@@ -50,6 +55,10 @@ class PremiumRepository(
         .build()
 
     fun start() {
+        coroutineScope.launch {
+            _freeAreaIds.value = areaRepository.getTaggedAreas(FREE_AREAS_TAG).map { it.id }.toSet()
+        }
+
         billingClient.startConnection(
             object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
@@ -126,4 +135,8 @@ class PremiumRepository(
 
     private fun BillingResult.isOk(): Boolean =
         responseCode == BillingResponseCode.OK
+
+    companion object {
+        private const val FREE_AREAS_TAG = "popular"
+    }
 }

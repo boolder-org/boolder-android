@@ -5,6 +5,8 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class PremiumStatusTest {
 
@@ -76,6 +78,51 @@ class PremiumStatusTest {
 
         // Then
         assertEquals(PremiumStatus.SUBSCRIBED, status)
+    }
+
+    @Test
+    fun `isPhotoLocked() should return false for a free area when not subscribed`() {
+        // When
+        val isLocked = isPhotoLocked(areaId = 1, freeAreaIds = setOf(1, 2), status = PremiumStatus.NOT_SUBSCRIBED)
+
+        // Then
+        assertFalse(isLocked)
+    }
+
+    @Test
+    fun `isPhotoLocked() should return true for a paid area when not subscribed`() {
+        // When
+        val isLocked = isPhotoLocked(areaId = 3, freeAreaIds = setOf(1, 2), status = PremiumStatus.NOT_SUBSCRIBED)
+
+        // Then
+        assertTrue(isLocked)
+    }
+
+    @Test
+    fun `isPhotoLocked() should return false for a paid area when subscribed`() {
+        // When
+        val isLocked = isPhotoLocked(areaId = 3, freeAreaIds = setOf(1, 2), status = PremiumStatus.SUBSCRIBED)
+
+        // Then
+        assertFalse(isLocked)
+    }
+
+    @Test
+    fun `isPhotoLocked() should return true for any area when free areas are not loaded and not subscribed`() {
+        // When
+        val isLocked = isPhotoLocked(areaId = 1, freeAreaIds = emptySet(), status = PremiumStatus.NOT_SUBSCRIBED)
+
+        // Then
+        assertTrue(isLocked)
+    }
+
+    @Test
+    fun `isPhotoLocked() should return false for any area when free areas are not loaded and subscribed`() {
+        // When
+        val isLocked = isPhotoLocked(areaId = 1, freeAreaIds = emptySet(), status = PremiumStatus.SUBSCRIBED)
+
+        // Then
+        assertFalse(isLocked)
     }
 
     private fun purchase(productId: String, purchaseState: Int): Purchase =
