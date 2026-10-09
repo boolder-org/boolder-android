@@ -1,40 +1,30 @@
 package com.boolder.boolder.view.detail.composable
 
-import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -180,59 +170,6 @@ private fun TopoPhotoContent(
                     painter = painterResource(id = R.drawable.ic_placeholder),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LockedPhoto(
-    painter: Painter,
-    premiumPrice: String?,
-    onPremiumRequested: () -> Unit
-) {
-    Box(contentAlignment = Alignment.Center) {
-        Image(
-            modifier = Modifier.blur(radius = 24.dp),
-            painter = painter,
-            contentDescription = null
-        )
-
-        // Modifier.blur has no effect before Android 12, the photo is hidden instead
-        val veilColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Color.Black.copy(alpha = .4f)
-        } else {
-            MaterialTheme.colorScheme.background
-        }
-
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(color = veilColor)
-        )
-
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.premium_photo_locked_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    Color.White
-                } else {
-                    MaterialTheme.colorScheme.onBackground
-                },
-                textAlign = TextAlign.Center
-            )
-
-            Button(onClick = onPremiumRequested) {
-                Text(
-                    text = premiumPrice
-                        ?.let { stringResource(id = R.string.premium_photo_locked_button_with_price, it) }
-                        ?: stringResource(id = R.string.premium_photo_locked_button)
                 )
             }
         }
