@@ -145,4 +145,8 @@
     <string name="cd_circuit_previous_boulder_problem">Bloc précédent du circuit</string>
     <string name="cd_circuit_next_boulder_problem">Bloc suivant du circuit</string>
 
+    <string name="premium_photo_locked_title">Photo disponible\navec Boolder Premium</string>
+    <string name="premium_photo_locked_button">Voir l\'abonnement</string>
+    <string name="premium_photo_locked_button_with_price">Voir l\'abonnement · %1$s/an</string>
+
 </resources>

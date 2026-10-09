@@ -148,4 +148,8 @@
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>
 
+    <string name="premium_photo_locked_title">Photo available\nwith Boolder Premium</string>
+    <string name="premium_photo_locked_button">See the subscription</string>
+    <string name="premium_photo_locked_button_with_price">See the subscription · %1$s/year</string>
+
 </resources>
