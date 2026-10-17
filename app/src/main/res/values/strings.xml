@@ -182,4 +182,8 @@
     <string name="premium_success_thanks">Thank you! Half of your subscription goes to &lt;b>bleau.info&lt;/b>.</string>
     <string name="premium_success_continue">Continue</string>
 
+    <string name="premium_restore_success_message">Your subscription has been restored.</string>
+    <string name="premium_restore_not_found_message">No Boolder Premium subscription is linked to this Google Play account.</string>
+    <string name="premium_restore_error_message">Couldn\'t reach Google Play. Check your connection.</string>
+
 </resources>

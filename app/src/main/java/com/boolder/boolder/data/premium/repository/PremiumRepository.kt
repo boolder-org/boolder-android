@@ -23,9 +23,11 @@ import com.boolder.boolder.data.premium.model.PREMIUM_PRODUCT_ID
 import com.boolder.boolder.data.premium.model.PremiumProduct
 import com.boolder.boolder.data.premium.model.PremiumStatus
 import com.boolder.boolder.data.premium.model.PurchaseResult
+import com.boolder.boolder.data.premium.model.RestoreResult
 import com.boolder.boolder.data.premium.model.toPremiumProduct
 import com.boolder.boolder.data.premium.model.toPremiumStatus
 import com.boolder.boolder.data.premium.model.toPurchaseResult
+import com.boolder.boolder.data.premium.model.toRestoreResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -94,6 +96,20 @@ class PremiumRepository(
             if (!billingResult.isOk()) return@queryPurchasesAsync
 
             onPurchasesFetched(purchases)
+        }
+    }
+
+    fun restorePurchases(onResult: (RestoreResult) -> Unit) {
+        val params = QueryPurchasesParams.newBuilder()
+            .setProductType(ProductType.SUBS)
+            .build()
+
+        billingClient.queryPurchasesAsync(params) { billingResult, purchases ->
+            val restoreResult = toRestoreResult(billingResult.responseCode, purchases)
+
+            if (restoreResult != RestoreResult.ERROR) onPurchasesFetched(purchases)
+
+            onResult(restoreResult)
         }
     }
 

@@ -47,7 +47,7 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
                             isPurchaseInProgress = isPurchaseInProgress,
                             onCloseClicked = ::onCloseClicked,
                             onSubscribeClicked = { viewModel.onSubscribeClicked(requireActivity()) },
-                            onRestoreClicked = {}, // TODO(premium): D4
+                            onRestoreClicked = viewModel::onRestoreClicked,
                             onTermsClicked = ::onTermsClicked,
                             onPrivacyClicked = ::onPrivacyClicked
                         )
@@ -73,8 +73,6 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
 
         viewModel.events.launchAndCollectIn(owner = viewLifecycleOwner) { event ->
             when (event) {
-                is PaywallViewModel.Event.PurchaseSucceeded -> onCloseClicked()
-
                 is PaywallViewModel.Event.PurchasePending -> showDialog(
                     titleRes = R.string.premium_purchase_pending_title,
                     messageRes = R.string.premium_purchase_pending_message
@@ -83,6 +81,22 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
                 is PaywallViewModel.Event.PurchaseFailed -> showDialog(
                     titleRes = R.string.premium_purchase_error_title,
                     messageRes = R.string.premium_purchase_error_message
+                )
+
+                is PaywallViewModel.Event.RestoreSucceeded -> showDialog(
+                    titleRes = R.string.premium_paywall_restore,
+                    messageRes = R.string.premium_restore_success_message,
+                    onDismiss = ::onCloseClicked
+                )
+
+                is PaywallViewModel.Event.RestoreNotFound -> showDialog(
+                    titleRes = R.string.premium_paywall_restore,
+                    messageRes = R.string.premium_restore_not_found_message
+                )
+
+                is PaywallViewModel.Event.RestoreFailed -> showDialog(
+                    titleRes = R.string.premium_paywall_restore,
+                    messageRes = R.string.premium_restore_error_message
                 )
             }
         }
@@ -101,13 +115,14 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
         openWebUrl("https://www.boolder.com/${getLanguage()}/privacy")
     }
 
-    private fun showDialog(titleRes: Int, messageRes: Int) {
+    private fun showDialog(titleRes: Int, messageRes: Int, onDismiss: () -> Unit = {}) {
         val context = context ?: return
 
         MaterialAlertDialogBuilder(context)
             .setTitle(titleRes)
             .setMessage(messageRes)
             .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .setOnDismissListener { onDismiss() }
             .show()
     }
 

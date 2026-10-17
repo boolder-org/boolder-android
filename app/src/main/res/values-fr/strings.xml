@@ -179,4 +179,8 @@
     <string name="premium_success_thanks">Merci ! La moitié de ton abonnement est reversée à &lt;b>bleau.info&lt;/b>.</string>
     <string name="premium_success_continue">Continuer</string>
 
+    <string name="premium_restore_success_message">Ton abonnement a été restauré.</string>
+    <string name="premium_restore_not_found_message">Aucun abonnement Boolder Premium n\'est associé à ce compte Google Play.</string>
+    <string name="premium_restore_error_message">Impossible de joindre Google Play. Vérifie ta connexion.</string>
+
 </resources>

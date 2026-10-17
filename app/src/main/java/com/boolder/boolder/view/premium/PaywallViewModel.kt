@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.data.premium.model.PurchaseResult
+import com.boolder.boolder.data.premium.model.RestoreResult
 import com.boolder.boolder.data.premium.repository.PremiumRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,8 @@ class PaywallViewModel(
     private val _isPurchaseInProgress = MutableStateFlow(false)
     val isPurchaseInProgress = _isPurchaseInProgress.asStateFlow()
 
+    private val _isRestoreInProgress = MutableStateFlow(false)
+
     private val _isPurchaseSucceeded = MutableStateFlow(false)
     val isPurchaseSucceeded = _isPurchaseSucceeded.asStateFlow()
 
@@ -42,11 +45,23 @@ class PaywallViewModel(
     }
 
     fun onSubscribeClicked(activity: Activity) {
-        if (_isPurchaseInProgress.value) return
+        if (_isPurchaseInProgress.value || _isRestoreInProgress.value) return
 
         _isPurchaseInProgress.value = true
 
         premiumRepository.launchPurchase(activity)
+    }
+
+    fun onRestoreClicked() {
+        if (_isPurchaseInProgress.value || _isRestoreInProgress.value) return
+
+        _isRestoreInProgress.value = true
+
+        premiumRepository.restorePurchases { restoreResult ->
+            _isRestoreInProgress.value = false
+
+            viewModelScope.launch { _events.emit(restoreResult.toEvent()) }
+        }
     }
 
     private suspend fun onPurchaseResult(purchaseResult: PurchaseResult) {
@@ -54,16 +69,25 @@ class PaywallViewModel(
 
         when (purchaseResult) {
             PurchaseResult.SUCCESS -> _isPurchaseSucceeded.value = true
-            PurchaseResult.ALREADY_OWNED -> _events.emit(Event.PurchaseSucceeded)
+            PurchaseResult.ALREADY_OWNED -> _events.emit(Event.RestoreSucceeded)
             PurchaseResult.PENDING -> _events.emit(Event.PurchasePending)
             PurchaseResult.ERROR -> _events.emit(Event.PurchaseFailed)
             PurchaseResult.CANCELED -> Unit
         }
     }
 
+    private fun RestoreResult.toEvent(): Event =
+        when (this) {
+            RestoreResult.RESTORED -> Event.RestoreSucceeded
+            RestoreResult.NOT_FOUND -> Event.RestoreNotFound
+            RestoreResult.ERROR -> Event.RestoreFailed
+        }
+
     sealed interface Event {
-        data object PurchaseSucceeded : Event
         data object PurchasePending : Event
         data object PurchaseFailed : Event
+        data object RestoreSucceeded : Event
+        data object RestoreNotFound : Event
+        data object RestoreFailed : Event
     }
 }
