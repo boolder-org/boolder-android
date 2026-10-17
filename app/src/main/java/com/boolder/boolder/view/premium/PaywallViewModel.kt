@@ -66,6 +66,10 @@ class PaywallViewModel(
         }
     }
 
+    fun onIntroShown() {
+        premiumRepository.markPremiumIntroAsSeen()
+    }
+
     fun onSuccessDismissed() {
         _isPurchaseSucceeded.value = false
     }

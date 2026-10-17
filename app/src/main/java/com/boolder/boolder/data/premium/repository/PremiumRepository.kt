@@ -21,12 +21,15 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.boolder.boolder.data.database.repository.AreaRepository
+import com.boolder.boolder.data.datastore.PREF_PREMIUM_INTRO_SEEN
 import com.boolder.boolder.data.datastore.PREF_PREMIUM_SUBSCRIBED
 import com.boolder.boolder.data.premium.model.PREMIUM_PRODUCT_ID
+import com.boolder.boolder.data.premium.model.PremiumIntroDecision
 import com.boolder.boolder.data.premium.model.PremiumProduct
 import com.boolder.boolder.data.premium.model.PremiumStatus
 import com.boolder.boolder.data.premium.model.PurchaseResult
 import com.boolder.boolder.data.premium.model.RestoreResult
+import com.boolder.boolder.data.premium.model.decidePremiumIntro
 import com.boolder.boolder.data.premium.model.toPremiumProduct
 import com.boolder.boolder.data.premium.model.toPremiumStatus
 import com.boolder.boolder.data.premium.model.toPurchaseResult
@@ -42,9 +45,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 
 class PremiumRepository(
-    context: Context,
+    private val context: Context,
     private val dataStore: DataStore<Preferences>,
     private val areaRepository: AreaRepository
 ) {
@@ -53,6 +57,8 @@ class PremiumRepository(
 
     private val _status = MutableStateFlow(readCachedStatus())
     val status: StateFlow<PremiumStatus> = _status.asStateFlow()
+
+    private val isStatusResolved = MutableStateFlow(false)
 
     private val _product = MutableStateFlow<PremiumProduct?>(null)
     val product: StateFlow<PremiumProduct?> = _product.asStateFlow()
@@ -163,6 +169,7 @@ class PremiumRepository(
             .forEach(::acknowledgePurchase)
 
         updateStatus(purchases.toPremiumStatus())
+        isStatusResolved.value = true
     }
 
     fun loadProduct() {
@@ -193,6 +200,30 @@ class PremiumRepository(
         billingClient.acknowledgePurchase(params) {}
     }
 
+    suspend fun getPremiumIntroDecision(): PremiumIntroDecision {
+        val isIntroSeen = dataStore.data.first()[PREF_PREMIUM_INTRO_SEEN] ?: false
+
+        val status = withTimeoutOrNull(STATUS_RESOLUTION_TIMEOUT) {
+            isStatusResolved.first { it }
+            _status.value
+        }
+
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+
+        return decidePremiumIntro(
+            isIntroSeen = isIntroSeen,
+            status = status,
+            firstInstallTime = packageInfo.firstInstallTime,
+            lastUpdateTime = packageInfo.lastUpdateTime
+        )
+    }
+
+    fun markPremiumIntroAsSeen() {
+        coroutineScope.launch {
+            dataStore.edit { it[PREF_PREMIUM_INTRO_SEEN] = true }
+        }
+    }
+
     private fun updateStatus(status: PremiumStatus) {
         _status.value = status
 
@@ -212,5 +243,6 @@ class PremiumRepository(
 
     companion object {
         private const val FREE_AREAS_TAG = "popular"
+        private const val STATUS_RESOLUTION_TIMEOUT = 3_000L
     }
 }

@@ -42,6 +42,9 @@
         <action
             android:id="@+id/show_paywall"
             app:destination="@+id/dialog_paywall" />
+        <action
+            android:id="@+id/show_premium_intro"
+            app:destination="@+id/dialog_premium_intro" />
     </fragment>
 
     <fragment
@@ -220,6 +223,11 @@
         android:id="@+id/dialog_paywall"
         android:name="com.boolder.boolder.view.premium.PaywallBottomSheetDialogFragment"
         android:label="Paywall" />
+
+    <dialog
+        android:id="@+id/dialog_premium_intro"
+        android:name="com.boolder.boolder.view.premium.PremiumIntroBottomSheetDialogFragment"
+        android:label="Premium intro" />
 
     <dialog
         android:id="@+id/dialog_circuit_filter"

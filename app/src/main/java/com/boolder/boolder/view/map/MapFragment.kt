@@ -173,6 +173,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 pendingMapAction?.invoke()
                     ?: postDelayed(1_000L) { detectArea() }
                 pendingMapAction = null
+                mapViewModel.onMapLoaded()
             }
         }
 
@@ -233,6 +234,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 )
 
                 is MapViewModel.Event.ShowPaywall -> navigateToPaywall()
+                is MapViewModel.Event.ShowPremiumIntro -> navigateToPremiumIntro()
 
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
 
@@ -522,6 +524,15 @@ class MapFragment : Fragment(), BoolderMapListener {
         if (navController.currentDestination?.id != R.id.map_fragment) return
 
         navController.navigate(MapFragmentDirections.showPaywall())
+    }
+
+    private fun navigateToPremiumIntro() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id != R.id.map_fragment) return
+        if (bottomSheetBehavior.state != STATE_HIDDEN) return
+
+        navController.navigate(MapFragmentDirections.showPremiumIntro())
     }
 
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {

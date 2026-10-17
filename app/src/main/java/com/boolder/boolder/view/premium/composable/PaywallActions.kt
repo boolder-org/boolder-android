@@ -10,6 +10,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,9 +33,10 @@ internal fun PaywallActions(
     premiumPrice: String?,
     isPurchaseInProgress: Boolean,
     onSubscribeClicked: () -> Unit,
-    onRestoreClicked: () -> Unit,
+    onRestoreClicked: (() -> Unit)?,
     onTermsClicked: () -> Unit,
-    onPrivacyClicked: () -> Unit
+    onPrivacyClicked: () -> Unit,
+    onLaterClicked: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -64,6 +66,16 @@ internal fun PaywallActions(
                         ?: stringResource(id = R.string.premium_paywall_subscribe),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        if (onLaterClicked != null) {
+            TextButton(onClick = onLaterClicked) {
+                Text(
+                    text = stringResource(id = R.string.premium_intro_later),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

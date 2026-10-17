@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
+import com.boolder.boolder.data.premium.model.PremiumIntroDecision
 import com.boolder.boolder.data.premium.model.isPhotoLocked
 import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
@@ -97,6 +98,7 @@ class MapViewModel(
 
     private var lastZoomValue = 0.0
     private var isProblemTopoShown = false
+    private var isPremiumIntroChecked = false
 
     var cameraState: CameraState? = null
 
@@ -225,6 +227,20 @@ class MapViewModel(
                 areaState = null,
                 circuitState = null
             )
+        }
+    }
+
+    fun onMapLoaded() {
+        if (isPremiumIntroChecked) return
+
+        isPremiumIntroChecked = true
+
+        viewModelScope.launch {
+            when (premiumRepository.getPremiumIntroDecision()) {
+                PremiumIntroDecision.SHOW -> _eventFlow.emit(Event.ShowPremiumIntro)
+                PremiumIntroDecision.MARK_AS_SEEN -> premiumRepository.markPremiumIntroAsSeen()
+                PremiumIntroDecision.NOTHING -> Unit
+            }
         }
     }
 
@@ -580,6 +596,7 @@ class MapViewModel(
         data class ZoomOnArea(val area: Area) : Event
 
         data object ShowPaywall : Event
+        data object ShowPremiumIntro : Event
 
         data object WarnNoSavedProjects : Event
         data object WarnNoTickedProblems : Event

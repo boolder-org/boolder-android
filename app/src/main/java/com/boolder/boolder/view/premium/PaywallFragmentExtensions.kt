@@ -13,13 +13,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 internal fun Fragment.collectPaywallEvents(
     viewModel: PaywallViewModel,
-    onRestoreSucceeded: () -> Unit
+    onRestoreSucceeded: () -> Unit,
+    onPurchasePending: () -> Unit = {}
 ) {
     viewModel.events.launchAndCollectIn(owner = viewLifecycleOwner) { event ->
         when (event) {
             is PaywallViewModel.Event.PurchasePending -> showPaywallDialog(
                 titleRes = R.string.premium_purchase_pending_title,
-                messageRes = R.string.premium_purchase_pending_message
+                messageRes = R.string.premium_purchase_pending_message,
+                onDismiss = onPurchasePending
             )
 
             is PaywallViewModel.Event.PurchaseFailed -> showPaywallDialog(

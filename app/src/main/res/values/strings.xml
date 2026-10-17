@@ -191,4 +191,8 @@
     <string name="premium_management_price">%1$s per year</string>
     <string name="premium_management_manage">Manage subscription</string>
 
+    <string name="premium_intro_badge">New</string>
+    <string name="premium_intro_description">The &lt;b>8 most popular areas remain free&lt;/b>. Photos of the 82 others are available with Boolder Premium.</string>
+    <string name="premium_intro_later">Later</string>
+
 </resources>

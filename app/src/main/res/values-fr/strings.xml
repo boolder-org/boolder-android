@@ -188,4 +188,8 @@
     <string name="premium_management_price">%1$s par an</string>
     <string name="premium_management_manage">Gérer mon abonnement</string>
 
+    <string name="premium_intro_badge">Nouveau</string>
+    <string name="premium_intro_description">Les &lt;b>8 secteurs les plus populaires restent gratuits&lt;/b>. Les photos des 82 autres sont disponibles avec Boolder Premium.</string>
+    <string name="premium_intro_later">Plus tard</string>
+
 </resources>
