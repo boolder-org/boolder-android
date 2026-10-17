@@ -13,6 +13,9 @@ import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.InAppMessageParams
+import com.android.billingclient.api.InAppMessageParams.InAppMessageCategoryId
+import com.android.billingclient.api.InAppMessageResult.InAppMessageResponseCode
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
@@ -128,6 +131,16 @@ class PremiumRepository(
         val billingResult = billingClient.launchBillingFlow(activity, params)
 
         if (!billingResult.isOk()) onPurchasesUpdated(billingResult, emptyList())
+    }
+
+    fun showInAppMessages(activity: Activity) {
+        val params = InAppMessageParams.newBuilder()
+            .addInAppMessageCategoryToShow(InAppMessageCategoryId.TRANSACTIONAL)
+            .build()
+
+        billingClient.showInAppMessages(activity, params) { result ->
+            if (result.responseCode == InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED) refreshPurchases()
+        }
     }
 
     private fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>) {

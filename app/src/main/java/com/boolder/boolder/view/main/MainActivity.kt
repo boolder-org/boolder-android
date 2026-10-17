@@ -26,6 +26,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (savedInstanceState == null) {
+            binding.root.post { premiumRepository.showInAppMessages(this) }
+        }
+
         val navController = findNavController()
 
         binding.bottomNavigationView.setupWithNavController(navController)
