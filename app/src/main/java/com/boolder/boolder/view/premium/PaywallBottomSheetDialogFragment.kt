@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,17 +38,27 @@ class PaywallBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragment() {
                 BoolderTheme {
                     val premiumPrice by viewModel.premiumPrice.collectAsStateWithLifecycle()
                     val isPurchaseInProgress by viewModel.isPurchaseInProgress.collectAsStateWithLifecycle()
+                    val isPurchaseSucceeded by viewModel.isPurchaseSucceeded.collectAsStateWithLifecycle()
 
-                    PaywallScreen(
-                        presentation = PaywallPresentation.SHEET,
-                        premiumPrice = premiumPrice,
-                        isPurchaseInProgress = isPurchaseInProgress,
-                        onCloseClicked = ::onCloseClicked,
-                        onSubscribeClicked = { viewModel.onSubscribeClicked(requireActivity()) },
-                        onRestoreClicked = {}, // TODO(premium): D4
-                        onTermsClicked = ::onTermsClicked,
-                        onPrivacyClicked = ::onPrivacyClicked
-                    )
+                    Box {
+                        PaywallScreen(
+                            presentation = PaywallPresentation.SHEET,
+                            premiumPrice = premiumPrice,
+                            isPurchaseInProgress = isPurchaseInProgress,
+                            onCloseClicked = ::onCloseClicked,
+                            onSubscribeClicked = { viewModel.onSubscribeClicked(requireActivity()) },
+                            onRestoreClicked = {}, // TODO(premium): D4
+                            onTermsClicked = ::onTermsClicked,
+                            onPrivacyClicked = ::onPrivacyClicked
+                        )
+
+                        if (isPurchaseSucceeded) {
+                            PaywallSuccessScreen(
+                                modifier = Modifier.matchParentSize(),
+                                onContinueClicked = ::onCloseClicked
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -29,6 +29,9 @@ class PaywallViewModel(
     private val _isPurchaseInProgress = MutableStateFlow(false)
     val isPurchaseInProgress = _isPurchaseInProgress.asStateFlow()
 
+    private val _isPurchaseSucceeded = MutableStateFlow(false)
+    val isPurchaseSucceeded = _isPurchaseSucceeded.asStateFlow()
+
     private val _events = MutableSharedFlow<Event>()
     val events = _events.asSharedFlow()
 
@@ -50,7 +53,7 @@ class PaywallViewModel(
         _isPurchaseInProgress.value = false
 
         when (purchaseResult) {
-            PurchaseResult.SUCCESS,
+            PurchaseResult.SUCCESS -> _isPurchaseSucceeded.value = true
             PurchaseResult.ALREADY_OWNED -> _events.emit(Event.PurchaseSucceeded)
             PurchaseResult.PENDING -> _events.emit(Event.PurchasePending)
             PurchaseResult.ERROR -> _events.emit(Event.PurchaseFailed)

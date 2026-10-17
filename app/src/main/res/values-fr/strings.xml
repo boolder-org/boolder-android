@@ -174,4 +174,9 @@
     <string name="premium_purchase_error_title">Achat impossible</string>
     <string name="premium_purchase_error_message">L\'achat n\'a pas pu aboutir. Réessaie dans un instant.</string>
 
+    <string name="premium_success_title">Bienvenue dans\nBoolder Premium</string>
+    <string name="premium_success_description">Les photos des 90 secteurs\nsont maintenant visibles.</string>
+    <string name="premium_success_thanks">Merci ! La moitié de ton abonnement est reversée à &lt;b>bleau.info&lt;/b>.</string>
+    <string name="premium_success_continue">Continuer</string>
+
 </resources>

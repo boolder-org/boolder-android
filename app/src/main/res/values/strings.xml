@@ -177,4 +177,9 @@
     <string name="premium_purchase_error_title">Purchase failed</string>
     <string name="premium_purchase_error_message">The purchase could not be completed. Try again in a moment.</string>
 
+    <string name="premium_success_title">Welcome to\nBoolder Premium</string>
+    <string name="premium_success_description">The photos of all 90 areas\nare now visible.</string>
+    <string name="premium_success_thanks">Thank you! Half of your subscription goes to &lt;b>bleau.info&lt;/b>.</string>
+    <string name="premium_success_continue">Continue</string>
+
 </resources>
