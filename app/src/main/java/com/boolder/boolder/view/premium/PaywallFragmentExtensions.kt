@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.boolder.boolder.R
+import com.boolder.boolder.data.premium.model.PREMIUM_PRODUCT_ID
 import com.boolder.boolder.utils.extension.launchAndCollectIn
 import com.boolder.boolder.utils.getLanguage
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -43,6 +44,10 @@ internal fun Fragment.collectPaywallEvents(
             )
         }
     }
+}
+
+internal fun Fragment.openPremiumManagement() {
+    openWebUrl("https://play.google.com/store/account/subscriptions?sku=$PREMIUM_PRODUCT_ID&package=com.boolder.boolder")
 }
 
 internal fun Fragment.openPaywallTerms() {

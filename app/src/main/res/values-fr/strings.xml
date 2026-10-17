@@ -184,4 +184,8 @@
     <string name="premium_restore_not_found_message">Aucun abonnement Boolder Premium n\'est associé à ce compte Google Play.</string>
     <string name="premium_restore_error_message">Impossible de joindre Google Play. Vérifie ta connexion.</string>
 
+    <string name="premium_management_active">Actif</string>
+    <string name="premium_management_price">%1$s par an</string>
+    <string name="premium_management_manage">Gérer mon abonnement</string>
+
 </resources>

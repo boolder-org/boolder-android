@@ -84,15 +84,15 @@ internal fun PaywallActions(
 }
 
 @Composable
-private fun PaywallLinks(
-    onRestoreClicked: () -> Unit,
+internal fun PaywallLinks(
+    onRestoreClicked: (() -> Unit)?,
     onTermsClicked: () -> Unit,
     onPrivacyClicked: () -> Unit
 ) {
-    val links = listOf(
+    val links = listOfNotNull(
         stringResource(id = R.string.premium_paywall_terms) to onTermsClicked,
         stringResource(id = R.string.premium_paywall_privacy) to onPrivacyClicked,
-        stringResource(id = R.string.premium_paywall_restore) to onRestoreClicked
+        onRestoreClicked?.let { stringResource(id = R.string.premium_paywall_restore) to it }
     )
 
     val linkStyles = TextLinkStyles(style = SpanStyle(textDecoration = TextDecoration.Underline))

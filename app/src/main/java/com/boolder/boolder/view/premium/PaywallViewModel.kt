@@ -27,6 +27,8 @@ class PaywallViewModel(
             initialValue = premiumRepository.product.value?.formattedPrice
         )
 
+    val premiumStatus = premiumRepository.status
+
     private val _isPurchaseInProgress = MutableStateFlow(false)
     val isPurchaseInProgress = _isPurchaseInProgress.asStateFlow()
 
