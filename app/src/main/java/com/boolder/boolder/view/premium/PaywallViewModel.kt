@@ -64,6 +64,10 @@ class PaywallViewModel(
         }
     }
 
+    fun onSuccessDismissed() {
+        _isPurchaseSucceeded.value = false
+    }
+
     private suspend fun onPurchaseResult(purchaseResult: PurchaseResult) {
         _isPurchaseInProgress.value = false
 

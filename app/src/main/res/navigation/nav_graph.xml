@@ -199,6 +199,11 @@
         android:name="com.boolder.boolder.view.ticklist.TickListFragment"
         android:label="Tick list" />
 
+    <fragment
+        android:id="@+id/premium_fragment"
+        android:name="com.boolder.boolder.view.premium.PremiumFragment"
+        android:label="Premium" />
+
     <dialog
         android:id="@+id/full_screen_photo_fragment"
         android:name="com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoFragment"

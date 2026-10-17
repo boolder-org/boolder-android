@@ -3,6 +3,7 @@
     <string name="tab_map">Carte</string>
     <string name="tab_discover">Découvrir</string>
     <string name="tab_tick_list">Mes voies</string>
+    <string name="tab_premium">Premium</string>
 
     <string name="search_query_hint">Nom de voie ou secteur</string>
     <string name="cd_find_my_position">Me localiser</string>
