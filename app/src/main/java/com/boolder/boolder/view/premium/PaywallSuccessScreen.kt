@@ -4,13 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -24,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -39,6 +36,7 @@ import com.boolder.boolder.R
 import com.boolder.boolder.view.compose.BoolderGreenDark
 import com.boolder.boolder.view.compose.BoolderGreenDeep
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.premium.composable.PaywallSuccessConfetti
 
 @Composable
 internal fun PaywallSuccessScreen(
@@ -152,36 +150,6 @@ private fun PaywallSuccessThanks() {
         )
     }
 }
-
-@Composable
-private fun PaywallSuccessConfetti() {
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        confettiPieces.forEach { piece ->
-            Box(
-                modifier = Modifier
-                    .offset(x = maxWidth * piece.x, y = maxHeight * piece.y)
-                    .rotate(piece.rotation)
-                    .size(width = 6.dp, height = 10.dp)
-                    .background(color = piece.color, shape = RoundedCornerShape(2.dp))
-            )
-        }
-    }
-}
-
-private data class ConfettiPiece(
-    val x: Float,
-    val y: Float,
-    val rotation: Float,
-    val color: Color
-)
-
-private val confettiPieces = listOf(
-    ConfettiPiece(x = .16f, y = .08f, rotation = 24f, color = Color(0xFFFFD166)),
-    ConfettiPiece(x = .74f, y = .11f, rotation = -18f, color = Color(0xFFEF476F)),
-    ConfettiPiece(x = .44f, y = .05f, rotation = 40f, color = Color.White),
-    ConfettiPiece(x = .86f, y = .20f, rotation = 10f, color = Color(0xFFFFD166)),
-    ConfettiPiece(x = .08f, y = .22f, rotation = -32f, color = Color.White)
-)
 
 @PreviewLightDark
 @Composable
