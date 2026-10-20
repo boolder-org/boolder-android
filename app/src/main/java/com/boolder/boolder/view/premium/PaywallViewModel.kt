@@ -75,6 +75,9 @@ class PaywallViewModel(
     }
 
     private suspend fun onPurchaseResult(purchaseResult: PurchaseResult) {
+        // every paywall collects the same results: only the one that launched the purchase handles them
+        if (!_isPurchaseInProgress.value) return
+
         _isPurchaseInProgress.value = false
 
         when (purchaseResult) {
