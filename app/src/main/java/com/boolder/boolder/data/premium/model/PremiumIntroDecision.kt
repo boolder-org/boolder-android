@@ -14,8 +14,8 @@ fun decidePremiumIntro(
 ): PremiumIntroDecision =
     when {
         isIntroSeen -> PremiumIntroDecision.NOTHING
+        lastUpdateTime <= firstInstallTime -> PremiumIntroDecision.MARK_AS_SEEN
         status == null -> PremiumIntroDecision.NOTHING
         status == PremiumStatus.SUBSCRIBED -> PremiumIntroDecision.MARK_AS_SEEN
-        lastUpdateTime <= firstInstallTime -> PremiumIntroDecision.MARK_AS_SEEN
         else -> PremiumIntroDecision.SHOW
     }

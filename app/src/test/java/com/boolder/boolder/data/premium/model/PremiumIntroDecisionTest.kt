@@ -27,14 +27,12 @@ class PremiumIntroDecisionTest {
     }
 
     @Test
-    fun `decidePremiumIntro() should return NOTHING when the status is not resolved`() {
+    fun `decidePremiumIntro() should return NOTHING when the status is not resolved after an update`() {
         // When
-        val decisions = listOf(true, false).map { isUpdate ->
-            decide(isIntroSeen = false, status = null, isUpdate = isUpdate)
-        }
+        val decision = decide(isIntroSeen = false, status = null, isUpdate = true)
 
         // Then
-        assertEquals(List(2) { PremiumIntroDecision.NOTHING }, decisions)
+        assertEquals(PremiumIntroDecision.NOTHING, decision)
     }
 
     @Test
@@ -49,12 +47,14 @@ class PremiumIntroDecisionTest {
     }
 
     @Test
-    fun `decidePremiumIntro() should return MARK_AS_SEEN for a new user`() {
+    fun `decidePremiumIntro() should return MARK_AS_SEEN for a new user, even when the status is not resolved`() {
         // When
-        val decision = decide(isIntroSeen = false, status = PremiumStatus.NOT_SUBSCRIBED, isUpdate = false)
+        val decisions = listOf(PremiumStatus.NOT_SUBSCRIBED, null).map { status ->
+            decide(isIntroSeen = false, status = status, isUpdate = false)
+        }
 
         // Then
-        assertEquals(PremiumIntroDecision.MARK_AS_SEEN, decision)
+        assertEquals(List(2) { PremiumIntroDecision.MARK_AS_SEEN }, decisions)
     }
 
     private fun decide(isIntroSeen: Boolean, status: PremiumStatus?, isUpdate: Boolean): PremiumIntroDecision =
