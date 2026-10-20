@@ -53,7 +53,6 @@ internal fun Fragment.openPremiumManagement() {
 }
 
 internal fun Fragment.openPaywallTerms() {
-    // TODO(premium): this page does not exist yet on boolder.com
     openWebUrl("https://www.boolder.com/${getLanguage()}/terms")
 }
 
