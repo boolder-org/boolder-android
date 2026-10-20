@@ -36,6 +36,7 @@ import com.boolder.boolder.data.premium.model.toPurchaseResult
 import com.boolder.boolder.data.premium.model.toRestoreResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -53,7 +54,7 @@ class PremiumRepository(
     private val areaRepository: AreaRepository
 ) {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _status = MutableStateFlow(readCachedStatus())
     val status: StateFlow<PremiumStatus> = _status.asStateFlow()
