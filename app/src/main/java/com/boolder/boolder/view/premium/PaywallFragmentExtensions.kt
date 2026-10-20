@@ -49,7 +49,7 @@ internal fun Fragment.collectPaywallEvents(
 }
 
 internal fun Fragment.openPremiumManagement() {
-    openWebUrl("https://play.google.com/store/account/subscriptions?sku=$PREMIUM_PRODUCT_ID&package=com.boolder.boolder")
+    openWebUrl("https://play.google.com/store/account/subscriptions?sku=$PREMIUM_PRODUCT_ID&package=${requireContext().packageName}")
 }
 
 internal fun Fragment.openPaywallTerms() {
@@ -66,7 +66,7 @@ private fun Fragment.showPaywallDialog(titleRes: Int, messageRes: Int, onDismiss
     MaterialAlertDialogBuilder(context)
         .setTitle(titleRes)
         .setMessage(messageRes)
-        .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+        .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
         .setOnDismissListener { onDismiss() }
         .show()
 }
