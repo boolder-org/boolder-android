@@ -61,6 +61,8 @@ class PremiumRepository(
 
     private val isStatusResolved = MutableStateFlow(false)
 
+    private val isConnected = MutableStateFlow(false)
+
     private val _product = MutableStateFlow<PremiumProduct?>(null)
     val product: StateFlow<PremiumProduct?> = _product.asStateFlow()
 
@@ -86,6 +88,7 @@ class PremiumRepository(
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
                     if (!billingResult.isOk()) return
 
+                    isConnected.value = true
                     refreshPurchases()
                     loadProduct()
                 }
@@ -140,7 +143,9 @@ class PremiumRepository(
         if (!billingResult.isOk()) onPurchasesUpdated(billingResult, emptyList())
     }
 
-    fun showInAppMessages(activity: Activity) {
+    suspend fun showInAppMessages(activity: Activity) {
+        isConnected.first { it }
+
         val params = InAppMessageParams.newBuilder()
             .addInAppMessageCategoryToShow(InAppMessageCategoryId.TRANSACTIONAL)
             .build()

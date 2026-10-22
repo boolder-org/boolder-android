@@ -5,12 +5,14 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.boolder.boolder.R
 import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +29,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (savedInstanceState == null) {
-            binding.root.post { premiumRepository.showInAppMessages(this) }
+            binding.root.post {
+                lifecycleScope.launch { premiumRepository.showInAppMessages(this@MainActivity) }
+            }
         }
 
         val navController = findNavController()
