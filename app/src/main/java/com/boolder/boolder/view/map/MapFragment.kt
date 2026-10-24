@@ -86,6 +86,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private lateinit var mapView: BoolderMap
     private var pendingMapAction: (() -> Unit)? = null
     private var topInset = 0
+    private var lastFlownProblemId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -411,10 +412,15 @@ class MapFragment : Fragment(), BoolderMapListener {
                 ?.problem
                 ?: return@let
 
+            // the topo is re-emitted when the premium status or price changes: only move the map for a new problem
+            if (selectedProblem.id == lastFlownProblemId) return@let
+
+            lastFlownProblemId = selectedProblem.id
             flyToProblem(problem = selectedProblem, origin = topo.origin)
         }
 
         if (nullableTopo == null) {
+            lastFlownProblemId = null
             bottomSheetBehavior.state = STATE_HIDDEN
         } else {
             onBackPressedCallback.isEnabled = true
