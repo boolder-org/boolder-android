@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,8 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
-import com.boolder.boolder.view.compose.BoolderGreenDark
-import com.boolder.boolder.view.compose.BoolderGreenDeep
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.premium.composable.PaywallSuccessConfetti
 
@@ -46,12 +43,7 @@ internal fun PaywallSuccessScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.linearGradient(
-                    0f to Color.BoolderGreenDark,
-                    1f to Color.BoolderGreenDeep
-                )
-            )
+            .background(color = MaterialTheme.colorScheme.primary)
     ) {
         PaywallSuccessConfetti()
 
@@ -78,7 +70,7 @@ internal fun PaywallSuccessScreen(
                         modifier = Modifier.size(40.dp),
                         painter = painterResource(id = R.drawable.ic_done),
                         contentDescription = null,
-                        tint = Color.BoolderGreenDeep
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -104,7 +96,7 @@ internal fun PaywallSuccessScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
-                    contentColor = Color.BoolderGreenDeep
+                    contentColor = MaterialTheme.colorScheme.primary
                 ),
                 onClick = onContinueClicked
             ) {

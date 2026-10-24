@@ -10,8 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import com.boolder.boolder.R
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -39,6 +41,7 @@ class PremiumIntroBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragmen
                             onCloseClicked = ::onCloseClicked,
                             onSubscribeClicked = { viewModel.onSubscribeClicked(requireActivity()) },
                             onLaterClicked = ::onCloseClicked,
+                            onSeePopularAreasClicked = ::onSeePopularAreasClicked,
                             onTermsClicked = ::openPaywallTerms,
                             onPrivacyClicked = ::openPaywallPrivacy
                         )
@@ -73,5 +76,13 @@ class PremiumIntroBottomSheetDialogFragment : EdgeToEdgeBottomSheetDialogFragmen
 
     private fun onCloseClicked() {
         findNavController().popBackStack()
+    }
+
+    private fun onSeePopularAreasClicked() {
+        onCloseClicked()
+
+        requireActivity()
+            .findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
+            .selectedItemId = R.id.discover_fragment
     }
 }

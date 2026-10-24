@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,7 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.boolder.boolder.view.compose.BoolderGreenDeep
+import com.boolder.boolder.view.compose.BoolderTheme
 import kotlin.random.Random
 
 private const val CONFETTI_COUNT = 18
@@ -109,7 +110,9 @@ private data class ConfettiFall(
 @Preview
 @Composable
 private fun PaywallSuccessConfettiPreview() {
-    PaywallSuccessConfetti(
-        modifier = Modifier.background(color = Color.BoolderGreenDeep)
-    )
+    BoolderTheme {
+        PaywallSuccessConfetti(
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.primary)
+        )
+    }
 }

@@ -3,6 +3,8 @@ package com.boolder.boolder.view.discover.discover
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.data.database.repository.AreaRepository
+import com.boolder.boolder.data.premium.model.PremiumStatus
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.domain.model.Area
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DiscoverViewModel(
-    private val areaRepository: AreaRepository
+    private val areaRepository: AreaRepository,
+    private val premiumRepository: PremiumRepository
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
@@ -26,11 +29,14 @@ class DiscoverViewModel(
             val allAreas = areaRepository.getAllAreas()
             val popularAreas = areaRepository.getTaggedAreas("popular")
 
-            _screenState.update {
-                ScreenState.Content(
-                    allAreas = allAreas,
-                    popularAreas = popularAreas
-                )
+            premiumRepository.status.collect { status ->
+                _screenState.update {
+                    ScreenState.Content(
+                        allAreas = allAreas,
+                        popularAreas = popularAreas,
+                        showFreeAreasBanner = status != PremiumStatus.SUBSCRIBED
+                    )
+                }
             }
         }
     }
@@ -45,7 +51,8 @@ class DiscoverViewModel(
         data object Loading : ScreenState
         data class Content(
             val allAreas: List<Area>,
-            val popularAreas: List<Area>
+            val popularAreas: List<Area>,
+            val showFreeAreasBanner: Boolean
         ) : ScreenState
     }
 

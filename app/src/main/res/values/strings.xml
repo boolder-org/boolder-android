@@ -119,6 +119,8 @@
     <string name="discover_section_all_areas">All areas</string>
     <string name="discover_section_popular_areas">Popular</string>
     <string name="discover_section_support">Want to help?</string>
+    <string name="discover_free_areas">Problem photos and lines are available for free in popular areas.</string>
+    <string name="discover_free_areas_see_areas">See the areas</string>
     <string name="discover_snackbar_no_browser_found">No browser found, can\'t open the link</string>
     <string name="discover_support_rate">Rate the app</string>
 
@@ -165,7 +167,7 @@
     <string name="premium_paywall_benefit_photos_description">With the line of every problem</string>
     <string name="premium_paywall_reasons_title">Why a subscription</string>
     <string name="premium_paywall_reasons_partnership">Boolder × bleau.info</string>
-    <string name="premium_paywall_reasons_description">Boolder is a volunteer project, with no ads and no investors. Your subscription is shared &lt;b>equally&lt;/b> with bleau.info, the reference guide for Fontainebleau.</string>
+    <string name="premium_paywall_reasons_description">Boolder is a volunteer project, with no ads and no investors. Your subscription is shared &lt;b>equally&lt;/b> with bleau.info, the reference guide for Fontainebleau, and will only be used to develop climbing.&lt;br>&lt;a href=\"https://www.boolder.com/en\">Learn more&lt;/a></string>
     <string name="premium_paywall_subscribe">Subscribe</string>
     <string name="premium_paywall_subscribe_with_price">Subscribe — %1$s/year</string>
     <string name="premium_paywall_legal">Yearly subscription with automatic renewal, cancel anytime in Google Play.</string>
@@ -193,6 +195,7 @@
 
     <string name="premium_intro_badge">New</string>
     <string name="premium_intro_description">The &lt;b>8 most popular areas remain free&lt;/b>. Photos of the 82 others are available with Boolder Premium.</string>
+    <string name="premium_intro_see_popular_areas">See the popular areas</string>
     <string name="premium_intro_later">Later</string>
 
 </resources>

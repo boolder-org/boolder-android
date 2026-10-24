@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +49,7 @@ import com.boolder.boolder.utils.previewgenerator.dummyArea
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.LoadingScreen
 import com.boolder.boolder.view.discover.composable.AreaThumbnailsRow
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,8 +106,12 @@ private fun DiscoverScreenContent(
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit
 ) {
+    val lazyListState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
+        state = lazyListState,
         contentPadding = PaddingValues(
             top = contentPadding.calculateTopPadding() + 16.dp,
             bottom = 16.dp
@@ -113,6 +120,17 @@ private fun DiscoverScreenContent(
     ) {
         item {
             DiscoverHeader(onItemClicked = onDiscoverHeaderItemClicked)
+        }
+
+        if (screenState.showFreeAreasBanner) {
+            item {
+                FreeAreasBanner(
+                    onSeeAreasClicked = {
+                        // the popular areas title comes right after the header and this banner
+                        coroutineScope.launch { lazyListState.animateScrollToItem(index = 2) }
+                    }
+                )
+            }
         }
 
         item {
@@ -235,6 +253,41 @@ private fun DiscoverHeaderItem(
 }
 
 @Composable
+private fun FreeAreasBanner(onSeeAreasClicked: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(8.dp))
+            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = .15f))
+            .padding(16.dp),
+        horizontalArrangement = spacedBy(8.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_check_circle),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Column(verticalArrangement = spacedBy(6.dp)) {
+            Text(
+                text = stringResource(id = R.string.discover_free_areas),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable(onClick = onSeeAreasClicked),
+                text = stringResource(id = R.string.discover_free_areas_see_areas),
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
 private fun DiscoverSectionTitle(text: String) {
     Text(
         modifier = Modifier.padding(16.dp),
@@ -331,7 +384,8 @@ private class DiscoverScreenPreviewParameterProvider : PreviewParameterProvider<
         DiscoverViewModel.ScreenState.Loading,
         DiscoverViewModel.ScreenState.Content(
             allAreas = dummyAreas,
-            popularAreas = dummyAreas
+            popularAreas = dummyAreas,
+            showFreeAreasBanner = true
         )
     )
 }

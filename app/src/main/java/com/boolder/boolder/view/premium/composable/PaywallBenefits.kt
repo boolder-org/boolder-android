@@ -3,7 +3,6 @@ package com.boolder.boolder.view.premium.composable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,15 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
-import com.boolder.boolder.view.compose.BoolderGreenDeep
-import com.boolder.boolder.view.compose.BoolderGreenLight
 import com.boolder.boolder.view.compose.BoolderTheme
 
 @Composable
@@ -58,8 +54,6 @@ private fun PaywallBenefit(
     @StringRes titleRes: Int,
     @StringRes descriptionRes: Int
 ) {
-    val isDarkTheme = isSystemInDarkTheme()
-
     Row(
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp),
         horizontalArrangement = spacedBy(16.dp),
@@ -69,7 +63,7 @@ private fun PaywallBenefit(
             modifier = Modifier
                 .size(46.dp)
                 .background(
-                    color = if (isDarkTheme) MaterialTheme.colorScheme.primary.copy(alpha = .2f) else Color.BoolderGreenLight,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = .15f),
                     shape = RoundedCornerShape(12.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -78,7 +72,7 @@ private fun PaywallBenefit(
                 modifier = Modifier.size(24.dp),
                 painter = painterResource(id = iconRes),
                 contentDescription = null,
-                tint = if (isDarkTheme) MaterialTheme.colorScheme.primary else Color.BoolderGreenDeep
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 

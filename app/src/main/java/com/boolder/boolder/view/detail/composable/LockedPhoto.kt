@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.view.compose.BoolderTheme
-import com.boolder.boolder.view.compose.LockedPhotoVeil
 
 @Composable
 internal fun LockedPhoto(
@@ -53,7 +52,7 @@ internal fun LockedPhoto(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(color = Color.LockedPhotoVeil.copy(alpha = veilAlpha))
+                .background(color = Color.Black.copy(alpha = veilAlpha))
         )
 
         Column(

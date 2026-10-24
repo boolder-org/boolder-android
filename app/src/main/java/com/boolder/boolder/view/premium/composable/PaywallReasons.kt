@@ -23,22 +23,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.view.compose.BleauInfoBlue
-import com.boolder.boolder.view.compose.BleauInfoBlueBorder
-import com.boolder.boolder.view.compose.BleauInfoBlueDark
-import com.boolder.boolder.view.compose.BleauInfoBlueLight
-import com.boolder.boolder.view.compose.BleauInfoBlueMedium
-import com.boolder.boolder.view.compose.BleauInfoBlueSoft
+import com.boolder.boolder.view.compose.BleauInfoBlueNight
 import com.boolder.boolder.view.compose.BoolderTheme
 
 @Composable
 internal fun PaywallReasons() {
-    val isDarkTheme = isSystemInDarkTheme()
+    val bleauInfoBlue = if (isSystemInDarkTheme()) Color.BleauInfoBlueNight else Color.BleauInfoBlue
     val shape = RoundedCornerShape(16.dp)
 
     Column {
@@ -50,12 +48,12 @@ internal fun PaywallReasons() {
                 .padding(top = 6.dp)
                 .fillMaxWidth()
                 .background(
-                    color = if (isDarkTheme) Color.BleauInfoBlue.copy(alpha = .2f) else Color.BleauInfoBlueLight,
+                    color = bleauInfoBlue.copy(alpha = .08f),
                     shape = shape
                 )
                 .border(
                     width = 1.dp,
-                    color = if (isDarkTheme) Color.BleauInfoBlue.copy(alpha = .4f) else Color.BleauInfoBlueBorder,
+                    color = bleauInfoBlue.copy(alpha = .2f),
                     shape = shape
                 )
                 .padding(16.dp),
@@ -69,7 +67,7 @@ internal fun PaywallReasons() {
 
                 Text(
                     text = "×",
-                    color = Color.BleauInfoBlueSoft
+                    color = bleauInfoBlue.copy(alpha = .5f)
                 )
 
                 PaywallPartnerLogo(imageRes = R.drawable.premium_logo_bleau_info)
@@ -79,16 +77,17 @@ internal fun PaywallReasons() {
                     text = stringResource(id = R.string.premium_paywall_reasons_partnership),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (isDarkTheme) Color.BleauInfoBlueBorder else Color.BleauInfoBlueDark
+                    color = bleauInfoBlue
                 )
             }
 
             Text(
                 text = AnnotatedString.fromHtml(
-                    htmlString = stringResource(id = R.string.premium_paywall_reasons_description)
+                    htmlString = stringResource(id = R.string.premium_paywall_reasons_description),
+                    linkStyles = TextLinkStyles(style = SpanStyle(color = bleauInfoBlue))
                 ),
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isDarkTheme) Color.BleauInfoBlueBorder else Color.BleauInfoBlueMedium
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

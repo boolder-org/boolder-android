@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,9 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
-import com.boolder.boolder.view.compose.BoolderGreenBright
-import com.boolder.boolder.view.compose.BoolderGreenDark
-import com.boolder.boolder.view.compose.BoolderGreenDeep
 import com.boolder.boolder.view.compose.BoolderTheme
 
 @Composable
@@ -49,13 +45,7 @@ internal fun PaywallHeader(
             .fillMaxWidth()
             .height(136.dp + topInset)
             .clipToBounds()
-            .background(
-                brush = Brush.linearGradient(
-                    0f to Color.BoolderGreenBright,
-                    .62f to Color.BoolderGreenDark,
-                    1f to Color.BoolderGreenDeep
-                )
-            )
+            .background(color = MaterialTheme.colorScheme.primary)
             .padding(top = topInset),
         contentAlignment = Alignment.Center
     ) {
