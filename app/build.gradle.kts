@@ -13,14 +13,14 @@ plugins {
 
 android {
     namespace = "com.boolder.boolder"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.boolder.boolder"
-        minSdk = 21
-        targetSdk = 35
-        versionCode = 43 // bump when new version
-        versionName = "1.32.1" // bump when new version
+        minSdk = 23
+        targetSdk = 36
+        versionCode = 44 // bump when new version
+        versionName = "1.33" // bump when new version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -125,4 +125,7 @@ dependencies {
 
     // Work manager
     implementation("androidx.work:work-runtime-ktx:2.10.0")
+
+    // Billing
+    implementation("com.android.billingclient:billing:9.1.0")
 }

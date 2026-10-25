@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
+import com.boolder.boolder.data.premium.model.isPhotoLocked
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
@@ -16,7 +18,8 @@ import kotlinx.coroutines.launch
 class FullScreenPhotoViewModel(
     savedStateHandle: SavedStateHandle,
     private val lineRepository: LineRepository,
-    private val problemRepository: ProblemRepository
+    private val problemRepository: ProblemRepository,
+    private val premiumRepository: PremiumRepository
 ) : ViewModel() {
 
     private val problemId = requireNotNull(savedStateHandle.get<Int>("problem_id"))
@@ -48,7 +51,12 @@ class FullScreenPhotoViewModel(
             _screenState.update {
                 ScreenState.Content(
                     photoUri = photoUri,
-                    completeProblem = completeProblem
+                    completeProblem = completeProblem,
+                    isPhotoLocked = isPhotoLocked(
+                        areaId = problem.areaId,
+                        freeAreaIds = premiumRepository.freeAreaIds.value,
+                        status = premiumRepository.status.value
+                    )
                 )
             }
         }
@@ -59,7 +67,8 @@ class FullScreenPhotoViewModel(
 
         data class Content(
             val photoUri: String,
-            val completeProblem: CompleteProblem
+            val completeProblem: CompleteProblem,
+            val isPhotoLocked: Boolean = false
         ) : ScreenState
 
         data object Error : ScreenState

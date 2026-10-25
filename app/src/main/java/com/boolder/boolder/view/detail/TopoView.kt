@@ -27,6 +27,7 @@ class TopoView(
                     onProblemPhotoLoaded = {},
                     onProblemStartClicked = {},
                     onShowPhotoFullScreen = { _, _ -> },
+                    onPremiumRequested = {},
                     onVariantSelected = {},
                     onCircuitProblemSelected = {},
                     onBleauInfoClicked = {},
@@ -55,6 +56,7 @@ class TopoView(
                     onShowPhotoFullScreen = { problemId, photoUri ->
                         topoCallbacks?.onShowProblemPhotoFullScreen(problemId, photoUri)
                     },
+                    onPremiumRequested = { topoCallbacks?.onPremiumRequested() },
                     onVariantSelected = { topoCallbacks?.onVariantSelected(it) },
                     onCircuitProblemSelected = { topoCallbacks?.onCircuitProblemSelected(it) },
                     onBleauInfoClicked = ::onBleauInfoClicked,
@@ -102,5 +104,6 @@ class TopoView(
         fun onVariantSelected(variant: ProblemWithLine)
         fun onCircuitProblemSelected(problemId: Int)
         fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String)
+        fun onPremiumRequested()
     }
 }

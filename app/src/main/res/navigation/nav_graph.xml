@@ -39,6 +39,12 @@
         <action
             android:id="@+id/show_problem_photo_full_screen"
             app:destination="@+id/full_screen_photo_fragment" />
+        <action
+            android:id="@+id/show_paywall"
+            app:destination="@+id/dialog_paywall" />
+        <action
+            android:id="@+id/show_premium_intro"
+            app:destination="@+id/dialog_premium_intro" />
     </fragment>
 
     <fragment
@@ -197,9 +203,9 @@
         android:label="Tick list" />
 
     <fragment
-        android:id="@+id/contribute_fragment"
-        android:name="com.boolder.boolder.view.contribute.ContributeFragment"
-        android:label="Contribute" />
+        android:id="@+id/premium_fragment"
+        android:name="com.boolder.boolder.view.premium.PremiumFragment"
+        android:label="Premium" />
 
     <dialog
         android:id="@+id/full_screen_photo_fragment"
@@ -212,6 +218,16 @@
             android:name="photo_uri"
             app:argType="string" />
     </dialog>
+
+    <dialog
+        android:id="@+id/dialog_paywall"
+        android:name="com.boolder.boolder.view.premium.PaywallBottomSheetDialogFragment"
+        android:label="Paywall" />
+
+    <dialog
+        android:id="@+id/dialog_premium_intro"
+        android:name="com.boolder.boolder.view.premium.PremiumIntroBottomSheetDialogFragment"
+        android:label="Premium intro" />
 
     <dialog
         android:id="@+id/dialog_circuit_filter"

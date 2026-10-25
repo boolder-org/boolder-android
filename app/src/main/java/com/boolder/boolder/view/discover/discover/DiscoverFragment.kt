@@ -37,7 +37,7 @@ class DiscoverFragment : Fragment() {
                         onDiscoverHeaderItemClicked = ::onDiscoverHeaderItemClicked,
                         onAreaClicked = ::onAreaClicked,
                         onRateAppClicked = ::onOpenPlayStorePage,
-                        onContributeClicked = ::onOpenContributeWebPage,
+                        onFireWarningLearnMoreClicked = ::openFireWarningPage,
                         event = event
                     )
                 }
@@ -66,6 +66,15 @@ class DiscoverFragment : Fragment() {
         openWebUrl("https://www.boolder.com/${getLanguage()}/articles/beginners-guide")
     }
 
+    private fun openFireWarningPage() {
+        val url = when (getLanguage()) {
+            "fr" -> "https://www.onf.fr/vivre-la-foret/+/2d9a::foret-de-fontainebleau-carte-des-sentiers-et-routes-forestieres-accessibles.html"
+            else -> "https://www-onf-fr.translate.goog/vivre-la-foret/+/2d9a::foret-de-fontainebleau-carte-des-sentiers-et-routes-forestieres-accessibles.html?_x_tr_sl=fr&_x_tr_tl=en&_x_tr_hl=en"
+        }
+
+        openWebUrl(url)
+    }
+
     private fun onAreaClicked(areaId: Int) {
         val navController = findNavController()
 
@@ -81,10 +90,6 @@ class DiscoverFragment : Fragment() {
 
     private fun onOpenPlayStorePage() {
         openWebUrl("https://play.google.com/store/apps/details?id=com.boolder.boolder")
-    }
-
-    private fun onOpenContributeWebPage() {
-        openWebUrl("https://www.boolder.com/${getLanguage()}/contribute")
     }
 
     private fun openWebUrl(url: String) {

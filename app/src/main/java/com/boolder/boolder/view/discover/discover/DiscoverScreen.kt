@@ -44,7 +44,9 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.utils.previewgenerator.dummyArea
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.compose.BoolderYellow
 import com.boolder.boolder.view.compose.LoadingScreen
 import com.boolder.boolder.view.discover.composable.AreaThumbnailsRow
 
@@ -55,7 +57,7 @@ internal fun DiscoverScreen(
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit,
-    onContributeClicked: () -> Unit,
+    onFireWarningLearnMoreClicked: () -> Unit,
     modifier: Modifier = Modifier,
     event: DiscoverViewModel.Event? = null
 ) {
@@ -90,7 +92,7 @@ internal fun DiscoverScreen(
                     onDiscoverHeaderItemClicked = onDiscoverHeaderItemClicked,
                     onAreaClicked = onAreaClicked,
                     onRateAppClicked = onRateAppClicked,
-                    onContributeClicked = onContributeClicked
+                    onFireWarningLearnMoreClicked = onFireWarningLearnMoreClicked
                 )
             }
         }
@@ -104,7 +106,7 @@ private fun DiscoverScreenContent(
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit,
-    onContributeClicked: () -> Unit
+    onFireWarningLearnMoreClicked: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -114,6 +116,10 @@ private fun DiscoverScreenContent(
         ),
         verticalArrangement = spacedBy(8.dp)
     ) {
+        item {
+            FireWarningBanner(onLearnMoreClicked = onFireWarningLearnMoreClicked)
+        }
+
         item {
             DiscoverHeader(onItemClicked = onDiscoverHeaderItemClicked)
         }
@@ -127,6 +133,12 @@ private fun DiscoverScreenContent(
                 areas = screenState.popularAreas,
                 onAreaClicked = onAreaClicked
             )
+        }
+
+        if (screenState.showFreeAreasBanner) {
+            item {
+                FreeAreasBanner()
+            }
         }
 
         item {
@@ -149,14 +161,6 @@ private fun DiscoverScreenContent(
                 text = stringResource(id = R.string.discover_support_rate),
                 iconRes = R.drawable.ic_star_outline,
                 onClick = onRateAppClicked
-            )
-        }
-
-        item {
-            SupportItem(
-                text = stringResource(id = R.string.discover_support_contribute),
-                iconRes = R.drawable.ic_add_circle_outline,
-                onClick = onContributeClicked
             )
         }
     }
@@ -246,6 +250,68 @@ private fun DiscoverHeaderItem(
 }
 
 @Composable
+private fun FireWarningBanner(onLearnMoreClicked: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .background(
+                color = Color.BoolderYellow.copy(alpha = .2f),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(16.dp),
+        horizontalArrangement = spacedBy(8.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_outline_report),
+            contentDescription = null,
+            tint = Color.BoolderOrange.copy(alpha = .8f)
+        )
+
+        Column(verticalArrangement = spacedBy(6.dp)) {
+            Text(
+                text = stringResource(id = R.string.discover_fire_warning),
+                color = Color.BoolderOrange.copy(alpha = .8f)
+            )
+
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable(onClick = onLearnMoreClicked),
+                text = stringResource(id = R.string.discover_fire_warning_learn_more),
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun FreeAreasBanner() {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(8.dp))
+            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = .15f))
+            .padding(16.dp),
+        horizontalArrangement = spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_check_circle),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            text = stringResource(id = R.string.discover_free_areas),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
 private fun DiscoverSectionTitle(text: String) {
     Text(
         modifier = Modifier.padding(16.dp),
@@ -325,7 +391,7 @@ private fun DiscoverScreenPreview(
             onDiscoverHeaderItemClicked = {},
             onAreaClicked = {},
             onRateAppClicked = {},
-            onContributeClicked = {}
+            onFireWarningLearnMoreClicked = {}
         )
     }
 }
@@ -343,7 +409,8 @@ private class DiscoverScreenPreviewParameterProvider : PreviewParameterProvider<
         DiscoverViewModel.ScreenState.Loading,
         DiscoverViewModel.ScreenState.Content(
             allAreas = dummyAreas,
-            popularAreas = dummyAreas
+            popularAreas = dummyAreas,
+            showFreeAreasBanner = true
         )
     )
 }

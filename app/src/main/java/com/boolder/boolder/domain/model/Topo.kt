@@ -15,6 +15,10 @@ package com.boolder.boolder.domain.model
  * @param origin The interaction from which the topo has been requested.
  * @param canShowProblemStarts Indicates if the problem starts and lines can be
  * drawn.
+ * @param isPhotoLocked Indicates if the picture should be blurred because it
+ * requires a premium subscription.
+ * @param premiumPrice The formatted price of the premium subscription, if
+ * available.
  */
 data class Topo(
     val photoUri: String?,
@@ -22,7 +26,9 @@ data class Topo(
     val otherCompleteProblems: List<CompleteProblem>,
     val circuitInfo: CircuitInfo?,
     val origin: TopoOrigin,
-    val canShowProblemStarts: Boolean = false
+    val canShowProblemStarts: Boolean = false,
+    val isPhotoLocked: Boolean = false,
+    val premiumPrice: String? = null
 )
 
 /**

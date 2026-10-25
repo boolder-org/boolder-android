@@ -86,6 +86,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private lateinit var mapView: BoolderMap
     private var pendingMapAction: (() -> Unit)? = null
     private var topInset = 0
+    private var lastFlownProblemId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -173,6 +174,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 pendingMapAction?.invoke()
                     ?: postDelayed(1_000L) { detectArea() }
                 pendingMapAction = null
+                mapViewModel.onMapLoaded()
             }
         }
 
@@ -231,6 +233,9 @@ class MapFragment : Fragment(), BoolderMapListener {
                     problemId = event.problemId,
                     photoUri = event.photoUri
                 )
+
+                is MapViewModel.Event.ShowPaywall -> navigateToPaywall()
+                is MapViewModel.Event.ShowPremiumIntro -> navigateToPremiumIntro()
 
                 is MapViewModel.Event.ZoomOnCircuit -> zoomOnCircuit(event)
 
@@ -407,10 +412,15 @@ class MapFragment : Fragment(), BoolderMapListener {
                 ?.problem
                 ?: return@let
 
+            // the topo is re-emitted when the premium status or price changes: only move the map for a new problem
+            if (selectedProblem.id == lastFlownProblemId) return@let
+
+            lastFlownProblemId = selectedProblem.id
             flyToProblem(problem = selectedProblem, origin = topo.origin)
         }
 
         if (nullableTopo == null) {
+            lastFlownProblemId = null
             bottomSheetBehavior.state = STATE_HIDDEN
         } else {
             onBackPressedCallback.isEnabled = true
@@ -512,6 +522,23 @@ class MapFragment : Fragment(), BoolderMapListener {
         )
 
         navController.navigate(direction)
+    }
+
+    private fun navigateToPaywall() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id != R.id.map_fragment) return
+
+        navController.navigate(MapFragmentDirections.showPaywall())
+    }
+
+    private fun navigateToPremiumIntro() {
+        val navController = findNavController()
+
+        if (navController.currentDestination?.id != R.id.map_fragment) return
+        if (bottomSheetBehavior.state != STATE_HIDDEN) return
+
+        navController.navigate(MapFragmentDirections.showPremiumIntro())
     }
 
     private fun showCircuitFilterBottomSheet(event: MapViewModel.Event.ShowAvailableCircuits) {

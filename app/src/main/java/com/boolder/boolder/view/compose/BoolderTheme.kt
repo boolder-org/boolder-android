@@ -70,3 +70,9 @@ val Color.Companion.BoolderOrange get() = Color(red = 255, green = 149, blue = 0
 
 @Stable
 val Color.Companion.BoolderYellow get() = Color(red = 255, green = 204, blue = 0)
+
+@Stable
+val Color.Companion.BleauInfoBlue get() = Color(0xFF003386)
+
+@Stable
+val Color.Companion.BleauInfoBlueNight get() = Color(0xFF0B71BC)

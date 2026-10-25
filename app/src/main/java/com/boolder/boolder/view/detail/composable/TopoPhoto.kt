@@ -47,6 +47,7 @@ internal fun TopoPhoto(
     onProblemPhotoLoaded: () -> Unit,
     onProblemStartClicked: (Int) -> Unit,
     onShowPhotoFullScreen: (Int, String) -> Unit,
+    onPremiumRequested: () -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -67,16 +68,19 @@ internal fun TopoPhoto(
 
         TopoPhotoContent(
             imageUri = topo.photoUri,
+            isPhotoLocked = topo.isPhotoLocked,
+            premiumPrice = topo.premiumPrice,
             onProblemPhotoLoaded = onProblemPhotoLoaded,
             onShowPhotoFullScreen = {
                 val problem = topo.selectedCompleteProblem ?: return@TopoPhotoContent
                 val photoUri = topo.photoUri ?: return@TopoPhotoContent
 
                 onShowPhotoFullScreen(problem.problemWithLine.problem.id , photoUri)
-            }
+            },
+            onPremiumRequested = onPremiumRequested
         )
 
-        if (topo.canShowProblemStarts) {
+        if (topo.canShowProblemStarts && !topo.isPhotoLocked) {
             val selectedProblem = topo.selectedCompleteProblem ?: return
 
             val initialUiProblem = selectedProblem.toUiProblem(
@@ -109,10 +113,19 @@ internal fun TopoPhoto(
 @Composable
 private fun TopoPhotoContent(
     imageUri: String?,
+    isPhotoLocked: Boolean,
+    premiumPrice: String?,
     onProblemPhotoLoaded: () -> Unit,
-    onShowPhotoFullScreen: () -> Unit
+    onShowPhotoFullScreen: () -> Unit,
+    onPremiumRequested: () -> Unit
 ) {
-    if (LocalInspectionMode.current) {
+    if (LocalInspectionMode.current && isPhotoLocked) {
+        LockedPhoto(
+            painter = painterResource(id = R.drawable.area_cover_1),
+            premiumPrice = premiumPrice,
+            onPremiumRequested = onPremiumRequested
+        )
+    } else if (LocalInspectionMode.current) {
         Image(
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(id = R.drawable.area_cover_1),
@@ -136,15 +149,23 @@ private fun TopoPhotoContent(
             when (state) {
                 is AsyncImagePainter.State.Empty -> Unit
                 is AsyncImagePainter.State.Loading -> CircularProgressIndicator()
-                is AsyncImagePainter.State.Success -> Image(
-                    modifier = Modifier.clickable(
-                        onClick = onShowPhotoFullScreen,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ),
-                    painter = painter,
-                    contentDescription = null
-                )
+                is AsyncImagePainter.State.Success -> if (isPhotoLocked) {
+                    LockedPhoto(
+                        painter = painter,
+                        premiumPrice = premiumPrice,
+                        onPremiumRequested = onPremiumRequested
+                    )
+                } else {
+                    Image(
+                        modifier = Modifier.clickable(
+                            onClick = onShowPhotoFullScreen,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ),
+                        painter = painter,
+                        contentDescription = null
+                    )
+                }
                 is AsyncImagePainter.State.Error -> Icon(
                     painter = painterResource(id = R.drawable.ic_placeholder),
                     contentDescription = null,
@@ -167,6 +188,7 @@ private fun TopoPhotoPreview(
             onProblemPhotoLoaded = {},
             onProblemStartClicked = {},
             onShowPhotoFullScreen = { _, _ -> },
+            onPremiumRequested = {},
             onVariantSelected = {}
         )
     }
@@ -184,6 +206,8 @@ private class TopoPhotoPreviewParameterProvider : PreviewParameterProvider<Topo?
     override val values = sequenceOf(
         null,
         topo,
-        topo.copy(canShowProblemStarts = true)
+        topo.copy(canShowProblemStarts = true),
+        topo.copy(canShowProblemStarts = true, isPhotoLocked = true, premiumPrice = "10,00 €"),
+        topo.copy(canShowProblemStarts = true, isPhotoLocked = true)
     )
 }

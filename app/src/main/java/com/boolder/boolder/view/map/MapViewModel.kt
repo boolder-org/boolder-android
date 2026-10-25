@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.boolder.boolder.R
 import com.boolder.boolder.data.database.repository.AreaRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
+import com.boolder.boolder.data.premium.model.PremiumIntroDecision
+import com.boolder.boolder.data.premium.model.isPhotoLocked
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
 import com.boolder.boolder.domain.CircuitProblemsRetriever
@@ -33,6 +36,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -43,7 +47,8 @@ class MapViewModel(
     private val topoDataAggregator: TopoDataAggregator,
     private val resources: Resources,
     private val boolderOfflineRepository: BoolderOfflineRepository,
-    private val circuitProblemsRetriever: CircuitProblemsRetriever
+    private val circuitProblemsRetriever: CircuitProblemsRetriever,
+    private val premiumRepository: PremiumRepository
 ) : ViewModel(),
     OfflineAreaDownloader,
     TopoView.TopoCallbacks,
@@ -67,7 +72,20 @@ class MapViewModel(
     val screenStateFlow = _screenStateFlow.asStateFlow()
 
     private val _topoStateFlow = MutableStateFlow<Topo?>(null)
-    val topoStateFlow = _topoStateFlow.asStateFlow()
+    val topoStateFlow = combine(
+        _topoStateFlow,
+        premiumRepository.status,
+        premiumRepository.freeAreaIds,
+        premiumRepository.product
+    ) { topo, status, freeAreaIds, product ->
+        val areaId = topo?.selectedCompleteProblem?.problemWithLine?.problem?.areaId
+            ?: return@combine topo
+
+        topo.copy(
+            isPhotoLocked = isPhotoLocked(areaId, freeAreaIds, status),
+            premiumPrice = product?.formattedPrice
+        )
+    }
 
     private val _eventFlow = MutableSharedFlow<Event>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -80,6 +98,7 @@ class MapViewModel(
 
     private var lastZoomValue = 0.0
     private var isProblemTopoShown = false
+    private var isPremiumIntroChecked = false
 
     var cameraState: CameraState? = null
 
@@ -208,6 +227,20 @@ class MapViewModel(
                 areaState = null,
                 circuitState = null
             )
+        }
+    }
+
+    fun onMapLoaded() {
+        if (isPremiumIntroChecked) return
+
+        isPremiumIntroChecked = true
+
+        viewModelScope.launch {
+            when (premiumRepository.getPremiumIntroDecision()) {
+                PremiumIntroDecision.SHOW -> _eventFlow.emit(Event.ShowPremiumIntro)
+                PremiumIntroDecision.MARK_AS_SEEN -> premiumRepository.markPremiumIntroAsSeen()
+                PremiumIntroDecision.NOTHING -> Unit
+            }
         }
     }
 
@@ -462,6 +495,10 @@ class MapViewModel(
         }
     }
 
+    override fun onPremiumRequested() {
+        viewModelScope.launch { _eventFlow.emit(Event.ShowPaywall) }
+    }
+
     // endregion TopoCallbacks
 
     // region TickedProblemSaver
@@ -557,6 +594,9 @@ class MapViewModel(
 
         data class ZoomOnCircuitStartProblem(val problemId: Int) : Event
         data class ZoomOnArea(val area: Area) : Event
+
+        data object ShowPaywall : Event
+        data object ShowPremiumIntro : Event
 
         data object WarnNoSavedProjects : Event
         data object WarnNoTickedProblems : Event

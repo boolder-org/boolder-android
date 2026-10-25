@@ -5,15 +5,21 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.boolder.boolder.R
+import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val premiumRepository by inject<PremiumRepository>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -22,6 +28,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (savedInstanceState == null) {
+            binding.root.post {
+                lifecycleScope.launch { premiumRepository.showInAppMessages(this@MainActivity) }
+            }
+        }
+
         val navController = findNavController()
 
         binding.bottomNavigationView.setupWithNavController(navController)
@@ -29,6 +41,12 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.bottomNavigationView.isVisible = destination.id in BOTTOM_BAR_DESTINATION_IDS
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        premiumRepository.refreshPurchases()
+        premiumRepository.loadProduct()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -47,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             R.id.map_fragment,
             R.id.discover_fragment,
             R.id.tick_list_fragment,
-            R.id.contribute_fragment,
+            R.id.premium_fragment,
             R.id.dialog_circuit_filter,
             R.id.dialog_grades_filter
         )

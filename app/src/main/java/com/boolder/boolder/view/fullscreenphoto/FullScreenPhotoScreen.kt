@@ -50,11 +50,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.toUiProblem
 import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.LoadingScreen
+import com.boolder.boolder.view.detail.composable.LockedPhoto
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -125,6 +127,23 @@ private fun FullScreenPhotoScreenContent(
     screenState: FullScreenPhotoViewModel.ScreenState.Content,
     onDragStateChanged: (Boolean) -> Unit
 ) {
+    if (screenState.isPhotoLocked) {
+        LockedPhoto(
+            painter = if (LocalInspectionMode.current) {
+                painterResource(id = R.drawable.area_cover_1)
+            } else {
+                rememberAsyncImagePainter(model = screenState.photoUri)
+            },
+            premiumPrice = null,
+            onPremiumRequested = null,
+            imageModifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(4 / 3f)
+        )
+
+        return
+    }
+
     val widthPx = with(LocalDensity.current) {
         (LocalConfiguration.current.screenWidthDp * density).roundToInt()
     }
@@ -238,6 +257,11 @@ private class FullScreenPhotoScreenPreviewParameterProvider : PreviewParameterPr
         FullScreenPhotoViewModel.ScreenState.Content(
             photoUri = "photoUri",
             completeProblem = dummyCompleteProblem()
+        ),
+        FullScreenPhotoViewModel.ScreenState.Content(
+            photoUri = "photoUri",
+            completeProblem = dummyCompleteProblem(),
+            isPhotoLocked = true
         ),
         FullScreenPhotoViewModel.ScreenState.Error
     )

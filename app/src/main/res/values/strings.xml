@@ -4,7 +4,7 @@
     <string name="tab_map">Map</string>
     <string name="tab_discover">Discover</string>
     <string name="tab_tick_list">Tick List</string>
-    <string name="tab_contribute">Contribute</string>
+    <string name="tab_premium">Premium</string>
 
     <string name="search_query_hint">Problem or area name</string>
     <string name="cd_find_my_position">Find my position</string>
@@ -21,7 +21,6 @@
     <string name="save">Save</string>
     <string name="saved">Saved</string>
     <string name="bleau_info">Bleau.info</string>
-    <string name="report">Report</string>
 
 
     <string name="circuit_short_name_yellow">Yellow</string>
@@ -120,9 +119,11 @@
     <string name="discover_section_all_areas">All areas</string>
     <string name="discover_section_popular_areas">Popular</string>
     <string name="discover_section_support">Want to help?</string>
+    <string name="discover_fire_warning">Following the July 2026 fires, many areas are closed, notably in the Trois Pignons forest.</string>
+    <string name="discover_fire_warning_learn_more">Learn more</string>
+    <string name="discover_free_areas">These areas are available for free</string>
     <string name="discover_snackbar_no_browser_found">No browser found, can\'t open the link</string>
     <string name="discover_support_rate">Rate the app</string>
-    <string name="discover_support_contribute">Contribute</string>
 
     <string name="top_areas_levels_all_areas">All areas</string>
     <string name="top_areas_levels_beginner_friendly">Beginner friendly</string>
@@ -146,16 +147,56 @@
     <string name="tick_list_error_import_malformed_input">The file is malformed and can\'t be imported.</string>
     <string name="tick_list_error_import_cant_be_read">The file can\'t be read.</string>
 
-    <string name="contribute_title">Contribute to Boolder</string>
-    <string name="contribute_intro">Help us build the best collaborative guidebook for Fontainebleau!</string>
-    <string name="contribute_photo">Take photos of missing boulders</string>
-    <string name="contribute_report">Report errors</string>
-    <string name="contribute_cta">Start contributing</string>
-    <string name="contribute_learn_more">Learn more about Boolder</string>
-
     <string name="full_screen_photo_error">This photo can\'t be displayed</string>
 
     <string name="cd_circuit_previous_boulder_problem">Circuit\'s previous boulder problem</string>
     <string name="cd_circuit_next_boulder_problem">Circuit\'s next boulder problem</string>
+
+    <string name="premium_photo_locked_title">Photo available\nwith Boolder Premium</string>
+    <string name="premium_photo_locked_button">See the subscription</string>
+    <string name="premium_photo_locked_button_with_price">See the subscription · %1$s/year</string>
+
+    <string name="premium_paywall_close">Close</string>
+    <string name="premium_paywall_title">Boolder Premium</string>
+    <string name="premium_paywall_subtitle">All of Fontainebleau in your pocket</string>
+    <string name="premium_paywall_benefits_title">What you get</string>
+    <string name="premium_paywall_benefit_areas_title">90 areas</string>
+    <string name="premium_paywall_benefit_areas_description">The whole Fontainebleau forest</string>
+    <string name="premium_paywall_benefit_problems_title">20,000 problems</string>
+    <string name="premium_paywall_benefit_problems_description">Graded and sorted by circuit</string>
+    <string name="premium_paywall_benefit_photos_title">10,000 boulder photos</string>
+    <string name="premium_paywall_benefit_photos_description">With the line of every problem</string>
+    <string name="premium_paywall_reasons_title">Why a subscription</string>
+    <string name="premium_paywall_reasons_partnership">Boolder × bleau.info</string>
+    <string name="premium_paywall_reasons_description">Boolder is a volunteer project, with no ads and no investors. Your subscription is shared &lt;b>equally&lt;/b> with bleau.info, the reference guide for Fontainebleau, and will only be used to develop climbing.&lt;br>&lt;a href=\"https://www.boolder.com/en/bleau-info-partnership\">Learn more&lt;/a></string>
+    <string name="premium_paywall_subscribe">Subscribe</string>
+    <string name="premium_paywall_subscribe_with_price">Subscribe — %1$s/year</string>
+    <string name="premium_paywall_legal">Yearly subscription with automatic renewal, cancel anytime in Google Play.</string>
+    <string name="premium_paywall_terms">Terms</string>
+    <string name="premium_paywall_privacy">Privacy</string>
+    <string name="premium_paywall_restore">Restore purchase</string>
+
+    <string name="premium_purchase_pending_title">Purchase pending</string>
+    <string name="premium_purchase_pending_message">Your photos will be unlocked as soon as the payment is confirmed.</string>
+    <string name="premium_purchase_error_title">Purchase failed</string>
+    <string name="premium_purchase_error_message">The purchase could not be completed. Try again in a moment.</string>
+
+    <string name="premium_success_title">Welcome to\nBoolder Premium</string>
+    <string name="premium_success_description">The photos of all 90 areas\nare now visible.</string>
+    <string name="premium_success_thanks">Thank you! Half of your subscription goes to &lt;b>bleau.info&lt;/b>.</string>
+    <string name="premium_success_continue">Continue</string>
+
+    <string name="premium_restore_success_message">Your subscription has been restored.</string>
+    <string name="premium_restore_not_found_message">No Boolder Premium subscription is linked to this Google Play account.</string>
+    <string name="premium_restore_error_message">Couldn\'t reach Google Play. Check your connection.</string>
+
+    <string name="premium_management_active">Active</string>
+    <string name="premium_management_price">%1$s per year</string>
+    <string name="premium_management_manage">Manage subscription</string>
+
+    <string name="premium_intro_badge">New</string>
+    <string name="premium_intro_description">The &lt;b>8 most popular areas remain free&lt;/b>. Photos of the 82 others are available with Boolder Premium.</string>
+    <string name="premium_intro_see_popular_areas">See the popular areas</string>
+    <string name="premium_intro_later">Later</string>
 
 </resources>
