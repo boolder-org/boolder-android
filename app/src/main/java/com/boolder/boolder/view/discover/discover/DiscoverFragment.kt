@@ -37,6 +37,7 @@ class DiscoverFragment : Fragment() {
                         onDiscoverHeaderItemClicked = ::onDiscoverHeaderItemClicked,
                         onAreaClicked = ::onAreaClicked,
                         onRateAppClicked = ::onOpenPlayStorePage,
+                        onFireWarningLearnMoreClicked = ::openFireWarningPage,
                         event = event
                     )
                 }
@@ -63,6 +64,15 @@ class DiscoverFragment : Fragment() {
 
     private fun openBeginnerGuideArticle() {
         openWebUrl("https://www.boolder.com/${getLanguage()}/articles/beginners-guide")
+    }
+
+    private fun openFireWarningPage() {
+        val url = when (getLanguage()) {
+            "fr" -> "https://www.onf.fr/vivre-la-foret/+/2d9a::foret-de-fontainebleau-carte-des-sentiers-et-routes-forestieres-accessibles.html"
+            else -> "https://www-onf-fr.translate.goog/vivre-la-foret/+/2d9a::foret-de-fontainebleau-carte-des-sentiers-et-routes-forestieres-accessibles.html?_x_tr_sl=fr&_x_tr_tl=en&_x_tr_hl=en"
+        }
+
+        openWebUrl(url)
     }
 
     private fun onAreaClicked(areaId: Int) {

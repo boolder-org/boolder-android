@@ -116,8 +116,9 @@
     <string name="discover_section_all_areas">Tous les secteurs</string>
     <string name="discover_section_popular_areas">Populaires</string>
     <string name="discover_section_support">Envie d\'aider ?</string>
-    <string name="discover_free_areas">Les photos et tracés des voies sont disponibles gratuitement sur les secteurs populaires.</string>
-    <string name="discover_free_areas_see_areas">Voir les secteurs</string>
+    <string name="discover_fire_warning">Suite aux incendies de juillet 2026, de nombreux secteurs sont fermés, notamment dans la forêt des Trois Pignons.</string>
+    <string name="discover_fire_warning_learn_more">En savoir plus</string>
+    <string name="discover_free_areas">Ces secteurs sont disponibles gratuitement</string>
     <string name="discover_snackbar_no_browser_found">Aucun navigateur trouvé, impossible d\'ouvrir le lien</string>
     <string name="discover_support_rate">Noter l\'appli</string>
 
@@ -164,7 +165,7 @@
     <string name="premium_paywall_benefit_photos_description">Avec le tracé de chaque voie</string>
     <string name="premium_paywall_reasons_title">Pourquoi un abonnement</string>
     <string name="premium_paywall_reasons_partnership">Boolder × bleau.info</string>
-    <string name="premium_paywall_reasons_description">Boolder est un projet bénévole, sans publicité ni investisseur. Ton abonnement est partagé &lt;b>à parts égales&lt;/b> avec bleau.info, le topo de référence de Fontainebleau et ne servira qu\'à développer l\'escalade.&lt;br>&lt;a href=\"https://www.boolder.com/fr\">En savoir plus&lt;/a></string>
+    <string name="premium_paywall_reasons_description">Boolder est un projet bénévole, sans publicité ni investisseur. Ton abonnement est partagé &lt;b>à parts égales&lt;/b> avec bleau.info, le topo de référence de Fontainebleau et ne servira qu\'à développer l\'escalade.&lt;br>&lt;a href=\"https://www.boolder.com/fr/bleau-info-partnership\">En savoir plus&lt;/a></string>
     <string name="premium_paywall_subscribe">S\'abonner</string>
     <string name="premium_paywall_subscribe_with_price">S\'abonner — %1$s/an</string>
     <string name="premium_paywall_legal">Abonnement annuel à renouvellement automatique, résiliable à tout moment dans Google Play.</string>

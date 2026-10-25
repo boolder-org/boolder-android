@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +27,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,10 +44,11 @@ import androidx.compose.ui.unit.dp
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.Area
 import com.boolder.boolder.utils.previewgenerator.dummyArea
+import com.boolder.boolder.view.compose.BoolderOrange
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.compose.BoolderYellow
 import com.boolder.boolder.view.compose.LoadingScreen
 import com.boolder.boolder.view.discover.composable.AreaThumbnailsRow
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +57,7 @@ internal fun DiscoverScreen(
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
     onRateAppClicked: () -> Unit,
+    onFireWarningLearnMoreClicked: () -> Unit,
     modifier: Modifier = Modifier,
     event: DiscoverViewModel.Event? = null
 ) {
@@ -91,7 +91,8 @@ internal fun DiscoverScreen(
                     contentPadding = it,
                     onDiscoverHeaderItemClicked = onDiscoverHeaderItemClicked,
                     onAreaClicked = onAreaClicked,
-                    onRateAppClicked = onRateAppClicked
+                    onRateAppClicked = onRateAppClicked,
+                    onFireWarningLearnMoreClicked = onFireWarningLearnMoreClicked
                 )
             }
         }
@@ -104,14 +105,11 @@ private fun DiscoverScreenContent(
     contentPadding: PaddingValues,
     onDiscoverHeaderItemClicked: (DiscoverHeaderItem) -> Unit,
     onAreaClicked: (Int) -> Unit,
-    onRateAppClicked: () -> Unit
+    onRateAppClicked: () -> Unit,
+    onFireWarningLearnMoreClicked: () -> Unit
 ) {
-    val lazyListState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        state = lazyListState,
         contentPadding = PaddingValues(
             top = contentPadding.calculateTopPadding() + 16.dp,
             bottom = 16.dp
@@ -119,18 +117,11 @@ private fun DiscoverScreenContent(
         verticalArrangement = spacedBy(8.dp)
     ) {
         item {
-            DiscoverHeader(onItemClicked = onDiscoverHeaderItemClicked)
+            FireWarningBanner(onLearnMoreClicked = onFireWarningLearnMoreClicked)
         }
 
-        if (screenState.showFreeAreasBanner) {
-            item {
-                FreeAreasBanner(
-                    onSeeAreasClicked = {
-                        // the popular areas title comes right after the header and this banner
-                        coroutineScope.launch { lazyListState.animateScrollToItem(index = 2) }
-                    }
-                )
-            }
+        item {
+            DiscoverHeader(onItemClicked = onDiscoverHeaderItemClicked)
         }
 
         item {
@@ -142,6 +133,12 @@ private fun DiscoverScreenContent(
                 areas = screenState.popularAreas,
                 onAreaClicked = onAreaClicked
             )
+        }
+
+        if (screenState.showFreeAreasBanner) {
+            item {
+                FreeAreasBanner()
+            }
         }
 
         item {
@@ -253,7 +250,44 @@ private fun DiscoverHeaderItem(
 }
 
 @Composable
-private fun FreeAreasBanner(onSeeAreasClicked: () -> Unit) {
+private fun FireWarningBanner(onLearnMoreClicked: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .background(
+                color = Color.BoolderYellow.copy(alpha = .2f),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(16.dp),
+        horizontalArrangement = spacedBy(8.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_outline_report),
+            contentDescription = null,
+            tint = Color.BoolderOrange.copy(alpha = .8f)
+        )
+
+        Column(verticalArrangement = spacedBy(6.dp)) {
+            Text(
+                text = stringResource(id = R.string.discover_fire_warning),
+                color = Color.BoolderOrange.copy(alpha = .8f)
+            )
+
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable(onClick = onLearnMoreClicked),
+                text = stringResource(id = R.string.discover_fire_warning_learn_more),
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun FreeAreasBanner() {
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -261,7 +295,8 @@ private fun FreeAreasBanner(onSeeAreasClicked: () -> Unit) {
             .clip(shape = RoundedCornerShape(8.dp))
             .background(color = MaterialTheme.colorScheme.primary.copy(alpha = .15f))
             .padding(16.dp),
-        horizontalArrangement = spacedBy(8.dp)
+        horizontalArrangement = spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_check_circle),
@@ -269,21 +304,10 @@ private fun FreeAreasBanner(onSeeAreasClicked: () -> Unit) {
             tint = MaterialTheme.colorScheme.primary
         )
 
-        Column(verticalArrangement = spacedBy(6.dp)) {
-            Text(
-                text = stringResource(id = R.string.discover_free_areas),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Text(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .clickable(onClick = onSeeAreasClicked),
-                text = stringResource(id = R.string.discover_free_areas_see_areas),
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+        Text(
+            text = stringResource(id = R.string.discover_free_areas),
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
@@ -366,7 +390,8 @@ private fun DiscoverScreenPreview(
             screenState = screenState,
             onDiscoverHeaderItemClicked = {},
             onAreaClicked = {},
-            onRateAppClicked = {}
+            onRateAppClicked = {},
+            onFireWarningLearnMoreClicked = {}
         )
     }
 }
