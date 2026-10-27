@@ -125,6 +125,16 @@ private fun TopoPhotoPager(
             }
         }
 
+        // a problem selected elsewhere (map, search, circuit) can be on another page
+        LaunchedEffect(topo.topoId) {
+            val selectedPage = boulderTopos.indexOfFirst { it.topoId == topo.topoId }
+
+            if (selectedPage < 0 || selectedPage == pagerState.currentPage) return@LaunchedEffect
+            if (pagerState.isScrollInProgress) return@LaunchedEffect
+
+            pagerState.animateScrollToPage(selectedPage)
+        }
+
         HorizontalPager(
             state = pagerState,
             beyondViewportPageCount = 1,

@@ -33,6 +33,7 @@ import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
 import com.mapbox.maps.CameraState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -102,40 +103,46 @@ class MapViewModel(
     private var isProblemTopoShown = false
     private var isPremiumIntroChecked = false
 
+    // only the latest selection should end up in the topo
+    private var fetchTopoJob: Job? = null
+
     var cameraState: CameraState? = null
 
     fun fetchTopo(problemId: Int, origin: TopoOrigin) {
-        viewModelScope.launch {
-            val currentTopo = _topoStateFlow.value
+        fetchTopoJob?.cancel()
+        fetchTopoJob = viewModelScope.launch { loadTopo(problemId = problemId, origin = origin) }
+    }
 
-            _topoStateFlow.value = topoDataAggregator.aggregate(
-                problemId = problemId,
-                origin = origin,
-                previousPhotoUri = currentTopo?.photoUri,
-                previousPhotoWasProperlyLoaded = currentTopo?.canShowProblemStarts == true
-            )
+    private suspend fun loadTopo(problemId: Int, origin: TopoOrigin) {
+        val currentTopo = _topoStateFlow.value
 
-            if (origin != TopoOrigin.CIRCUIT) {
-                _screenStateFlow.update {
-                    it.copy(
-                        circuitState = it.circuitState?.copy(showCircuitStartButton = false)
-                    )
-                }
+        _topoStateFlow.value = topoDataAggregator.aggregate(
+            problemId = problemId,
+            origin = origin,
+            previousPhotoUri = currentTopo?.photoUri,
+            previousPhotoWasProperlyLoaded = currentTopo?.canShowProblemStarts == true
+        )
 
-                return@launch
-            }
-
-            val circuit = circuitRepository.getCircuitFromProblemId(problemId) ?: return@launch
-
+        if (origin != TopoOrigin.CIRCUIT) {
             _screenStateFlow.update {
                 it.copy(
-                    circuitState = CircuitState(
-                        circuitId = circuit.id,
-                        color = circuit.color,
-                        showCircuitStartButton = false
-                    )
+                    circuitState = it.circuitState?.copy(showCircuitStartButton = false)
                 )
             }
+
+            return
+        }
+
+        val circuit = circuitRepository.getCircuitFromProblemId(problemId) ?: return
+
+        _screenStateFlow.update {
+            it.copy(
+                circuitState = CircuitState(
+                    circuitId = circuit.id,
+                    color = circuit.color,
+                    showCircuitStartButton = false
+                )
+            )
         }
     }
 
@@ -488,10 +495,11 @@ class MapViewModel(
     }
 
     override fun onTopoSwiped(topoId: Int) {
-        viewModelScope.launch {
+        fetchTopoJob?.cancel()
+        fetchTopoJob = viewModelScope.launch {
             val topProblemId = boulderToposRetriever.getTopProblemId(topoId) ?: return@launch
 
-            fetchTopo(problemId = topProblemId, origin = TopoOrigin.TOPO)
+            loadTopo(problemId = topProblemId, origin = TopoOrigin.TOPO)
         }
     }
 
