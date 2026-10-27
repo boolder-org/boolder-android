@@ -11,6 +11,7 @@ import com.boolder.boolder.data.premium.model.isPhotoLocked
 import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
+import com.boolder.boolder.domain.BoulderToposRetriever
 import com.boolder.boolder.domain.CircuitProblemsRetriever
 import com.boolder.boolder.domain.TopoDataAggregator
 import com.boolder.boolder.domain.model.ALL_GRADES
@@ -48,7 +49,8 @@ class MapViewModel(
     private val resources: Resources,
     private val boolderOfflineRepository: BoolderOfflineRepository,
     private val circuitProblemsRetriever: CircuitProblemsRetriever,
-    private val premiumRepository: PremiumRepository
+    private val premiumRepository: PremiumRepository,
+    private val boulderToposRetriever: BoulderToposRetriever
 ) : ViewModel(),
     OfflineAreaDownloader,
     TopoView.TopoCallbacks,
@@ -482,6 +484,14 @@ class MapViewModel(
                 selectedCompleteProblem = selectedProblem,
                 otherCompleteProblems = newCompleteProblems
             )
+        }
+    }
+
+    override fun onTopoSwiped(topoId: Int) {
+        viewModelScope.launch {
+            val topProblemId = boulderToposRetriever.getTopProblemId(topoId) ?: return@launch
+
+            fetchTopo(problemId = topProblemId, origin = TopoOrigin.TOPO)
         }
     }
 

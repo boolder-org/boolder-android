@@ -28,6 +28,7 @@ internal fun TopoLayout(
     topo: Topo?,
     onProblemPhotoLoaded: () -> Unit,
     onProblemStartClicked: (Int) -> Unit,
+    onTopoSwiped: (Int) -> Unit,
     onShowPhotoFullScreen: (Int, String) -> Unit,
     onPremiumRequested: () -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
@@ -64,6 +65,7 @@ internal fun TopoLayout(
                 topo = topo,
                 onProblemPhotoLoaded = onProblemPhotoLoaded,
                 onProblemStartClicked = onProblemStartClicked,
+                onTopoSwiped = onTopoSwiped,
                 onShowPhotoFullScreen = onShowPhotoFullScreen,
                 onPremiumRequested = onPremiumRequested,
                 onVariantSelected = onVariantSelected
@@ -110,6 +112,7 @@ private fun TopoLayoutPreview() {
             ),
             onProblemPhotoLoaded = {},
             onProblemStartClicked = {},
+            onTopoSwiped = {},
             onShowPhotoFullScreen = { _, _ -> },
             onPremiumRequested = {},
             onVariantSelected = {},

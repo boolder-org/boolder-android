@@ -8,12 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +42,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.boolder.boolder.R
+import com.boolder.boolder.domain.model.BoulderTopo
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
@@ -46,16 +56,12 @@ internal fun TopoPhoto(
     topo: Topo?,
     onProblemPhotoLoaded: () -> Unit,
     onProblemStartClicked: (Int) -> Unit,
+    onTopoSwiped: (Int) -> Unit,
     onShowPhotoFullScreen: (Int, String) -> Unit,
     onPremiumRequested: () -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerWidth = with(LocalDensity.current) {
-        (LocalConfiguration.current.screenWidthDp * density).roundToInt()
-    }
-    val containerHeight = (containerWidth * 3f / 4f).roundToInt()
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -66,21 +72,124 @@ internal fun TopoPhoto(
     ) {
         topo ?: return@Box
 
+        if (topo.boulderTopos.size > 1) {
+            TopoPhotoPager(
+                topo = topo,
+                onProblemPhotoLoaded = onProblemPhotoLoaded,
+                onProblemStartClicked = onProblemStartClicked,
+                onTopoSwiped = onTopoSwiped,
+                onShowPhotoFullScreen = onShowPhotoFullScreen,
+                onPremiumRequested = onPremiumRequested,
+                onVariantSelected = onVariantSelected
+            )
+        } else {
+            TopoPhotoPage(
+                topo = topo,
+                photoUri = topo.photoUri,
+                isSelectedTopo = true,
+                onProblemPhotoLoaded = onProblemPhotoLoaded,
+                onProblemStartClicked = onProblemStartClicked,
+                onShowPhotoFullScreen = onShowPhotoFullScreen,
+                onPremiumRequested = onPremiumRequested,
+                onVariantSelected = onVariantSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun TopoPhotoPager(
+    topo: Topo,
+    onProblemPhotoLoaded: () -> Unit,
+    onProblemStartClicked: (Int) -> Unit,
+    onTopoSwiped: (Int) -> Unit,
+    onShowPhotoFullScreen: (Int, String) -> Unit,
+    onPremiumRequested: () -> Unit,
+    onVariantSelected: (ProblemWithLine) -> Unit
+) {
+    val boulderTopos = topo.boulderTopos
+
+    // a new boulder starts a new pager, a swipe on the same boulder keeps it
+    key(boulderTopos.map { it.topoId }) {
+        val pagerState = rememberPagerState(
+            initialPage = boulderTopos.indexOfFirst { it.topoId == topo.topoId }.coerceAtLeast(0),
+            pageCount = { boulderTopos.size }
+        )
+        val selectedTopoId by rememberUpdatedState(topo.topoId)
+
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.settledPage }.collect { page ->
+                val topoId = boulderTopos[page].topoId
+
+                if (topoId != selectedTopoId) onTopoSwiped(topoId)
+            }
+        }
+
+        HorizontalPager(
+            state = pagerState,
+            beyondViewportPageCount = 1,
+            key = { boulderTopos[it].topoId }
+        ) { page ->
+            val boulderTopo = boulderTopos[page]
+
+            TopoPhotoPage(
+                topo = topo,
+                photoUri = boulderTopo.photoUri,
+                isSelectedTopo = boulderTopo.topoId == topo.topoId,
+                onProblemPhotoLoaded = onProblemPhotoLoaded,
+                onProblemStartClicked = onProblemStartClicked,
+                onShowPhotoFullScreen = onShowPhotoFullScreen,
+                onPremiumRequested = onPremiumRequested,
+                onVariantSelected = onVariantSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun TopoPhotoPage(
+    topo: Topo,
+    photoUri: String?,
+    isSelectedTopo: Boolean,
+    onProblemPhotoLoaded: () -> Unit,
+    onProblemStartClicked: (Int) -> Unit,
+    onShowPhotoFullScreen: (Int, String) -> Unit,
+    onPremiumRequested: () -> Unit,
+    onVariantSelected: (ProblemWithLine) -> Unit
+) {
+    val containerWidth = with(LocalDensity.current) {
+        (LocalConfiguration.current.screenWidthDp * density).roundToInt()
+    }
+    val containerHeight = (containerWidth * 3f / 4f).roundToInt()
+
+    // a page can be loaded before it gets selected: report it once it is both
+    var isPhotoLoaded by remember(photoUri) { mutableStateOf(false) }
+
+    LaunchedEffect(isSelectedTopo, isPhotoLoaded) {
+        if (isSelectedTopo && isPhotoLoaded) onProblemPhotoLoaded()
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
         TopoPhotoContent(
-            imageUri = topo.photoUri,
+            imageUri = photoUri,
             isPhotoLocked = topo.isPhotoLocked,
             premiumPrice = topo.premiumPrice,
-            onProblemPhotoLoaded = onProblemPhotoLoaded,
+            onProblemPhotoLoaded = { isPhotoLoaded = true },
             onShowPhotoFullScreen = {
-                val problem = topo.selectedCompleteProblem ?: return@TopoPhotoContent
-                val photoUri = topo.photoUri ?: return@TopoPhotoContent
+                if (!isSelectedTopo) return@TopoPhotoContent
 
-                onShowPhotoFullScreen(problem.problemWithLine.problem.id , photoUri)
+                val problem = topo.selectedCompleteProblem ?: return@TopoPhotoContent
+                val topoPhotoUri = topo.photoUri ?: return@TopoPhotoContent
+
+                onShowPhotoFullScreen(problem.problemWithLine.problem.id, topoPhotoUri)
             },
             onPremiumRequested = onPremiumRequested
         )
 
-        if (topo.canShowProblemStarts && !topo.isPhotoLocked) {
+        if (isSelectedTopo && topo.canShowProblemStarts && !topo.isPhotoLocked) {
             val selectedProblem = topo.selectedCompleteProblem ?: return
 
             val initialUiProblem = selectedProblem.toUiProblem(
@@ -187,6 +296,7 @@ private fun TopoPhotoPreview(
             topo = topo,
             onProblemPhotoLoaded = {},
             onProblemStartClicked = {},
+            onTopoSwiped = {},
             onShowPhotoFullScreen = { _, _ -> },
             onPremiumRequested = {},
             onVariantSelected = {}
@@ -207,6 +317,14 @@ private class TopoPhotoPreviewParameterProvider : PreviewParameterProvider<Topo?
         null,
         topo,
         topo.copy(canShowProblemStarts = true),
+        topo.copy(
+            canShowProblemStarts = true,
+            topoId = 1,
+            boulderTopos = listOf(
+                BoulderTopo(topoId = 1, photoUri = "uri"),
+                BoulderTopo(topoId = 2, photoUri = "uri")
+            )
+        ),
         topo.copy(canShowProblemStarts = true, isPhotoLocked = true, premiumPrice = "10,00 €"),
         topo.copy(canShowProblemStarts = true, isPhotoLocked = true)
     )

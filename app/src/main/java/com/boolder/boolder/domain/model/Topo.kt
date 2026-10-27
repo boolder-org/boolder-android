@@ -19,6 +19,8 @@ package com.boolder.boolder.domain.model
  * requires a premium subscription.
  * @param premiumPrice The formatted price of the premium subscription, if
  * available.
+ * @param topoId The ID of the picture that is displayed.
+ * @param boulderTopos The pictures of the same boulder, in display order.
  */
 data class Topo(
     val photoUri: String?,
@@ -28,7 +30,21 @@ data class Topo(
     val origin: TopoOrigin,
     val canShowProblemStarts: Boolean = false,
     val isPhotoLocked: Boolean = false,
-    val premiumPrice: String? = null
+    val premiumPrice: String? = null,
+    val topoId: Int? = null,
+    val boulderTopos: List<BoulderTopo> = emptyList()
+)
+
+/**
+ * A picture of the boulder on which the selected problem is.
+ *
+ * @param topoId The ID of the picture.
+ * @param photoUri The URI of the picture. Can refer to a web URL or a local
+ * file URI.
+ */
+data class BoulderTopo(
+    val topoId: Int,
+    val photoUri: String
 )
 
 /**

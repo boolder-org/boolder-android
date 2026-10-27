@@ -26,6 +26,7 @@ class TopoView(
                     topo = null,
                     onProblemPhotoLoaded = {},
                     onProblemStartClicked = {},
+                    onTopoSwiped = {},
                     onShowPhotoFullScreen = { _, _ -> },
                     onPremiumRequested = {},
                     onVariantSelected = {},
@@ -53,6 +54,7 @@ class TopoView(
                     topo = topo,
                     onProblemPhotoLoaded = { topoCallbacks?.onProblemPhotoLoaded() },
                     onProblemStartClicked = { topoCallbacks?.onProblemStartClicked(it) },
+                    onTopoSwiped = { topoCallbacks?.onTopoSwiped(it) },
                     onShowPhotoFullScreen = { problemId, photoUri ->
                         topoCallbacks?.onShowProblemPhotoFullScreen(problemId, photoUri)
                     },
@@ -101,6 +103,7 @@ class TopoView(
     interface TopoCallbacks {
         fun onProblemPhotoLoaded()
         fun onProblemStartClicked(problemId: Int)
+        fun onTopoSwiped(topoId: Int)
         fun onVariantSelected(variant: ProblemWithLine)
         fun onCircuitProblemSelected(problemId: Int)
         fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String)

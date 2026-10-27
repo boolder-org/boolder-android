@@ -5,6 +5,7 @@ import com.boolder.boolder.data.database.entity.circuitColorSafe
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
+import com.boolder.boolder.domain.model.BoulderTopo
 import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
@@ -16,7 +17,8 @@ class TopoDataAggregator(
     private val lineRepository: LineRepository,
     private val tickedProblemRepository: TickedProblemRepository,
     private val photoUriRetriever: PhotoUriRetriever,
-    private val circuitProblemsRetriever: CircuitProblemsRetriever
+    private val circuitProblemsRetriever: CircuitProblemsRetriever,
+    private val boulderToposRetriever: BoulderToposRetriever
 ) {
 
     suspend fun aggregate(
@@ -57,6 +59,16 @@ class TopoDataAggregator(
         val (circuitPreviousProblemId, circuitNextProblemId) = circuitProblemsRetriever
             .getCircuitPreviousAndNextProblemIds(mainProblem)
 
+        val boulderTopos = topoId
+            ?.let { boulderToposRetriever.getBoulderTopoIds(it) }
+            ?.map {
+                BoulderTopo(
+                    topoId = it,
+                    photoUri = photoUriRetriever.getPhotoUri(topoId = it, areaId = mainProblem.areaId)
+                )
+            }
+            ?: emptyList()
+
         val hasValidPhoto = previousPhotoUri != null && previousPhotoWasProperlyLoaded
         val canShowProblemStarts = hasValidPhoto && previousPhotoUri == photoUri
 
@@ -70,7 +82,9 @@ class TopoDataAggregator(
                 nextProblemId = circuitNextProblemId
             ),
             origin = origin,
-            canShowProblemStarts = canShowProblemStarts
+            canShowProblemStarts = canShowProblemStarts,
+            topoId = topoId,
+            boulderTopos = boulderTopos
         )
     }
 
