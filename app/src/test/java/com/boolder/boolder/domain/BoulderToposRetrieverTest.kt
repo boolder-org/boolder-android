@@ -171,7 +171,7 @@ class BoulderToposRetrieverTest {
                 id = it.id,
                 problemId = it.id,
                 topoId = TOPO_ON_BOULDER,
-                coordinates = if (it.id in problemIdsWithoutLine) null else "[]"
+                coordinates = if (it.id in problemIdsWithoutLine) "null" else """[{"x":0.5,"y":0.9},{"x":0.5,"y":0.1}]"""
             )
         }
         val problemIds = problems.map { it.id }

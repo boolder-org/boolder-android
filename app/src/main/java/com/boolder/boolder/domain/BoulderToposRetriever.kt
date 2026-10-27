@@ -21,7 +21,7 @@ class BoulderToposRetriever(
 
     suspend fun getTopProblemId(topoId: Int): Int? {
         val lines = lineRepository.loadAllByTopoIds(topoId)
-        val problemIdsWithLine = lines.filter { it.coordinates != null }.map { it.problemId }
+        val problemIdsWithLine = lines.filter { it.convert().points().isNotEmpty() }.map { it.problemId }
         val problems = problemRepository.loadAllByIds(lines.map { it.problemId })
 
         val topProblem = problems.filter { it.id in problemIdsWithLine }.maxByOrNull { it.zIndex() }
