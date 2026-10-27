@@ -6,12 +6,14 @@ import com.boolder.boolder.data.database.dao.AreaDao
 import com.boolder.boolder.data.database.dao.CircuitDao
 import com.boolder.boolder.data.database.dao.LineDao
 import com.boolder.boolder.data.database.dao.ProblemDao
+import com.boolder.boolder.data.database.dao.TopoDao
 import com.boolder.boolder.data.database.entity.AreaEntity
 import com.boolder.boolder.data.database.entity.CircuitEntity
 import com.boolder.boolder.data.database.entity.LineEntity
 import com.boolder.boolder.data.database.entity.PoiEntity
 import com.boolder.boolder.data.database.entity.PoiRouteEntity
 import com.boolder.boolder.data.database.entity.ProblemEntity
+import com.boolder.boolder.data.database.entity.TopoEntity
 
 @Database(
     entities = [
@@ -20,9 +22,10 @@ import com.boolder.boolder.data.database.entity.ProblemEntity
         LineEntity::class,
         PoiEntity::class,
         PoiRouteEntity::class,
-        ProblemEntity::class
+        ProblemEntity::class,
+        TopoEntity::class
     ],
-    version = 29, // increment version number everytime the boolder.db database changes (schema or data)
+    version = 30, // increment version number everytime the boolder.db database changes (schema or data)
     exportSchema = true
 )
 abstract class BoolderAppDatabase : RoomDatabase() {
@@ -30,6 +33,7 @@ abstract class BoolderAppDatabase : RoomDatabase() {
     abstract fun circuitDao(): CircuitDao
     abstract fun lineDao(): LineDao
     abstract fun problemDao(): ProblemDao
+    abstract fun topoDao(): TopoDao
 }
 
 
