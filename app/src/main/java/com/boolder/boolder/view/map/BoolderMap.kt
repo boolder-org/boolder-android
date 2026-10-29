@@ -577,4 +577,5 @@ class BoolderMap(
                 ?: listener?.onAreaLeft()
         }
     }
+
 }
