@@ -21,6 +21,8 @@ package com.boolder.boolder.domain.model
  * available.
  * @param topoId The ID of the picture that is displayed.
  * @param boulderTopos The pictures of the same boulder, in display order.
+ * @param isTopoMode Indicates if the whole picture is selected rather than a
+ * single problem: the lines of all its problems are then drawn.
  */
 data class Topo(
     val photoUri: String?,
@@ -32,7 +34,8 @@ data class Topo(
     val isPhotoLocked: Boolean = false,
     val premiumPrice: String? = null,
     val topoId: Int? = null,
-    val boulderTopos: List<BoulderTopo> = emptyList()
+    val boulderTopos: List<BoulderTopo> = emptyList(),
+    val isTopoMode: Boolean = false
 )
 
 /**

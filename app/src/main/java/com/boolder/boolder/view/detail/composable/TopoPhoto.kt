@@ -223,7 +223,8 @@ private fun TopoPhotoPage(
                 uiProblems = uiProblems,
                 selectedProblem = selectedProblem,
                 onProblemStartClicked = onProblemStartClicked,
-                onVariantSelected = onVariantSelected
+                onVariantSelected = onVariantSelected,
+                showAllLines = topo.isTopoMode
             )
         }
     }
@@ -329,6 +330,7 @@ private class TopoPhotoPreviewParameterProvider : PreviewParameterProvider<Topo?
         topo.copy(canShowProblemStarts = true),
         topo.copy(
             canShowProblemStarts = true,
+            isTopoMode = true,
             topoId = 1,
             boulderTopos = listOf(
                 BoulderTopo(topoId = 1, photoUri = "uri"),

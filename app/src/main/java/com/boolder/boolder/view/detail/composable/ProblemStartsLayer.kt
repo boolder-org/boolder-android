@@ -42,9 +42,22 @@ internal fun ProblemStartsLayer(
     onProblemStartClicked: (Int) -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier,
+    showAllLines: Boolean = false,
     drawnElementsScaleFactor: Float = 1f
 ) {
     Box(modifier = modifier) {
+        if (showAllLines) {
+            uiProblems
+                .filter { it.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id }
+                .forEach {
+                    ProblemLine(
+                        line = it.completeProblem.problemWithLine.line,
+                        color = it.completeProblem.problemWithLine.problem.circuitColorSafe.composeColor(),
+                        scaleFactor = drawnElementsScaleFactor
+                    )
+                }
+        }
+
         uiProblems.forEach { uiProblem ->
             uiProblem.problemStart?.let { problemStart ->
                 MarkerShadow(

@@ -467,7 +467,8 @@ class MapViewModel(
                     selectedCompleteProblem = selectedProblem,
                     otherCompleteProblems = otherProblems,
                     circuitInfo = circuitInfo,
-                    origin = TopoOrigin.TOPO
+                    origin = TopoOrigin.TOPO,
+                    isTopoMode = false
                 )
             }
         }
@@ -489,7 +490,8 @@ class MapViewModel(
         _topoStateFlow.update {
             it?.copy(
                 selectedCompleteProblem = selectedProblem,
-                otherCompleteProblems = newCompleteProblems
+                otherCompleteProblems = newCompleteProblems,
+                isTopoMode = false
             )
         }
     }
@@ -500,6 +502,8 @@ class MapViewModel(
             val topProblemId = boulderToposRetriever.getTopProblemId(topoId) ?: return@launch
 
             loadTopo(problemId = topProblemId, origin = TopoOrigin.TOPO)
+
+            _topoStateFlow.update { it?.copy(isTopoMode = true) }
         }
     }
 
