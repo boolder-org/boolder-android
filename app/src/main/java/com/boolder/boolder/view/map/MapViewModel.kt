@@ -525,7 +525,8 @@ class MapViewModel(
                     problemId = problemId,
                     photoUri = photoUri,
                     topoId = topo?.topoId,
-                    boulderTopos = topo?.boulderTopos.orEmpty()
+                    boulderTopos = topo?.boulderTopos.orEmpty(),
+                    isTopoMode = topo?.isTopoMode == true
                 )
             )
         }
@@ -625,7 +626,8 @@ class MapViewModel(
             val problemId: Int,
             val photoUri: String,
             val topoId: Int?,
-            val boulderTopos: List<BoulderTopo>
+            val boulderTopos: List<BoulderTopo>,
+            val isTopoMode: Boolean
         ) : Event
 
         data class ZoomOnCircuit(val circuit: Circuit) : Event

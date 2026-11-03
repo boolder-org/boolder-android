@@ -40,6 +40,7 @@ import com.boolder.boolder.view.areadetails.KEY_CIRCUIT_ID
 import com.boolder.boolder.view.areadetails.KEY_PROBLEM
 import com.boolder.boolder.view.areadetails.REQUEST_KEY_AREA_DETAILS
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.MapControlsOverlay
@@ -297,6 +298,17 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
 
         parentFragmentManager.setFragmentResultListener(
+            /* requestKey = */ FullScreenPhotoFragment.REQUEST_KEY,
+            /* lifecycleOwner = */ this
+        ) { _, bundle ->
+            if (bundle.getBoolean(FullScreenPhotoFragment.RESULT_IS_TOPO_MODE)) {
+                mapViewModel.onTopoSwiped(bundle.getInt(FullScreenPhotoFragment.RESULT_TOPO_ID))
+            } else {
+                mapViewModel.onTopoProblemSelected(bundle.getInt(FullScreenPhotoFragment.RESULT_PROBLEM_ID))
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
             /* requestKey = */ GradesFilterBottomSheetDialogFragment.REQUEST_KEY,
             /* lifecycleOwner = */ this
         ) { _, bundle ->
@@ -548,7 +560,8 @@ class MapFragment : Fragment(), BoolderMapListener {
             photoUri = event.photoUri,
             topoId = event.topoId ?: -1,
             topoIds = event.boulderTopos.map { it.topoId }.toIntArray(),
-            photoUris = event.boulderTopos.map { it.photoUri }.toTypedArray()
+            photoUris = event.boulderTopos.map { it.photoUri }.toTypedArray(),
+            isTopoMode = event.isTopoMode
         )
 
         navController.navigate(direction)

@@ -34,7 +34,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,12 +58,16 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.CompleteProblem
+import com.boolder.boolder.domain.model.allProblems
 import com.boolder.boolder.domain.model.toUiProblem
 import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.compose.LoadingScreen
 import com.boolder.boolder.view.detail.composable.LockedPhoto
 import com.boolder.boolder.view.detail.composable.ProblemStartsLayer
+import com.boolder.boolder.view.detail.composable.TopoThumbnailStrip
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -71,6 +77,8 @@ internal fun FullScreenPhotoScreen(
     scrollOffset: Float,
     onCloseClicked: () -> Unit,
     onDragStateChanged: (Boolean) -> Unit,
+    onTopoSwiped: (Int) -> Unit,
+    onProblemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -103,7 +111,9 @@ internal fun FullScreenPhotoScreen(
 
                 is FullScreenPhotoViewModel.ScreenState.Content -> FullScreenPhotoScreenContent(
                     screenState = screenState,
-                    onDragStateChanged = onDragStateChanged
+                    onDragStateChanged = onDragStateChanged,
+                    onTopoSwiped = onTopoSwiped,
+                    onProblemSelected = onProblemSelected
                 )
 
                 is FullScreenPhotoViewModel.ScreenState.Error -> FullScreenPhotoScreenError()
@@ -128,20 +138,28 @@ internal fun FullScreenPhotoScreen(
 @Composable
 private fun FullScreenPhotoScreenContent(
     screenState: FullScreenPhotoViewModel.ScreenState.Content,
-    onDragStateChanged: (Boolean) -> Unit
+    onDragStateChanged: (Boolean) -> Unit,
+    onTopoSwiped: (Int) -> Unit,
+    onProblemSelected: (Int) -> Unit
 ) {
     val boulderTopos = screenState.boulderTopos
 
     if (boulderTopos.size <= 1) {
         FullScreenPhotoPage(
             photoUri = screenState.photoUri,
-            completeProblem = screenState.completeProblem,
+            selectedProblem = screenState.completeProblem,
+            otherProblems = emptyList(),
+            showAllLines = false,
             isPhotoLocked = screenState.isPhotoLocked,
+            onProblemSelected = {},
             onZoomStateChanged = { isZoomed -> onDragStateChanged(!isZoomed) }
         )
 
         return
     }
+
+    val shownTopo = screenState.shownTopo
+    val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState(
         initialPage = boulderTopos.indexOfFirst { it.topoId == screenState.topoId }.coerceAtLeast(0),
@@ -153,22 +171,56 @@ private fun FullScreenPhotoScreenContent(
         onDragStateChanged(!isZoomed)
     }
 
-    // a zoomed photo is panned instead of changing the page
-    HorizontalPager(
-        modifier = Modifier.fillMaxSize(),
-        state = pagerState,
-        userScrollEnabled = !isZoomed,
-        beyondViewportPageCount = 1,
-        key = { boulderTopos[it].topoId }
-    ) { page ->
-        val boulderTopo = boulderTopos[page]
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .drop(1)
+            .collect { onTopoSwiped(boulderTopos[it].topoId) }
+    }
 
-        FullScreenPhotoPage(
-            photoUri = boulderTopo.photoUri,
-            completeProblem = screenState.completeProblem.takeIf { boulderTopo.topoId == screenState.topoId },
-            isPhotoLocked = screenState.isPhotoLocked,
-            onZoomStateChanged = { if (page == pagerState.currentPage) isZoomed = it }
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // a zoomed photo is panned instead of changing the page
+        HorizontalPager(
+            modifier = Modifier.fillMaxSize(),
+            state = pagerState,
+            userScrollEnabled = !isZoomed,
+            beyondViewportPageCount = 1,
+            key = { boulderTopos[it].topoId }
+        ) { page ->
+            val boulderTopo = boulderTopos[page]
+            val pageTopo = shownTopo?.takeIf { it.topoId == boulderTopo.topoId }
+
+            FullScreenPhotoPage(
+                photoUri = boulderTopo.photoUri,
+                selectedProblem = when {
+                    pageTopo != null -> pageTopo.selectedCompleteProblem
+                    shownTopo == null && boulderTopo.topoId == screenState.topoId -> screenState.completeProblem
+                    else -> null
+                },
+                otherProblems = pageTopo?.otherCompleteProblems.orEmpty(),
+                showAllLines = pageTopo?.isTopoMode == true,
+                isPhotoLocked = screenState.isPhotoLocked,
+                onProblemSelected = onProblemSelected,
+                onZoomStateChanged = { if (page == pagerState.currentPage) isZoomed = it }
+            )
+        }
+
+        if (shownTopo?.isTopoMode == true) {
+            TopoThumbnailStrip(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .background(color = MaterialTheme.colorScheme.background.copy(alpha = .9f)),
+                boulderTopos = boulderTopos,
+                selectedTopoId = shownTopo.topoId,
+                isPhotoLocked = screenState.isPhotoLocked,
+                problems = shownTopo.allProblems().sortedBy { it.grade },
+                onTopoSelected = { topoId ->
+                    val page = boulderTopos.indexOfFirst { it.topoId == topoId }
+
+                    coroutineScope.launch { pagerState.animateScrollToPage(page) }
+                },
+                onProblemSelected = onProblemSelected
+            )
+        }
     }
 }
 
@@ -176,8 +228,11 @@ private fun FullScreenPhotoScreenContent(
 @Composable
 private fun FullScreenPhotoPage(
     photoUri: String,
-    completeProblem: CompleteProblem?,
+    selectedProblem: CompleteProblem?,
+    otherProblems: List<CompleteProblem>,
+    showAllLines: Boolean,
     isPhotoLocked: Boolean,
+    onProblemSelected: (Int) -> Unit,
     onZoomStateChanged: (Boolean) -> Unit
 ) {
     Box(
@@ -263,12 +318,14 @@ private fun FullScreenPhotoPage(
             contentScale = ContentScale.Fit
         )
 
-        completeProblem ?: return@Box
+        selectedProblem ?: return@Box
 
-        val uiProblem = completeProblem.toUiProblem(
-            containerWidthPx = widthPx,
-            containerHeightPx = heightPx
-        )
+        val uiProblems = (otherProblems + selectedProblem).map {
+            it.toUiProblem(
+                containerWidthPx = widthPx,
+                containerHeightPx = heightPx
+            )
+        }
 
         ProblemStartsLayer(
             modifier = Modifier
@@ -279,11 +336,12 @@ private fun FullScreenPhotoPage(
                     scaleX = scaleFactor
                     scaleY = scaleFactor
                 },
-            uiProblems = listOf(uiProblem),
-            selectedProblem = uiProblem.completeProblem,
+            uiProblems = uiProblems,
+            selectedProblem = selectedProblem,
+            showAllLines = showAllLines,
             drawnElementsScaleFactor = 1f / scaleFactor,
-            onProblemStartClicked = {},
-            onVariantSelected = {}
+            onProblemStartClicked = onProblemSelected,
+            onVariantSelected = { onProblemSelected(it.problem.id) }
         )
     }
 }
@@ -308,7 +366,9 @@ private fun FullScreenPhotoScreenPreview(
             screenState = screenState,
             scrollOffset = 1f,
             onCloseClicked = {},
-            onDragStateChanged = {}
+            onDragStateChanged = {},
+            onTopoSwiped = {},
+            onProblemSelected = {}
         )
     }
 }

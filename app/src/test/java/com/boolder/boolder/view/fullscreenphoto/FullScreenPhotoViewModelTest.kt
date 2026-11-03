@@ -9,6 +9,8 @@ import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.premium.model.PremiumStatus
 import com.boolder.boolder.data.premium.repository.PremiumRepository
+import com.boolder.boolder.domain.BoulderToposRetriever
+import com.boolder.boolder.domain.TopoDataAggregator
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.Line
 import com.boolder.boolder.domain.model.Problem
@@ -37,6 +39,8 @@ class FullScreenPhotoViewModelTest {
     @Mock private lateinit var lineRepository: LineRepository
     @Mock private lateinit var problemRepository: ProblemRepository
     @Mock private lateinit var premiumRepository: PremiumRepository
+    @Mock private lateinit var boulderToposRetriever: BoulderToposRetriever
+    @Mock private lateinit var topoDataAggregator: TopoDataAggregator
 
     @Before
     fun setUp() {
@@ -144,7 +148,9 @@ class FullScreenPhotoViewModelTest {
             savedStateHandle = savedStateHandle,
             lineRepository = lineRepository,
             problemRepository = problemRepository,
-            premiumRepository = premiumRepository
+            premiumRepository = premiumRepository,
+            boulderToposRetriever = boulderToposRetriever,
+            topoDataAggregator = topoDataAggregator
         )
     }
 

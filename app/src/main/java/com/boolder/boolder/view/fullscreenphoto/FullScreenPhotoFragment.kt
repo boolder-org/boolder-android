@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.fullscreenphoto
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.boolder.boolder.view.compose.BoolderTheme
 import com.boolder.boolder.view.custom.EdgeToEdgeBottomSheetDialogFragment
@@ -37,7 +40,9 @@ class FullScreenPhotoFragment : EdgeToEdgeBottomSheetDialogFragment() {
                         screenState = screenState,
                         scrollOffset = scrollOffset,
                         onCloseClicked = ::onCloseClicked,
-                        onDragStateChanged = ::onDragStateChanged
+                        onDragStateChanged = ::onDragStateChanged,
+                        onTopoSwiped = viewModel::onTopoSwiped,
+                        onProblemSelected = viewModel::onProblemSelected
                     )
                 }
             }
@@ -66,5 +71,32 @@ class FullScreenPhotoFragment : EdgeToEdgeBottomSheetDialogFragment() {
 
     private fun onDragStateChanged(canDragParentContainer: Boolean) {
         (dialog as? BottomSheetDialog)?.behavior?.isDraggable = canDragParentContainer
+    }
+
+    // the problem details bottom sheet shows the picture that was last seen in full screen
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+
+        val shownTopo = (viewModel.screenState.value as? FullScreenPhotoViewModel.ScreenState.Content)
+            ?.shownTopo
+            ?: return
+
+        val problemId = shownTopo.selectedCompleteProblem?.problemWithLine?.problem?.id ?: return
+
+        setFragmentResult(
+            requestKey = REQUEST_KEY,
+            result = bundleOf(
+                RESULT_TOPO_ID to shownTopo.topoId,
+                RESULT_PROBLEM_ID to problemId,
+                RESULT_IS_TOPO_MODE to shownTopo.isTopoMode
+            )
+        )
+    }
+
+    companion object {
+        const val REQUEST_KEY = "full_screen_photo"
+        const val RESULT_TOPO_ID = "result_topo_id"
+        const val RESULT_PROBLEM_ID = "result_problem_id"
+        const val RESULT_IS_TOPO_MODE = "result_is_topo_mode"
     }
 }

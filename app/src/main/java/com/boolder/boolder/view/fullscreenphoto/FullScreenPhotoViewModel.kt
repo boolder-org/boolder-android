@@ -7,10 +7,15 @@ import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.premium.model.isPhotoLocked
 import com.boolder.boolder.data.premium.repository.PremiumRepository
+import com.boolder.boolder.domain.BoulderToposRetriever
+import com.boolder.boolder.domain.TopoDataAggregator
 import com.boolder.boolder.domain.convert
 import com.boolder.boolder.domain.model.BoulderTopo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
+import com.boolder.boolder.domain.model.Topo
+import com.boolder.boolder.domain.model.TopoOrigin
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,12 +25,15 @@ class FullScreenPhotoViewModel(
     savedStateHandle: SavedStateHandle,
     private val lineRepository: LineRepository,
     private val problemRepository: ProblemRepository,
-    private val premiumRepository: PremiumRepository
+    private val premiumRepository: PremiumRepository,
+    private val boulderToposRetriever: BoulderToposRetriever,
+    private val topoDataAggregator: TopoDataAggregator
 ) : ViewModel() {
 
     private val problemId = requireNotNull(savedStateHandle.get<Int>("problem_id"))
     private val photoUri = requireNotNull(savedStateHandle.get<String>("photo_uri"))
     private val topoId = savedStateHandle.get<Int>("topo_id")?.takeIf { it >= 0 }
+    private val isTopoMode = savedStateHandle.get<Boolean>("is_topo_mode") == true
     private val boulderTopos = run {
         val topoIds = savedStateHandle.get<IntArray>("topo_ids") ?: intArrayOf()
         val photoUris = savedStateHandle.get<Array<String>>("photo_uris") ?: emptyArray()
@@ -35,6 +43,9 @@ class FullScreenPhotoViewModel(
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
     val screenState = _screenState.asStateFlow()
+
+    // only the latest selection should end up in the screen
+    private var loadTopoJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -69,8 +80,41 @@ class FullScreenPhotoViewModel(
                     )
                 )
             }
+
+            // the bottom sheet was showing the whole picture
+            if (isTopoMode && topoId != null) onTopoSwiped(topoId)
         }
     }
+
+    fun onTopoSwiped(topoId: Int) {
+        loadTopo {
+            val topProblemId = boulderToposRetriever.getTopProblemId(topoId) ?: return@loadTopo null
+
+            aggregate(topProblemId).copy(isTopoMode = true)
+        }
+    }
+
+    fun onProblemSelected(problemId: Int) {
+        loadTopo { aggregate(problemId) }
+    }
+
+    private fun loadTopo(block: suspend () -> Topo?) {
+        loadTopoJob?.cancel()
+        loadTopoJob = viewModelScope.launch {
+            val shownTopo = block() ?: return@launch
+
+            _screenState.update {
+                (it as? ScreenState.Content)?.copy(shownTopo = shownTopo) ?: it
+            }
+        }
+    }
+
+    private suspend fun aggregate(problemId: Int) = topoDataAggregator.aggregate(
+        problemId = problemId,
+        origin = TopoOrigin.TOPO,
+        previousPhotoUri = null,
+        previousPhotoWasProperlyLoaded = false
+    )
 
     sealed interface ScreenState {
         data object Loading : ScreenState
@@ -80,7 +124,8 @@ class FullScreenPhotoViewModel(
             val completeProblem: CompleteProblem,
             val topoId: Int? = null,
             val boulderTopos: List<BoulderTopo> = emptyList(),
-            val isPhotoLocked: Boolean = false
+            val isPhotoLocked: Boolean = false,
+            val shownTopo: Topo? = null
         ) : ScreenState
 
         data object Error : ScreenState
