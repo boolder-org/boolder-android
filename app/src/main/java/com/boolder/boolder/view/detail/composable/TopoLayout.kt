@@ -71,7 +71,17 @@ internal fun TopoLayout(
                 onVariantSelected = onVariantSelected
             )
 
-            topo?.selectedCompleteProblem?.let {
+            if (topo?.isTopoMode == true) {
+                TopoThumbnailStrip(
+                    modifier = Modifier
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding(),
+                    boulderTopos = topo.boulderTopos,
+                    selectedTopoId = topo.topoId,
+                    isPhotoLocked = topo.isPhotoLocked,
+                    onTopoSelected = onTopoSwiped
+                )
+            } else topo?.selectedCompleteProblem?.let {
                 TopoFooter(
                     modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.surface)
