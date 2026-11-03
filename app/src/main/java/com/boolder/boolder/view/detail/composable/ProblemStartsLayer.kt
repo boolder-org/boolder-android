@@ -94,11 +94,14 @@ internal fun ProblemStartsLayer(
                     )
                 }
 
-            ProblemVariantsButton(
-                modifier = Modifier.align(Alignment.TopEnd),
-                variants = listOf(selectedProblem.problemWithLine) + selectedProblem.variants,
-                onVariantSelected = onVariantSelected
-            )
+            // the variants are already drawn when all the lines are
+            if (!showAllLines) {
+                ProblemVariantsButton(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    variants = listOf(selectedProblem.problemWithLine) + selectedProblem.variants,
+                    onVariantSelected = onVariantSelected
+                )
+            }
         }
     }
 }

@@ -4,23 +4,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +33,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.boolder.boolder.R
@@ -54,18 +52,7 @@ internal fun TopoThumbnailStrip(
     onProblemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val listState = rememberLazyListState()
     var isProblemsListShown by remember { mutableStateOf(false) }
-
-    // keep the selected thumbnail visible when the photo is swiped
-    LaunchedEffect(selectedTopoId) {
-        val index = boulderTopos.indexOfFirst { it.topoId == selectedTopoId }
-
-        if (index < 0) return@LaunchedEffect
-        if (listState.layoutInfo.visibleItemsInfo.any { it.index == index }) return@LaunchedEffect
-
-        listState.animateScrollToItem(index)
-    }
 
     Column(
         modifier = modifier
@@ -74,21 +61,31 @@ internal fun TopoThumbnailStrip(
             .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            state = listState,
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        // all the thumbnails fit in the width: they get narrower on boulders with many pictures
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            items(boulderTopos, key = { it.topoId }) { boulderTopo ->
-                val isSelected = boulderTopo.topoId == selectedTopoId
+            val spacing = 8.dp
+            val thumbnailWidth = ((maxWidth - spacing * (boulderTopos.size - 1)) / boulderTopos.size.coerceAtLeast(1))
+                .coerceIn(0.dp, 72.dp)
 
-                TopoThumbnail(
-                    photoUri = boulderTopo.photoUri,
-                    isSelected = isSelected,
-                    isPhotoLocked = isPhotoLocked,
-                    onClick = { if (!isSelected) onTopoSelected(boulderTopo.topoId) }
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing, Alignment.CenterHorizontally)
+            ) {
+                boulderTopos.forEach { boulderTopo ->
+                    val isSelected = boulderTopo.topoId == selectedTopoId
+
+                    TopoThumbnail(
+                        photoUri = boulderTopo.photoUri,
+                        width = thumbnailWidth,
+                        isSelected = isSelected,
+                        isPhotoLocked = isPhotoLocked,
+                        onClick = { if (!isSelected) onTopoSelected(boulderTopo.topoId) }
+                    )
+                }
             }
         }
 
@@ -125,6 +122,7 @@ internal fun TopoThumbnailStrip(
 @Composable
 private fun TopoThumbnail(
     photoUri: String,
+    width: Dp,
     isSelected: Boolean,
     isPhotoLocked: Boolean,
     onClick: () -> Unit
@@ -132,7 +130,7 @@ private fun TopoThumbnail(
     val shape = RoundedCornerShape(8.dp)
 
     val imageModifier = Modifier
-        .size(width = 72.dp, height = 54.dp)
+        .size(width = width, height = 54.dp)
         .clip(shape)
         .border(
             width = 3.dp,
