@@ -33,6 +33,7 @@ internal fun TopoLayout(
     onPremiumRequested: () -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     onCircuitProblemSelected: (Int) -> Unit,
+    onTopoProblemSelected: (Int) -> Unit,
     onBleauInfoClicked: (String?) -> Unit,
     onShareClicked: (Int) -> Unit,
     onSaveProblem: (Int, TickStatus) -> Unit,
@@ -79,7 +80,12 @@ internal fun TopoLayout(
                     boulderTopos = topo.boulderTopos,
                     selectedTopoId = topo.topoId,
                     isPhotoLocked = topo.isPhotoLocked,
-                    onTopoSelected = onTopoSwiped
+                    problems = (listOfNotNull(topo.selectedCompleteProblem) + topo.otherCompleteProblems)
+                        .flatMap { listOf(it.problemWithLine) + it.variants }
+                        .map { it.problem }
+                        .sortedBy { it.grade },
+                    onTopoSelected = onTopoSwiped,
+                    onProblemSelected = onTopoProblemSelected
                 )
             } else topo?.selectedCompleteProblem?.let {
                 TopoFooter(
@@ -127,6 +133,7 @@ private fun TopoLayoutPreview() {
             onPremiumRequested = {},
             onVariantSelected = {},
             onCircuitProblemSelected = {},
+            onTopoProblemSelected = {},
             onBleauInfoClicked = {},
             onShareClicked = {},
             onSaveProblem = { _, _ -> },

@@ -511,6 +511,10 @@ class MapViewModel(
         fetchTopo(problemId = problemId, origin = TopoOrigin.CIRCUIT)
     }
 
+    override fun onTopoProblemSelected(problemId: Int) {
+        fetchTopo(problemId = problemId, origin = TopoOrigin.TOPO)
+    }
+
     override fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String) {
         viewModelScope.launch {
             _eventFlow.emit(Event.ShowProblemPhotoFullScreen(problemId, photoUri))

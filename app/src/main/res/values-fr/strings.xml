@@ -47,6 +47,12 @@
         <item quantity="other">%d variantes</item>
     </plurals>
 
+    <plurals name="topo_problems">
+        <item quantity="one">%d voie</item>
+        <item quantity="many">%d voies</item>
+        <item quantity="other">%d voies</item>
+    </plurals>
+
     <string name="stepness_wall">Mur vertical</string>
     <string name="stepness_slab">Dalle</string>
     <string name="stepness_overhang">Dévers</string>

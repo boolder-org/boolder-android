@@ -31,6 +31,7 @@ class TopoView(
                     onPremiumRequested = {},
                     onVariantSelected = {},
                     onCircuitProblemSelected = {},
+                    onTopoProblemSelected = {},
                     onBleauInfoClicked = {},
                     onShareClicked = {},
                     onSaveProblem = { _, _ -> },
@@ -61,6 +62,7 @@ class TopoView(
                     onPremiumRequested = { topoCallbacks?.onPremiumRequested() },
                     onVariantSelected = { topoCallbacks?.onVariantSelected(it) },
                     onCircuitProblemSelected = { topoCallbacks?.onCircuitProblemSelected(it) },
+                    onTopoProblemSelected = { topoCallbacks?.onTopoProblemSelected(it) },
                     onBleauInfoClicked = ::onBleauInfoClicked,
                     onShareClicked = ::onShareClicked,
                     onSaveProblem = { problemId, tickStatus ->
@@ -106,6 +108,7 @@ class TopoView(
         fun onTopoSwiped(topoId: Int)
         fun onVariantSelected(variant: ProblemWithLine)
         fun onCircuitProblemSelected(problemId: Int)
+        fun onTopoProblemSelected(problemId: Int)
         fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String)
         fun onPremiumRequested()
     }

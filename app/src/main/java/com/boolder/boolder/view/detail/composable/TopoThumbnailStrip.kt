@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,22 +15,33 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.boolder.boolder.R
 import com.boolder.boolder.domain.model.BoulderTopo
+import com.boolder.boolder.domain.model.Problem
+import com.boolder.boolder.utils.previewgenerator.dummyProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 
 @Composable
@@ -37,10 +49,13 @@ internal fun TopoThumbnailStrip(
     boulderTopos: List<BoulderTopo>,
     selectedTopoId: Int?,
     isPhotoLocked: Boolean,
+    problems: List<Problem>,
     onTopoSelected: (Int) -> Unit,
+    onProblemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
+    var isProblemsListShown by remember { mutableStateOf(false) }
 
     // keep the selected thumbnail visible when the photo is swiped
     LaunchedEffect(selectedTopoId) {
@@ -56,7 +71,8 @@ internal fun TopoThumbnailStrip(
         modifier = modifier
             .fillMaxWidth()
             .height(140.dp)
-            .padding(vertical = 16.dp)
+            .padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
@@ -75,6 +91,34 @@ internal fun TopoThumbnailStrip(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        TextButton(onClick = { isProblemsListShown = true }) {
+            Text(
+                text = pluralStringResource(id = R.plurals.topo_problems, count = problems.size, problems.size),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Icon(
+                modifier = Modifier.rotate(180f),
+                painter = painterResource(id = R.drawable.ic_chevron_left),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+
+    if (isProblemsListShown) {
+        TopoProblemsBottomSheet(
+            problems = problems,
+            onProblemSelected = {
+                isProblemsListShown = false
+                onProblemSelected(it)
+            },
+            onDismissRequest = { isProblemsListShown = false }
+        )
     }
 }
 
@@ -123,7 +167,9 @@ private fun TopoThumbnailStripPreview() {
             boulderTopos = (1..5).map { BoulderTopo(topoId = it, photoUri = "uri") },
             selectedTopoId = 3,
             isPhotoLocked = false,
-            onTopoSelected = {}
+            problems = listOf(dummyProblem()),
+            onTopoSelected = {},
+            onProblemSelected = {}
         )
     }
 }
