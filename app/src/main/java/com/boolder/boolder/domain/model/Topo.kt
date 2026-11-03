@@ -39,6 +39,14 @@ data class Topo(
 )
 
 /**
+ * All the problems drawn on the picture, variants included.
+ */
+fun Topo.allProblems(): List<Problem> =
+    (listOfNotNull(selectedCompleteProblem) + otherCompleteProblems)
+        .flatMap { listOf(it.problemWithLine) + it.variants }
+        .map { it.problem }
+
+/**
  * A picture of the boulder on which the selected problem is.
  *
  * @param topoId The ID of the picture.

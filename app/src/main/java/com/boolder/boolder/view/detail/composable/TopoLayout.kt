@@ -20,6 +20,7 @@ import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
+import com.boolder.boolder.domain.model.allProblems
 import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 
@@ -80,10 +81,7 @@ internal fun TopoLayout(
                     boulderTopos = topo.boulderTopos,
                     selectedTopoId = topo.topoId,
                     isPhotoLocked = topo.isPhotoLocked,
-                    problems = (listOfNotNull(topo.selectedCompleteProblem) + topo.otherCompleteProblems)
-                        .flatMap { listOf(it.problemWithLine) + it.variants }
-                        .map { it.problem }
-                        .sortedBy { it.grade },
+                    problems = topo.allProblems().sortedBy { it.grade },
                     onTopoSelected = onTopoSwiped,
                     onProblemSelected = onTopoProblemSelected
                 )

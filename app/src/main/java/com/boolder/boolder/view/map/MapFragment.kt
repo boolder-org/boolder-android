@@ -28,6 +28,7 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
+import com.boolder.boolder.domain.model.allProblems
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.containsCameraState
@@ -87,6 +88,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private var pendingMapAction: (() -> Unit)? = null
     private var topInset = 0
     private var lastFlownProblemId: Int? = null
+    private var lastShownTopoId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -413,19 +415,47 @@ class MapFragment : Fragment(), BoolderMapListener {
                 ?: return@let
 
             // the topo is re-emitted when the premium status or price changes: only move the map for a new problem
-            if (selectedProblem.id == lastFlownProblemId) return@let
+            if (selectedProblem.id != lastFlownProblemId) {
+                lastFlownProblemId = selectedProblem.id
+                flyToProblem(problem = selectedProblem, origin = topo.origin)
+            }
 
-            lastFlownProblemId = selectedProblem.id
-            flyToProblem(problem = selectedProblem, origin = topo.origin)
+            showTopoModeOnMap(topo = topo, selectedProblemId = selectedProblem.id)
         }
 
         if (nullableTopo == null) {
             lastFlownProblemId = null
+            lastShownTopoId = null
+            mapView.highlightTopoProblems(featureIds = emptySet(), selectedFeatureId = null)
             bottomSheetBehavior.state = STATE_HIDDEN
         } else {
             onBackPressedCallback.isEnabled = true
             mapView.post { bottomSheetBehavior.state = STATE_EXPANDED }
         }
+    }
+
+    private fun showTopoModeOnMap(topo: Topo, selectedProblemId: Int) {
+        val topoProblems = if (topo.isTopoMode) topo.allProblems() else emptyList()
+
+        mapView.highlightTopoProblems(
+            featureIds = topoProblems.map { it.id.toString() }.toSet(),
+            selectedFeatureId = selectedProblemId.toString()
+        )
+
+        if (!topo.isTopoMode) {
+            lastShownTopoId = null
+            return
+        }
+
+        // only move the map once per picture
+        if (topo.topoId == lastShownTopoId) return
+
+        lastShownTopoId = topo.topoId
+        mapView.showProblems(
+            coordinates = topoProblems.map {
+                Point.fromLngLat(it.longitude.toDouble(), it.latitude.toDouble())
+            }
+        )
     }
 
     private fun flyToArea(area: Area) {
