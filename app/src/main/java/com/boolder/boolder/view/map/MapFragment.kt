@@ -231,10 +231,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 is MapViewModel.Event.ShowAvailableCircuits -> showCircuitFilterBottomSheet(event)
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
 
-                is MapViewModel.Event.ShowProblemPhotoFullScreen -> navigateToFullScreenProblemPhoto(
-                    problemId = event.problemId,
-                    photoUri = event.photoUri
-                )
+                is MapViewModel.Event.ShowProblemPhotoFullScreen -> navigateToFullScreenProblemPhoto(event)
 
                 is MapViewModel.Event.ShowPaywall -> navigateToPaywall()
                 is MapViewModel.Event.ShowPremiumIntro -> navigateToPremiumIntro()
@@ -541,14 +538,17 @@ class MapFragment : Fragment(), BoolderMapListener {
         navController.navigate(MapFragmentDirections.navigateToSearch())
     }
 
-    private fun navigateToFullScreenProblemPhoto(problemId: Int, photoUri: String) {
+    private fun navigateToFullScreenProblemPhoto(event: MapViewModel.Event.ShowProblemPhotoFullScreen) {
         val navController = findNavController()
 
         if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.showProblemPhotoFullScreen(
-            problemId = problemId,
-            photoUri = photoUri
+            problemId = event.problemId,
+            photoUri = event.photoUri,
+            topoId = event.topoId ?: -1,
+            topoIds = event.boulderTopos.map { it.topoId }.toIntArray(),
+            photoUris = event.boulderTopos.map { it.photoUri }.toTypedArray()
         )
 
         navController.navigate(direction)

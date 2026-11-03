@@ -8,6 +8,7 @@ import com.boolder.boolder.data.database.repository.ProblemRepository
 import com.boolder.boolder.data.premium.model.isPhotoLocked
 import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.domain.convert
+import com.boolder.boolder.domain.model.BoulderTopo
 import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.ProblemWithLine
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,13 @@ class FullScreenPhotoViewModel(
 
     private val problemId = requireNotNull(savedStateHandle.get<Int>("problem_id"))
     private val photoUri = requireNotNull(savedStateHandle.get<String>("photo_uri"))
+    private val topoId = savedStateHandle.get<Int>("topo_id")?.takeIf { it >= 0 }
+    private val boulderTopos = run {
+        val topoIds = savedStateHandle.get<IntArray>("topo_ids") ?: intArrayOf()
+        val photoUris = savedStateHandle.get<Array<String>>("photo_uris") ?: emptyArray()
+
+        topoIds.zip(photoUris) { topoId, photoUri -> BoulderTopo(topoId = topoId, photoUri = photoUri) }
+    }
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
     val screenState = _screenState.asStateFlow()
@@ -52,6 +60,8 @@ class FullScreenPhotoViewModel(
                 ScreenState.Content(
                     photoUri = photoUri,
                     completeProblem = completeProblem,
+                    topoId = topoId,
+                    boulderTopos = boulderTopos,
                     isPhotoLocked = isPhotoLocked(
                         areaId = problem.areaId,
                         freeAreaIds = premiumRepository.freeAreaIds.value,
@@ -68,6 +78,8 @@ class FullScreenPhotoViewModel(
         data class Content(
             val photoUri: String,
             val completeProblem: CompleteProblem,
+            val topoId: Int? = null,
+            val boulderTopos: List<BoulderTopo> = emptyList(),
             val isPhotoLocked: Boolean = false
         ) : ScreenState
 

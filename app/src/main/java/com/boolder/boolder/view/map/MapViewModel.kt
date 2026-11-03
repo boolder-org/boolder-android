@@ -16,6 +16,7 @@ import com.boolder.boolder.domain.CircuitProblemsRetriever
 import com.boolder.boolder.domain.TopoDataAggregator
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.Area
+import com.boolder.boolder.domain.model.BoulderTopo
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
@@ -517,7 +518,16 @@ class MapViewModel(
 
     override fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String) {
         viewModelScope.launch {
-            _eventFlow.emit(Event.ShowProblemPhotoFullScreen(problemId, photoUri))
+            val topo = _topoStateFlow.value
+
+            _eventFlow.emit(
+                Event.ShowProblemPhotoFullScreen(
+                    problemId = problemId,
+                    photoUri = photoUri,
+                    topoId = topo?.topoId,
+                    boulderTopos = topo?.boulderTopos.orEmpty()
+                )
+            )
         }
     }
 
@@ -613,7 +623,9 @@ class MapViewModel(
 
         data class ShowProblemPhotoFullScreen(
             val problemId: Int,
-            val photoUri: String
+            val photoUri: String,
+            val topoId: Int?,
+            val boulderTopos: List<BoulderTopo>
         ) : Event
 
         data class ZoomOnCircuit(val circuit: Circuit) : Event

@@ -13,12 +13,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +55,7 @@ import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.boolder.boolder.R
+import com.boolder.boolder.domain.model.CompleteProblem
 import com.boolder.boolder.domain.model.toUiProblem
 import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.view.compose.BoolderTheme
@@ -121,109 +125,167 @@ internal fun FullScreenPhotoScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FullScreenPhotoScreenContent(
     screenState: FullScreenPhotoViewModel.ScreenState.Content,
     onDragStateChanged: (Boolean) -> Unit
 ) {
-    if (screenState.isPhotoLocked) {
-        LockedPhoto(
-            painter = if (LocalInspectionMode.current) {
-                painterResource(id = R.drawable.area_cover_1)
-            } else {
-                rememberAsyncImagePainter(model = screenState.photoUri)
-            },
-            premiumPrice = null,
-            onPremiumRequested = null,
-            imageModifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(4 / 3f)
+    val boulderTopos = screenState.boulderTopos
+
+    if (boulderTopos.size <= 1) {
+        FullScreenPhotoPage(
+            photoUri = screenState.photoUri,
+            completeProblem = screenState.completeProblem,
+            isPhotoLocked = screenState.isPhotoLocked,
+            onZoomStateChanged = { isZoomed -> onDragStateChanged(!isZoomed) }
         )
 
         return
     }
 
-    val widthPx = with(LocalDensity.current) {
-        (LocalConfiguration.current.screenWidthDp * density).roundToInt()
-    }
-    val heightPx = (widthPx * 3f / 4f).roundToInt()
-
-    val uiProblem = screenState.completeProblem.toUiProblem(
-        containerWidthPx = widthPx,
-        containerHeightPx = heightPx
+    val pagerState = rememberPagerState(
+        initialPage = boulderTopos.indexOfFirst { it.topoId == screenState.topoId }.coerceAtLeast(0),
+        pageCount = { boulderTopos.size }
     )
+    var isZoomed by remember { mutableStateOf(false) }
 
-    var targetOffset by remember { mutableStateOf(Offset.Zero) }
-    val offset by animateOffsetAsState(
-        targetValue = targetOffset,
-        label = "photo_offset_animation"
-    )
-
-    var targetScaleFactor by remember { mutableFloatStateOf(1f) }
-    val scaleFactor by animateFloatAsState(
-        targetValue = targetScaleFactor,
-        label = "photo_scale_animation"
-    )
-
-    val canDragParentContainer by remember { derivedStateOf { scaleFactor == 1f } }
-
-    LaunchedEffect(key1 = canDragParentContainer) {
-        onDragStateChanged(canDragParentContainer)
+    LaunchedEffect(isZoomed) {
+        onDragStateChanged(!isZoomed)
     }
 
-    AsyncImage(
-        modifier = Modifier
-            .fillMaxWidth()
-            .offset { IntOffset(x = offset.x.roundToInt(), y = offset.y.roundToInt()) }
-            .graphicsLayer {
-                scaleX = scaleFactor
-                scaleY = scaleFactor
-            }
-            .transformable(
-                state = rememberTransformableState { zoomChange, panChange, _ ->
-                    targetScaleFactor = max(targetScaleFactor * zoomChange, 1f)
+    // a zoomed photo is panned instead of changing the page
+    HorizontalPager(
+        modifier = Modifier.fillMaxSize(),
+        state = pagerState,
+        userScrollEnabled = !isZoomed,
+        beyondViewportPageCount = 1,
+        key = { boulderTopos[it].topoId }
+    ) { page ->
+        val boulderTopo = boulderTopos[page]
 
-                    val rawOffset = targetOffset + (panChange * targetScaleFactor)
-                    val scaleDeltaX = ((widthPx * targetScaleFactor) - widthPx) / 2f
-                    val scaleDeltaY = ((heightPx * targetScaleFactor) - heightPx) / 2f
+        FullScreenPhotoPage(
+            photoUri = boulderTopo.photoUri,
+            completeProblem = screenState.completeProblem.takeIf { boulderTopo.topoId == screenState.topoId },
+            isPhotoLocked = screenState.isPhotoLocked,
+            onZoomStateChanged = { if (page == pagerState.currentPage) isZoomed = it }
+        )
+    }
+}
 
-                    targetOffset = Offset(
-                        x = rawOffset.x.coerceIn(-scaleDeltaX..scaleDeltaX),
-                        y = rawOffset.y.coerceIn(-scaleDeltaY..scaleDeltaY)
-                    )
-                }
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FullScreenPhotoPage(
+    photoUri: String,
+    completeProblem: CompleteProblem?,
+    isPhotoLocked: Boolean,
+    onZoomStateChanged: (Boolean) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isPhotoLocked) {
+            LockedPhoto(
+                painter = if (LocalInspectionMode.current) {
+                    painterResource(id = R.drawable.area_cover_1)
+                } else {
+                    rememberAsyncImagePainter(model = photoUri)
+                },
+                premiumPrice = null,
+                onPremiumRequested = null,
+                imageModifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(4 / 3f)
             )
-            .combinedClickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = {},
-                onDoubleClick = {
-                    targetScaleFactor = if (targetScaleFactor == 1f) 2.5f else 1f
-                    targetOffset = Offset.Zero
-                }
-            ),
-        model = screenState.photoUri,
-        placeholder = if (LocalInspectionMode.current) painterResource(id = R.drawable.area_cover_1) else null,
-        contentDescription = null,
-        contentScale = ContentScale.Fit
-    )
 
-    ProblemStartsLayer(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(4 / 3f)
-            .offset { IntOffset(x = offset.x.roundToInt(), y = offset.y.roundToInt()) }
-            .graphicsLayer {
-                scaleX = scaleFactor
-                scaleY = scaleFactor
-            },
-        uiProblems = listOf(uiProblem),
-        selectedProblem = uiProblem.completeProblem,
-        drawnElementsScaleFactor = 1f / scaleFactor,
-        onProblemStartClicked = {},
-        onVariantSelected = {}
-    )
+            return@Box
+        }
+
+        val widthPx = with(LocalDensity.current) {
+            (LocalConfiguration.current.screenWidthDp * density).roundToInt()
+        }
+        val heightPx = (widthPx * 3f / 4f).roundToInt()
+
+        var targetOffset by remember { mutableStateOf(Offset.Zero) }
+        val offset by animateOffsetAsState(
+            targetValue = targetOffset,
+            label = "photo_offset_animation"
+        )
+
+        var targetScaleFactor by remember { mutableFloatStateOf(1f) }
+        val scaleFactor by animateFloatAsState(
+            targetValue = targetScaleFactor,
+            label = "photo_scale_animation"
+        )
+
+        val isZoomed by remember { derivedStateOf { scaleFactor != 1f } }
+
+        LaunchedEffect(key1 = isZoomed) {
+            onZoomStateChanged(isZoomed)
+        }
+
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset { IntOffset(x = offset.x.roundToInt(), y = offset.y.roundToInt()) }
+                .graphicsLayer {
+                    scaleX = scaleFactor
+                    scaleY = scaleFactor
+                }
+                .transformable(
+                    state = rememberTransformableState { zoomChange, panChange, _ ->
+                        targetScaleFactor = max(targetScaleFactor * zoomChange, 1f)
+
+                        val rawOffset = targetOffset + (panChange * targetScaleFactor)
+                        val scaleDeltaX = ((widthPx * targetScaleFactor) - widthPx) / 2f
+                        val scaleDeltaY = ((heightPx * targetScaleFactor) - heightPx) / 2f
+
+                        targetOffset = Offset(
+                            x = rawOffset.x.coerceIn(-scaleDeltaX..scaleDeltaX),
+                            y = rawOffset.y.coerceIn(-scaleDeltaY..scaleDeltaY)
+                        )
+                    },
+                    // a single finger swipes the pages until the photo is zoomed
+                    canPan = { targetScaleFactor > 1f }
+                )
+                .combinedClickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = {},
+                    onDoubleClick = {
+                        targetScaleFactor = if (targetScaleFactor == 1f) 2.5f else 1f
+                        targetOffset = Offset.Zero
+                    }
+                ),
+            model = photoUri,
+            placeholder = if (LocalInspectionMode.current) painterResource(id = R.drawable.area_cover_1) else null,
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
+
+        completeProblem ?: return@Box
+
+        val uiProblem = completeProblem.toUiProblem(
+            containerWidthPx = widthPx,
+            containerHeightPx = heightPx
+        )
+
+        ProblemStartsLayer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(4 / 3f)
+                .offset { IntOffset(x = offset.x.roundToInt(), y = offset.y.roundToInt()) }
+                .graphicsLayer {
+                    scaleX = scaleFactor
+                    scaleY = scaleFactor
+                },
+            uiProblems = listOf(uiProblem),
+            selectedProblem = uiProblem.completeProblem,
+            drawnElementsScaleFactor = 1f / scaleFactor,
+            onProblemStartClicked = {},
+            onVariantSelected = {}
+        )
+    }
 }
 
 @Composable
