@@ -77,9 +77,10 @@ class FullScreenPhotoFragment : EdgeToEdgeBottomSheetDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
-        val shownTopo = (viewModel.screenState.value as? FullScreenPhotoViewModel.ScreenState.Content)
-            ?.shownTopo
-            ?: return
+        // also called when the dialog is recreated on a configuration change
+        if (activity?.isChangingConfigurations == true) return
+
+        val shownTopo = viewModel.getChangedTopo() ?: return
 
         val problemId = shownTopo.selectedCompleteProblem?.problemWithLine?.problem?.id ?: return
 

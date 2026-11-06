@@ -96,6 +96,20 @@ class FullScreenPhotoViewModel(
         loadTopo { aggregate(problemId) }
     }
 
+    /**
+     * The topo shown when the full screen is closed, only if it differs from
+     * the one that was shown in the problem details bottom sheet.
+     */
+    fun getChangedTopo(): Topo? {
+        val shownTopo = (_screenState.value as? ScreenState.Content)?.shownTopo ?: return null
+
+        val isUnchanged = shownTopo.topoId == topoId
+            && shownTopo.selectedCompleteProblem?.problemWithLine?.problem?.id == problemId
+            && shownTopo.isTopoMode == isTopoMode
+
+        return shownTopo.takeUnless { isUnchanged }
+    }
+
     private fun loadTopo(block: suspend () -> Topo?) {
         loadTopoJob?.cancel()
         loadTopoJob = viewModelScope.launch {
