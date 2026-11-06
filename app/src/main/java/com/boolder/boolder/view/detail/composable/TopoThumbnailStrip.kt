@@ -1,5 +1,6 @@
 package com.boolder.boolder.view.detail.composable
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -138,7 +140,7 @@ private fun TopoThumbnail(
             shape = shape
         )
         .clickable(onClick = onClick)
-        .then(if (isPhotoLocked) Modifier.blur(radius = 4.dp) else Modifier)
+        .then(if (isPhotoLocked) Modifier.lockedThumbnail() else Modifier)
 
     if (LocalInspectionMode.current) {
         Image(
@@ -156,6 +158,14 @@ private fun TopoThumbnail(
         )
     }
 }
+
+// Modifier.blur has no effect before Android 12, the photo is hidden instead
+private fun Modifier.lockedThumbnail(): Modifier =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        blur(radius = 4.dp)
+    } else {
+        drawWithContent { drawRect(color = Color.Black) }
+    }
 
 @PreviewLightDark
 @Composable
