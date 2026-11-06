@@ -73,8 +73,8 @@ internal fun TopoLayout(
                 onVariantSelected = onVariantSelected
             )
 
-            if (topo?.isTopoMode == true) {
-                TopoThumbnailStrip(
+            when {
+                topo?.isTopoMode == true -> TopoThumbnailStrip(
                     modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.surface)
                         .navigationBarsPadding(),
@@ -85,24 +85,26 @@ internal fun TopoLayout(
                     onTopoSelected = onTopoSwiped,
                     onProblemSelected = onTopoProblemSelected
                 )
-            } else topo?.selectedCompleteProblem?.let {
-                TopoFooter(
+
+                topo?.selectedCompleteProblem != null -> TopoFooter(
                     modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.surface)
                         .navigationBarsPadding(),
-                    problem = it.problemWithLine.problem,
+                    problem = topo.selectedCompleteProblem.problemWithLine.problem,
                     onBleauInfoClicked = onBleauInfoClicked,
                     onShareClicked = onShareClicked,
                     onSaveProblem = onSaveProblem,
                     onUnsaveProblem = onUnsaveProblem
                 )
-            } ?: Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(210.dp)
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .navigationBarsPadding()
-            )
+
+                else -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(210.dp)
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding()
+                )
+            }
         }
     }
 }

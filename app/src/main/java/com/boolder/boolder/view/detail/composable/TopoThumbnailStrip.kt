@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -59,8 +56,8 @@ internal fun TopoThumbnailStrip(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(140.dp)
             .padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // all the thumbnails fit in the width: they get narrower on boulders with many pictures
@@ -70,7 +67,8 @@ internal fun TopoThumbnailStrip(
                 .padding(horizontal = 16.dp)
         ) {
             val spacing = 8.dp
-            val thumbnailWidth = ((maxWidth - spacing * (boulderTopos.size - 1)) / boulderTopos.size.coerceAtLeast(1))
+            val thumbnailCount = boulderTopos.size.coerceAtLeast(1)
+            val thumbnailWidth = ((maxWidth - spacing * (thumbnailCount - 1)) / thumbnailCount)
                 .coerceIn(0.dp, 72.dp)
 
             Row(
@@ -91,8 +89,6 @@ internal fun TopoThumbnailStrip(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
         TextButton(onClick = { isProblemsListShown = true }) {
             Text(
                 text = pluralStringResource(id = R.plurals.topo_problems, count = problems.size, problems.size),
@@ -101,8 +97,7 @@ internal fun TopoThumbnailStrip(
             )
 
             Icon(
-                modifier = Modifier.rotate(180f),
-                painter = painterResource(id = R.drawable.ic_chevron_left),
+                painter = painterResource(id = R.drawable.ic_chevron_right),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

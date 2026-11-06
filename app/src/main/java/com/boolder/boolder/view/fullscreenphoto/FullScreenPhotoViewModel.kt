@@ -44,7 +44,6 @@ class FullScreenPhotoViewModel(
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
     val screenState = _screenState.asStateFlow()
 
-    // only the latest selection should end up in the screen
     private var loadTopoJob: Job? = null
 
     init {
@@ -81,7 +80,6 @@ class FullScreenPhotoViewModel(
                 )
             }
 
-            // the bottom sheet was showing the whole picture
             if (isTopoMode && topoId != null) onTopoSwiped(topoId)
         }
     }

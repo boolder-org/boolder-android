@@ -104,7 +104,6 @@ class MapViewModel(
     private var isProblemTopoShown = false
     private var isPremiumIntroChecked = false
 
-    // only the latest selection should end up in the topo
     private var fetchTopoJob: Job? = null
 
     var cameraState: CameraState? = null

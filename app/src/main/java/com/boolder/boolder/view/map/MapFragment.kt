@@ -435,7 +435,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 }
             }
 
-            showTopoModeOnMap(topo = topo, selectedProblemId = selectedProblem.id)
+            updateMapForTopoMode(topo = topo, selectedProblemId = selectedProblem.id)
         }
 
         if (nullableTopo == null) {
@@ -449,7 +449,7 @@ class MapFragment : Fragment(), BoolderMapListener {
         }
     }
 
-    private fun showTopoModeOnMap(topo: Topo, selectedProblemId: Int) {
+    private fun updateMapForTopoMode(topo: Topo, selectedProblemId: Int) {
         val topoProblems = if (topo.isTopoMode) topo.allProblems() else emptyList()
 
         mapView.highlightTopoProblems(
@@ -462,11 +462,10 @@ class MapFragment : Fragment(), BoolderMapListener {
             return
         }
 
-        // only move the map once per picture
         if (topo.topoId == lastShownTopoId) return
 
         lastShownTopoId = topo.topoId
-        mapView.showProblems(
+        mapView.moveCameraToProblems(
             coordinates = topoProblems.map {
                 Point.fromLngLat(it.longitude.toDouble(), it.latitude.toDouble())
             }

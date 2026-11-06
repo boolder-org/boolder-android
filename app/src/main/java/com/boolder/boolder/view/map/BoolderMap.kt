@@ -311,7 +311,7 @@ class BoolderMap(
     }
 
     // only pans or zooms out, when some of the problems are hidden by the bars or the bottom sheet
-    fun showProblems(coordinates: List<Point>) {
+    fun moveCameraToProblems(coordinates: List<Point>) {
         if (coordinates.isEmpty()) return
 
         val defaultInset = resources.getDefaultMargin().toDouble()

@@ -45,10 +45,12 @@ internal fun ProblemStartsLayer(
     showAllLines: Boolean = false,
     drawnElementsScaleFactor: Float = 1f
 ) {
+    val selectedProblemId = selectedProblem?.problemWithLine?.problem?.id
+
     Box(modifier = modifier) {
         if (showAllLines) {
             uiProblems
-                .filter { it.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id }
+                .filter { it.completeProblem.problemWithLine.problem.id != selectedProblemId }
                 .forEach {
                     ProblemLine(
                         line = it.completeProblem.problemWithLine.line,
@@ -65,7 +67,7 @@ internal fun ProblemStartsLayer(
                     scaleFactor = drawnElementsScaleFactor
                 )
 
-                if (uiProblem.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id) {
+                if (uiProblem.completeProblem.problemWithLine.problem.id != selectedProblemId) {
                     ProblemStartMarker(
                         uiProblem = uiProblem,
                         scaleFactor = drawnElementsScaleFactor,
@@ -94,7 +96,6 @@ internal fun ProblemStartsLayer(
                     )
                 }
 
-            // the variants are already drawn when all the lines are
             if (!showAllLines) {
                 ProblemVariantsButton(
                     modifier = Modifier.align(Alignment.TopEnd),

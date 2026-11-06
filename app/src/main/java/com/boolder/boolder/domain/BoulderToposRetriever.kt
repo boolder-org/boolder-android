@@ -1,6 +1,5 @@
 package com.boolder.boolder.domain
 
-import androidx.annotation.VisibleForTesting
 import com.boolder.boolder.data.database.entity.ProblemEntity
 import com.boolder.boolder.data.database.repository.BoulderTopoRepository
 import com.boolder.boolder.data.database.repository.LineRepository
@@ -33,8 +32,7 @@ class BoulderToposRetriever(
     }
 }
 
-@VisibleForTesting
-internal fun ProblemEntity.zIndex(): Double {
+private fun ProblemEntity.zIndex(): Double {
     val circuitBonus = if (circuitId != null) 1000.0 else 0.0
     val tiebreaker = id / 100.0
 

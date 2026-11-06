@@ -126,7 +126,6 @@ private fun TopoPhotoPager(
             }
         }
 
-        // a problem selected elsewhere (map, search, circuit) can be on another page
         LaunchedEffect(topo.topoId) {
             val selectedPage = boulderTopos.indexOfFirst { it.topoId == topo.topoId }
 
