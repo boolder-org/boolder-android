@@ -20,6 +20,7 @@ import com.boolder.boolder.domain.model.CircuitInfo
 import com.boolder.boolder.domain.model.ProblemWithLine
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
+import com.boolder.boolder.domain.model.allProblems
 import com.boolder.boolder.utils.previewgenerator.dummyCompleteProblem
 import com.boolder.boolder.view.compose.BoolderTheme
 
@@ -28,10 +29,12 @@ internal fun TopoLayout(
     topo: Topo?,
     onProblemPhotoLoaded: () -> Unit,
     onProblemStartClicked: (Int) -> Unit,
+    onTopoSwiped: (Int) -> Unit,
     onShowPhotoFullScreen: (Int, String) -> Unit,
     onPremiumRequested: () -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     onCircuitProblemSelected: (Int) -> Unit,
+    onTopoProblemSelected: (Int) -> Unit,
     onBleauInfoClicked: (String?) -> Unit,
     onShareClicked: (Int) -> Unit,
     onSaveProblem: (Int, TickStatus) -> Unit,
@@ -64,29 +67,44 @@ internal fun TopoLayout(
                 topo = topo,
                 onProblemPhotoLoaded = onProblemPhotoLoaded,
                 onProblemStartClicked = onProblemStartClicked,
+                onTopoSwiped = onTopoSwiped,
                 onShowPhotoFullScreen = onShowPhotoFullScreen,
                 onPremiumRequested = onPremiumRequested,
                 onVariantSelected = onVariantSelected
             )
 
-            topo?.selectedCompleteProblem?.let {
-                TopoFooter(
+            when {
+                topo?.isTopoMode == true -> TopoThumbnailStrip(
                     modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.surface)
                         .navigationBarsPadding(),
-                    problem = it.problemWithLine.problem,
+                    boulderTopos = topo.boulderTopos,
+                    selectedTopoId = topo.topoId,
+                    isPhotoLocked = topo.isPhotoLocked,
+                    problems = topo.allProblems().sortedBy { it.grade },
+                    onTopoSelected = onTopoSwiped,
+                    onProblemSelected = onTopoProblemSelected
+                )
+
+                topo?.selectedCompleteProblem != null -> TopoFooter(
+                    modifier = Modifier
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding(),
+                    problem = topo.selectedCompleteProblem.problemWithLine.problem,
                     onBleauInfoClicked = onBleauInfoClicked,
                     onShareClicked = onShareClicked,
                     onSaveProblem = onSaveProblem,
                     onUnsaveProblem = onUnsaveProblem
                 )
-            } ?: Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(210.dp)
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .navigationBarsPadding()
-            )
+
+                else -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(210.dp)
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding()
+                )
+            }
         }
     }
 }
@@ -110,10 +128,12 @@ private fun TopoLayoutPreview() {
             ),
             onProblemPhotoLoaded = {},
             onProblemStartClicked = {},
+            onTopoSwiped = {},
             onShowPhotoFullScreen = { _, _ -> },
             onPremiumRequested = {},
             onVariantSelected = {},
             onCircuitProblemSelected = {},
+            onTopoProblemSelected = {},
             onBleauInfoClicked = {},
             onShareClicked = {},
             onSaveProblem = { _, _ -> },

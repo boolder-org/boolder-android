@@ -10,5 +10,7 @@ data class PoiEntity(
     @ColumnInfo("poi_type") val poiType: String,
     @ColumnInfo("name") val name: String,
     @ColumnInfo("short_name") val shortName: String,
-    @ColumnInfo("google_url") val googleMapsUrl: String
+    @ColumnInfo("google_url") val googleMapsUrl: String,
+    @ColumnInfo("latitude") val latitude: Double,
+    @ColumnInfo("longitude") val longitude: Double
 )

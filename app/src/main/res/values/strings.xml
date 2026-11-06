@@ -50,6 +50,11 @@
         <item quantity="other">%d variants</item>
     </plurals>
 
+    <plurals name="topo_problems">
+        <item quantity="one">%d problem</item>
+        <item quantity="other">%d problems</item>
+    </plurals>
+
     <string name="stepness_wall">Wall</string>
     <string name="stepness_slab">Slab</string>
     <string name="stepness_overhang">Overhang</string>

@@ -28,6 +28,7 @@ import com.boolder.boolder.domain.model.GradeRange
 import com.boolder.boolder.domain.model.Problem
 import com.boolder.boolder.domain.model.Topo
 import com.boolder.boolder.domain.model.TopoOrigin
+import com.boolder.boolder.domain.model.allProblems
 import com.boolder.boolder.utils.LocationProvider
 import com.boolder.boolder.utils.MapboxStyleFactory
 import com.boolder.boolder.utils.extension.containsCameraState
@@ -39,6 +40,7 @@ import com.boolder.boolder.view.areadetails.KEY_CIRCUIT_ID
 import com.boolder.boolder.view.areadetails.KEY_PROBLEM
 import com.boolder.boolder.view.areadetails.REQUEST_KEY_AREA_DETAILS
 import com.boolder.boolder.view.compose.BoolderTheme
+import com.boolder.boolder.view.fullscreenphoto.FullScreenPhotoFragment
 import com.boolder.boolder.view.map.BoolderMap.BoolderMapListener
 import com.boolder.boolder.view.map.animator.animationEndListener
 import com.boolder.boolder.view.map.composable.MapControlsOverlay
@@ -87,6 +89,7 @@ class MapFragment : Fragment(), BoolderMapListener {
     private var pendingMapAction: (() -> Unit)? = null
     private var topInset = 0
     private var lastFlownProblemId: Int? = null
+    private var lastShownTopoId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -229,10 +232,7 @@ class MapFragment : Fragment(), BoolderMapListener {
                 is MapViewModel.Event.ShowAvailableCircuits -> showCircuitFilterBottomSheet(event)
                 is MapViewModel.Event.ShowGradeRanges -> showGradesFilterBottomSheet(event)
 
-                is MapViewModel.Event.ShowProblemPhotoFullScreen -> navigateToFullScreenProblemPhoto(
-                    problemId = event.problemId,
-                    photoUri = event.photoUri
-                )
+                is MapViewModel.Event.ShowProblemPhotoFullScreen -> navigateToFullScreenProblemPhoto(event)
 
                 is MapViewModel.Event.ShowPaywall -> navigateToPaywall()
                 is MapViewModel.Event.ShowPremiumIntro -> navigateToPremiumIntro()
@@ -295,6 +295,17 @@ class MapFragment : Fragment(), BoolderMapListener {
             val circuitId = bundle.getInt(RESULT_CIRCUIT_ID)
 
             mapViewModel.onCircuitSelected(circuitId)
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            /* requestKey = */ FullScreenPhotoFragment.REQUEST_KEY,
+            /* lifecycleOwner = */ this
+        ) { _, bundle ->
+            if (bundle.getBoolean(FullScreenPhotoFragment.RESULT_IS_TOPO_MODE)) {
+                mapViewModel.onTopoSwiped(bundle.getInt(FullScreenPhotoFragment.RESULT_TOPO_ID))
+            } else {
+                mapViewModel.onTopoProblemSelected(bundle.getInt(FullScreenPhotoFragment.RESULT_PROBLEM_ID))
+            }
         }
 
         parentFragmentManager.setFragmentResultListener(
@@ -413,19 +424,52 @@ class MapFragment : Fragment(), BoolderMapListener {
                 ?: return@let
 
             // the topo is re-emitted when the premium status or price changes: only move the map for a new problem
-            if (selectedProblem.id == lastFlownProblemId) return@let
+            if (selectedProblem.id != lastFlownProblemId) {
+                lastFlownProblemId = selectedProblem.id
 
-            lastFlownProblemId = selectedProblem.id
-            flyToProblem(problem = selectedProblem, origin = topo.origin)
+                // in topo mode, the camera follows the whole picture instead
+                if (topo.isTopoMode) {
+                    mapView.selectProblem(selectedProblem.id.toString())
+                } else {
+                    flyToProblem(problem = selectedProblem, origin = topo.origin)
+                }
+            }
+
+            updateMapForTopoMode(topo = topo, selectedProblemId = selectedProblem.id)
         }
 
         if (nullableTopo == null) {
             lastFlownProblemId = null
+            lastShownTopoId = null
+            mapView.highlightTopoProblems(featureIds = emptySet(), selectedFeatureId = null)
             bottomSheetBehavior.state = STATE_HIDDEN
         } else {
             onBackPressedCallback.isEnabled = true
             mapView.post { bottomSheetBehavior.state = STATE_EXPANDED }
         }
+    }
+
+    private fun updateMapForTopoMode(topo: Topo, selectedProblemId: Int) {
+        val topoProblems = if (topo.isTopoMode) topo.allProblems() else emptyList()
+
+        mapView.highlightTopoProblems(
+            featureIds = topoProblems.map { it.id.toString() }.toSet(),
+            selectedFeatureId = selectedProblemId.toString()
+        )
+
+        if (!topo.isTopoMode) {
+            lastShownTopoId = null
+            return
+        }
+
+        if (topo.topoId == lastShownTopoId) return
+
+        lastShownTopoId = topo.topoId
+        mapView.moveCameraToProblems(
+            coordinates = topoProblems.map {
+                Point.fromLngLat(it.longitude.toDouble(), it.latitude.toDouble())
+            }
+        )
     }
 
     private fun flyToArea(area: Area) {
@@ -511,14 +555,18 @@ class MapFragment : Fragment(), BoolderMapListener {
         navController.navigate(MapFragmentDirections.navigateToSearch())
     }
 
-    private fun navigateToFullScreenProblemPhoto(problemId: Int, photoUri: String) {
+    private fun navigateToFullScreenProblemPhoto(event: MapViewModel.Event.ShowProblemPhotoFullScreen) {
         val navController = findNavController()
 
         if (navController.currentDestination?.id != R.id.map_fragment) return
 
         val direction = MapFragmentDirections.showProblemPhotoFullScreen(
-            problemId = problemId,
-            photoUri = photoUri
+            problemId = event.problemId,
+            photoUri = event.photoUri,
+            topoId = event.topoId ?: -1,
+            topoIds = event.boulderTopos.map { it.topoId }.toIntArray(),
+            photoUris = event.boulderTopos.map { it.photoUri }.toTypedArray(),
+            isTopoMode = event.isTopoMode
         )
 
         navController.navigate(direction)

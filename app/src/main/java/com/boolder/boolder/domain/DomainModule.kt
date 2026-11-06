@@ -7,4 +7,5 @@ val domainModule = module {
     factoryOf(::TopoDataAggregator)
     factoryOf(::PhotoUriRetriever)
     factoryOf(::CircuitProblemsRetriever)
+    factoryOf(::BoulderToposRetriever)
 }

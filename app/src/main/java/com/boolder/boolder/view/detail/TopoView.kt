@@ -26,10 +26,12 @@ class TopoView(
                     topo = null,
                     onProblemPhotoLoaded = {},
                     onProblemStartClicked = {},
+                    onTopoSwiped = {},
                     onShowPhotoFullScreen = { _, _ -> },
                     onPremiumRequested = {},
                     onVariantSelected = {},
                     onCircuitProblemSelected = {},
+                    onTopoProblemSelected = {},
                     onBleauInfoClicked = {},
                     onShareClicked = {},
                     onSaveProblem = { _, _ -> },
@@ -53,12 +55,14 @@ class TopoView(
                     topo = topo,
                     onProblemPhotoLoaded = { topoCallbacks?.onProblemPhotoLoaded() },
                     onProblemStartClicked = { topoCallbacks?.onProblemStartClicked(it) },
+                    onTopoSwiped = { topoCallbacks?.onTopoSwiped(it) },
                     onShowPhotoFullScreen = { problemId, photoUri ->
                         topoCallbacks?.onShowProblemPhotoFullScreen(problemId, photoUri)
                     },
                     onPremiumRequested = { topoCallbacks?.onPremiumRequested() },
                     onVariantSelected = { topoCallbacks?.onVariantSelected(it) },
                     onCircuitProblemSelected = { topoCallbacks?.onCircuitProblemSelected(it) },
+                    onTopoProblemSelected = { topoCallbacks?.onTopoProblemSelected(it) },
                     onBleauInfoClicked = ::onBleauInfoClicked,
                     onShareClicked = ::onShareClicked,
                     onSaveProblem = { problemId, tickStatus ->
@@ -101,8 +105,10 @@ class TopoView(
     interface TopoCallbacks {
         fun onProblemPhotoLoaded()
         fun onProblemStartClicked(problemId: Int)
+        fun onTopoSwiped(topoId: Int)
         fun onVariantSelected(variant: ProblemWithLine)
         fun onCircuitProblemSelected(problemId: Int)
+        fun onTopoProblemSelected(problemId: Int)
         fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String)
         fun onPremiumRequested()
     }

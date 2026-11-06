@@ -217,6 +217,24 @@
         <argument
             android:name="photo_uri"
             app:argType="string" />
+        <argument
+            android:name="topo_id"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="topo_ids"
+            android:defaultValue="@null"
+            app:argType="integer[]"
+            app:nullable="true" />
+        <argument
+            android:name="photo_uris"
+            android:defaultValue="@null"
+            app:argType="string[]"
+            app:nullable="true" />
+        <argument
+            android:name="is_topo_mode"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </dialog>
 
     <dialog
