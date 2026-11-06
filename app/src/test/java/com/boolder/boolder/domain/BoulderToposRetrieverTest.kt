@@ -151,6 +151,22 @@ class BoulderToposRetrieverTest {
     }
 
     @Test
+    fun `getTopProblemId() should ignore a problem shown on another topo`() = runTest {
+        // Given
+        givenTopoProblems(
+            problem(1, popularity = 500),
+            problem(2, popularity = 5),
+            problemIdsOnAnotherTopo = setOf(1)
+        )
+
+        // When
+        val topProblemId = boulderToposRetriever.getTopProblemId(TOPO_ON_BOULDER)
+
+        // Then
+        assertEquals(2, topProblemId)
+    }
+
+    @Test
     fun `getTopProblemId() for a topo without problems should return null`() = runTest {
         // Given
         givenTopoProblems()
@@ -164,7 +180,8 @@ class BoulderToposRetrieverTest {
 
     private suspend fun givenTopoProblems(
         vararg problems: ProblemEntity,
-        problemIdsWithoutLine: Set<Int> = emptySet()
+        problemIdsWithoutLine: Set<Int> = emptySet(),
+        problemIdsOnAnotherTopo: Set<Int> = emptySet()
     ) {
         val lines = problems.map {
             LineEntity(
@@ -174,10 +191,15 @@ class BoulderToposRetrieverTest {
                 coordinates = if (it.id in problemIdsWithoutLine) "null" else """[{"x":0.5,"y":0.9},{"x":0.5,"y":0.1}]"""
             )
         }
-        val problemIds = problems.map { it.id }
+        val shownLines = lines.filter { it.problemId !in problemIdsOnAnotherTopo }
+        val problemIds = shownLines.map { it.problemId }
 
         whenever(lineRepository.loadAllByTopoIds(TOPO_ON_BOULDER)) doReturn lines
-        whenever(problemRepository.loadAllByIds(problemIds)) doReturn problems.toList()
+        lines.forEach {
+            val firstLine = if (it.problemId in problemIdsOnAnotherTopo) it.copy(topoId = OTHER_TOPO) else it
+            whenever(lineRepository.loadByProblemId(it.problemId)) doReturn firstLine
+        }
+        whenever(problemRepository.loadAllByIds(problemIds)) doReturn problems.filter { it.id in problemIds }
     }
 
     companion object {
@@ -185,6 +207,7 @@ class BoulderToposRetrieverTest {
         private const val TOPO_ON_BOULDER = 20
         private const val TOPO_WITHOUT_BOULDER = 50
         private const val UNKNOWN_TOPO = 99
+        private const val OTHER_TOPO = 60
 
         private fun topo(id: Int, boulderId: Int?) = TopoEntity(
             id = id,

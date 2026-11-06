@@ -20,7 +20,9 @@ class BoulderToposRetriever(
     }
 
     suspend fun getTopProblemId(topoId: Int): Int? {
+        // a problem with lines on several topos is shown on the topo of its first line only
         val lines = lineRepository.loadAllByTopoIds(topoId)
+            .filter { lineRepository.loadByProblemId(it.problemId)?.topoId == topoId }
         val problemIdsWithLine = lines.filter { it.convert().points().isNotEmpty() }.map { it.problemId }
         val problems = problemRepository.loadAllByIds(lines.map { it.problemId })
 
