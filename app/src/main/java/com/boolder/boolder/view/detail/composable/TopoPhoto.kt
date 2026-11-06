@@ -72,7 +72,8 @@ internal fun TopoPhoto(
     ) {
         topo ?: return@Box
 
-        if (topo.boulderTopos.size > 1) {
+        // a single picture also goes through the pager, so that a swipe doesn't count as a tap
+        if (topo.boulderTopos.isNotEmpty()) {
             TopoPhotoPager(
                 topo = topo,
                 onProblemPhotoLoaded = onProblemPhotoLoaded,
