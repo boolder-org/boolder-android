@@ -426,7 +426,13 @@ class MapFragment : Fragment(), BoolderMapListener {
             // the topo is re-emitted when the premium status or price changes: only move the map for a new problem
             if (selectedProblem.id != lastFlownProblemId) {
                 lastFlownProblemId = selectedProblem.id
-                flyToProblem(problem = selectedProblem, origin = topo.origin)
+
+                // in topo mode, the camera follows the whole picture instead
+                if (topo.isTopoMode) {
+                    mapView.selectProblem(selectedProblem.id.toString())
+                } else {
+                    flyToProblem(problem = selectedProblem, origin = topo.origin)
+                }
             }
 
             showTopoModeOnMap(topo = topo, selectedProblemId = selectedProblem.id)

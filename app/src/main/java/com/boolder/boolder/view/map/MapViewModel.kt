@@ -114,7 +114,7 @@ class MapViewModel(
         fetchTopoJob = viewModelScope.launch { loadTopo(problemId = problemId, origin = origin) }
     }
 
-    private suspend fun loadTopo(problemId: Int, origin: TopoOrigin) {
+    private suspend fun loadTopo(problemId: Int, origin: TopoOrigin, isTopoMode: Boolean = false) {
         val currentTopo = _topoStateFlow.value
 
         _topoStateFlow.value = topoDataAggregator.aggregate(
@@ -122,7 +122,7 @@ class MapViewModel(
             origin = origin,
             previousPhotoUri = currentTopo?.photoUri,
             previousPhotoWasProperlyLoaded = currentTopo?.canShowProblemStarts == true
-        )
+        ).copy(isTopoMode = isTopoMode)
 
         if (origin != TopoOrigin.CIRCUIT) {
             _screenStateFlow.update {
@@ -502,9 +502,7 @@ class MapViewModel(
         fetchTopoJob = viewModelScope.launch {
             val topProblemId = boulderToposRetriever.getTopProblemId(topoId) ?: return@launch
 
-            loadTopo(problemId = topProblemId, origin = TopoOrigin.TOPO)
-
-            _topoStateFlow.update { it?.copy(isTopoMode = true) }
+            loadTopo(problemId = topProblemId, origin = TopoOrigin.TOPO, isTopoMode = true)
         }
     }
 
