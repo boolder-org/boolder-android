@@ -90,6 +90,8 @@ class BoolderMap(
 
     private var previousSelectedFeatureId: String? = null
 
+    private var topoFeatureIds = emptySet<String>()
+
     private var lastCameraCheckTimestamp = 0L
 
     private var insets = Insets.NONE
@@ -288,7 +290,7 @@ class BoolderMap(
     }
 
     private fun unselectProblem() {
-        previousSelectedFeatureId?.let {
+        previousSelectedFeatureId?.takeIf { it !in topoFeatureIds }?.let {
             mapboxMap.setFeatureState(
                 sourceId = "problems",
                 sourceLayerId = BoolderMapConfig.problemsSourceLayerId,
@@ -297,6 +299,58 @@ class BoolderMap(
                 callback = {}
             )
         }
+    }
+
+    fun highlightTopoProblems(featureIds: Set<String>, selectedFeatureId: String?) {
+        (topoFeatureIds - featureIds - setOfNotNull(selectedFeatureId)).forEach {
+            setProblemSelectedState(featureId = it, isSelected = false)
+        }
+        featureIds.forEach { setProblemSelectedState(featureId = it, isSelected = true) }
+
+        topoFeatureIds = featureIds
+    }
+
+    // only pans or zooms out, when some of the problems are hidden by the bars or the bottom sheet
+    fun moveCameraToProblems(coordinates: List<Point>) {
+        if (coordinates.isEmpty()) return
+
+        val defaultInset = resources.getDefaultMargin().toDouble()
+        // same camera padding as when flying to a problem, so that the next flight doesn't shift the map
+        val cameraPadding = EdgeInsets(
+            insets.top + resources.getAreaBarHeight().toDouble(),
+            0.0,
+            resources.getTopoBottomSheetHeight().toDouble(),
+            0.0
+        )
+
+        val areAllVisible = coordinates.all {
+            val pixel = mapboxMap.pixelForCoordinate(it)
+
+            pixel.x in defaultInset..(width - defaultInset) &&
+                pixel.y in (cameraPadding.top + defaultInset)..(height - cameraPadding.bottom - defaultInset)
+        }
+
+        if (areAllVisible) return
+
+        mapboxMap.cameraForCoordinates(
+            coordinates = coordinates,
+            camera = CameraOptions.Builder().padding(cameraPadding).build(),
+            coordinatesPadding = EdgeInsets(defaultInset, defaultInset, defaultInset, defaultInset),
+            maxZoom = mapboxMap.cameraState.zoom,
+            offset = null
+        ) { cameraOptions ->
+            mapboxMap.flyTo(cameraOptions, MapAnimationOptions.mapAnimationOptions { duration(300L) })
+        }
+    }
+
+    private fun setProblemSelectedState(featureId: String, isSelected: Boolean) {
+        mapboxMap.setFeatureState(
+            sourceId = "problems",
+            sourceLayerId = BoolderMapConfig.problemsSourceLayerId,
+            featureId = featureId,
+            state = Value(hashMapOf("selected" to Value(isSelected))),
+            callback = {}
+        )
     }
 
     fun updateCircuit(circuitId: Long?) {

@@ -11,10 +11,12 @@ import com.boolder.boolder.data.premium.model.isPhotoLocked
 import com.boolder.boolder.data.premium.repository.PremiumRepository
 import com.boolder.boolder.data.userdatabase.entity.TickStatus
 import com.boolder.boolder.data.userdatabase.repository.TickedProblemRepository
+import com.boolder.boolder.domain.BoulderToposRetriever
 import com.boolder.boolder.domain.CircuitProblemsRetriever
 import com.boolder.boolder.domain.TopoDataAggregator
 import com.boolder.boolder.domain.model.ALL_GRADES
 import com.boolder.boolder.domain.model.Area
+import com.boolder.boolder.domain.model.BoulderTopo
 import com.boolder.boolder.domain.model.Circuit
 import com.boolder.boolder.domain.model.CircuitColor
 import com.boolder.boolder.domain.model.GradeRange
@@ -32,6 +34,7 @@ import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItem
 import com.boolder.boolder.view.offlinephotos.model.OfflineAreaItemStatus
 import com.boolder.boolder.view.ticklist.TickedProblemSaver
 import com.mapbox.maps.CameraState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -48,7 +51,8 @@ class MapViewModel(
     private val resources: Resources,
     private val boolderOfflineRepository: BoolderOfflineRepository,
     private val circuitProblemsRetriever: CircuitProblemsRetriever,
-    private val premiumRepository: PremiumRepository
+    private val premiumRepository: PremiumRepository,
+    private val boulderToposRetriever: BoulderToposRetriever
 ) : ViewModel(),
     OfflineAreaDownloader,
     TopoView.TopoCallbacks,
@@ -100,40 +104,45 @@ class MapViewModel(
     private var isProblemTopoShown = false
     private var isPremiumIntroChecked = false
 
+    private var fetchTopoJob: Job? = null
+
     var cameraState: CameraState? = null
 
     fun fetchTopo(problemId: Int, origin: TopoOrigin) {
-        viewModelScope.launch {
-            val currentTopo = _topoStateFlow.value
+        fetchTopoJob?.cancel()
+        fetchTopoJob = viewModelScope.launch { loadTopo(problemId = problemId, origin = origin) }
+    }
 
-            _topoStateFlow.value = topoDataAggregator.aggregate(
-                problemId = problemId,
-                origin = origin,
-                previousPhotoUri = currentTopo?.photoUri,
-                previousPhotoWasProperlyLoaded = currentTopo?.canShowProblemStarts == true
-            )
+    private suspend fun loadTopo(problemId: Int, origin: TopoOrigin, isTopoMode: Boolean = false) {
+        val currentTopo = _topoStateFlow.value
 
-            if (origin != TopoOrigin.CIRCUIT) {
-                _screenStateFlow.update {
-                    it.copy(
-                        circuitState = it.circuitState?.copy(showCircuitStartButton = false)
-                    )
-                }
+        _topoStateFlow.value = topoDataAggregator.aggregate(
+            problemId = problemId,
+            origin = origin,
+            previousPhotoUri = currentTopo?.photoUri,
+            previousPhotoWasProperlyLoaded = currentTopo?.canShowProblemStarts == true
+        ).copy(isTopoMode = isTopoMode)
 
-                return@launch
-            }
-
-            val circuit = circuitRepository.getCircuitFromProblemId(problemId) ?: return@launch
-
+        if (origin != TopoOrigin.CIRCUIT) {
             _screenStateFlow.update {
                 it.copy(
-                    circuitState = CircuitState(
-                        circuitId = circuit.id,
-                        color = circuit.color,
-                        showCircuitStartButton = false
-                    )
+                    circuitState = it.circuitState?.copy(showCircuitStartButton = false)
                 )
             }
+
+            return
+        }
+
+        val circuit = circuitRepository.getCircuitFromProblemId(problemId) ?: return
+
+        _screenStateFlow.update {
+            it.copy(
+                circuitState = CircuitState(
+                    circuitId = circuit.id,
+                    color = circuit.color,
+                    showCircuitStartButton = false
+                )
+            )
         }
     }
 
@@ -458,7 +467,8 @@ class MapViewModel(
                     selectedCompleteProblem = selectedProblem,
                     otherCompleteProblems = otherProblems,
                     circuitInfo = circuitInfo,
-                    origin = TopoOrigin.TOPO
+                    origin = TopoOrigin.TOPO,
+                    isTopoMode = false
                 )
             }
         }
@@ -480,8 +490,18 @@ class MapViewModel(
         _topoStateFlow.update {
             it?.copy(
                 selectedCompleteProblem = selectedProblem,
-                otherCompleteProblems = newCompleteProblems
+                otherCompleteProblems = newCompleteProblems,
+                isTopoMode = false
             )
+        }
+    }
+
+    override fun onTopoSwiped(topoId: Int) {
+        fetchTopoJob?.cancel()
+        fetchTopoJob = viewModelScope.launch {
+            val topProblemId = boulderToposRetriever.getTopProblemId(topoId) ?: return@launch
+
+            loadTopo(problemId = topProblemId, origin = TopoOrigin.TOPO, isTopoMode = true)
         }
     }
 
@@ -489,9 +509,23 @@ class MapViewModel(
         fetchTopo(problemId = problemId, origin = TopoOrigin.CIRCUIT)
     }
 
+    override fun onTopoProblemSelected(problemId: Int) {
+        fetchTopo(problemId = problemId, origin = TopoOrigin.TOPO)
+    }
+
     override fun onShowProblemPhotoFullScreen(problemId: Int, photoUri: String) {
         viewModelScope.launch {
-            _eventFlow.emit(Event.ShowProblemPhotoFullScreen(problemId, photoUri))
+            val topo = _topoStateFlow.value
+
+            _eventFlow.emit(
+                Event.ShowProblemPhotoFullScreen(
+                    problemId = problemId,
+                    photoUri = photoUri,
+                    topoId = topo?.topoId,
+                    boulderTopos = topo?.boulderTopos.orEmpty(),
+                    isTopoMode = topo?.isTopoMode == true
+                )
+            )
         }
     }
 
@@ -587,7 +621,10 @@ class MapViewModel(
 
         data class ShowProblemPhotoFullScreen(
             val problemId: Int,
-            val photoUri: String
+            val photoUri: String,
+            val topoId: Int?,
+            val boulderTopos: List<BoulderTopo>,
+            val isTopoMode: Boolean
         ) : Event
 
         data class ZoomOnCircuit(val circuit: Circuit) : Event

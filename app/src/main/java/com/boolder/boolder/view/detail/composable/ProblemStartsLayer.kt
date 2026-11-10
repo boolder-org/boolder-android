@@ -42,9 +42,24 @@ internal fun ProblemStartsLayer(
     onProblemStartClicked: (Int) -> Unit,
     onVariantSelected: (ProblemWithLine) -> Unit,
     modifier: Modifier = Modifier,
+    showAllLines: Boolean = false,
     drawnElementsScaleFactor: Float = 1f
 ) {
+    val selectedProblemId = selectedProblem?.problemWithLine?.problem?.id
+
     Box(modifier = modifier) {
+        if (showAllLines) {
+            uiProblems
+                .filter { it.completeProblem.problemWithLine.problem.id != selectedProblemId }
+                .forEach {
+                    ProblemLine(
+                        line = it.completeProblem.problemWithLine.line,
+                        color = it.completeProblem.problemWithLine.problem.circuitColorSafe.composeColor(),
+                        scaleFactor = drawnElementsScaleFactor
+                    )
+                }
+        }
+
         uiProblems.forEach { uiProblem ->
             uiProblem.problemStart?.let { problemStart ->
                 MarkerShadow(
@@ -52,7 +67,7 @@ internal fun ProblemStartsLayer(
                     scaleFactor = drawnElementsScaleFactor
                 )
 
-                if (uiProblem.completeProblem.problemWithLine.problem.id != selectedProblem?.problemWithLine?.problem?.id) {
+                if (uiProblem.completeProblem.problemWithLine.problem.id != selectedProblemId) {
                     ProblemStartMarker(
                         uiProblem = uiProblem,
                         scaleFactor = drawnElementsScaleFactor,
@@ -81,11 +96,13 @@ internal fun ProblemStartsLayer(
                     )
                 }
 
-            ProblemVariantsButton(
-                modifier = Modifier.align(Alignment.TopEnd),
-                variants = listOf(selectedProblem.problemWithLine) + selectedProblem.variants,
-                onVariantSelected = onVariantSelected
-            )
+            if (!showAllLines) {
+                ProblemVariantsButton(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    variants = listOf(selectedProblem.problemWithLine) + selectedProblem.variants,
+                    onVariantSelected = onVariantSelected
+                )
+            }
         }
     }
 }

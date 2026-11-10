@@ -3,6 +3,7 @@ package com.boolder.boolder.data
 import androidx.room.Room
 import com.boolder.boolder.data.database.BoolderAppDatabase
 import com.boolder.boolder.data.database.repository.AreaRepository
+import com.boolder.boolder.data.database.repository.BoulderTopoRepository
 import com.boolder.boolder.data.database.repository.CircuitRepository
 import com.boolder.boolder.data.database.repository.LineRepository
 import com.boolder.boolder.data.database.repository.ProblemRepository
@@ -24,6 +25,7 @@ val databaseModule = module {
     single { CircuitRepository(get<BoolderAppDatabase>().circuitDao()) }
     single { LineRepository(get<BoolderAppDatabase>().lineDao()) }
     single { ProblemRepository(get<BoolderAppDatabase>().problemDao()) }
+    single { BoulderTopoRepository(get<BoolderAppDatabase>().topoDao()) }
 
     single {
         Room.databaseBuilder(androidContext(), UserDatabase::class.java, "boolder_user.db")
