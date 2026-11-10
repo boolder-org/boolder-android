@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -165,7 +166,9 @@ private fun FullScreenPhotoScreenContent(
         initialPage = boulderTopos.indexOfFirst { it.topoId == screenState.topoId }.coerceAtLeast(0),
         pageCount = { boulderTopos.size }
     )
-    var isZoomed by remember { mutableStateOf(false) }
+    // a thumbnail can change the page while a photo is zoomed: the zoom is kept per page
+    val zoomedPages = remember { mutableStateMapOf<Int, Boolean>() }
+    val isZoomed = zoomedPages[pagerState.currentPage] == true
 
     LaunchedEffect(isZoomed) {
         onDragStateChanged(!isZoomed)
@@ -200,7 +203,7 @@ private fun FullScreenPhotoScreenContent(
                 showAllLines = pageTopo?.isTopoMode == true,
                 isPhotoLocked = screenState.isPhotoLocked,
                 onProblemSelected = onProblemSelected,
-                onZoomStateChanged = { if (page == pagerState.currentPage) isZoomed = it }
+                onZoomStateChanged = { zoomedPages[page] = it }
             )
         }
 

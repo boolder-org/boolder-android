@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -116,17 +115,23 @@ private fun TopoPhotoPager(
             initialPage = boulderTopos.indexOfFirst { it.topoId == topo.topoId }.coerceAtLeast(0),
             pageCount = { boulderTopos.size }
         )
-        val selectedTopoId by rememberUpdatedState(topo.topoId)
+        // compared to the last requested topo, so that swiping back cancels a topo still loading
+        var requestedTopoId by remember { mutableStateOf(topo.topoId) }
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.settledPage }.collect { page ->
                 val topoId = boulderTopos[page].topoId
 
-                if (topoId != selectedTopoId) onTopoSwiped(topoId)
+                if (topoId != requestedTopoId) {
+                    requestedTopoId = topoId
+                    onTopoSwiped(topoId)
+                }
             }
         }
 
         LaunchedEffect(topo.topoId) {
+            requestedTopoId = topo.topoId
+
             val selectedPage = boulderTopos.indexOfFirst { it.topoId == topo.topoId }
 
             if (selectedPage < 0 || selectedPage == pagerState.currentPage) return@LaunchedEffect
